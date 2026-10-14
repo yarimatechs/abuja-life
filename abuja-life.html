@@ -270,6 +270,30 @@ button.pip-row { background: none; border: 0; padding: 0; width: 100%; cursor: p
 .auth-fine { margin: 0; font-size: 12px; }
 .auth-link { background: none; border: 0; padding: 4px 0; color: var(--accent); font: inherit; font-weight: 700; font-size: 13px; cursor: pointer; justify-self: start; }
 .showpw { display: flex; gap: 8px; align-items: center; font-size: 13px; color: var(--muted); }
+.chatv { position: fixed; inset: 0; z-index: 18; background: var(--bg); display: flex; flex-direction: column; height: 100dvh; padding-top: env(safe-area-inset-top, 0px); }
+.chat-head { display: flex; align-items: center; gap: 10px; padding: 12px 14px 6px; }
+.chat-head h2 { margin: 0; font-size: 22px; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.chat-back { border: 0; background: var(--surface2); color: var(--ink); width: 40px; height: 40px; border-radius: 50%; font-size: 26px; line-height: 1; cursor: pointer; }
+.chat-actions { display: flex; gap: 8px; padding: 6px 14px 10px; border-bottom: 1px solid var(--line); }
+.cact { border: 0; border-radius: 999px; padding: 9px 16px; font: inherit; font-weight: 700; font-size: 14px; background: var(--surface2); color: var(--ink); cursor: pointer; }
+.cact.money { background: #fbefc4; color: #6b4a00; }
+.chat-msgs { flex: 1; min-height: 0; overflow-y: auto; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; }
+.chat-day { text-align: center; font-size: 12px; color: var(--muted); margin: 4px 0; }
+.chat-empty { text-align: center; margin: auto; }
+.cb { max-width: 80%; padding: 8px 12px; border-radius: 18px; font-size: 15px; line-height: 1.35; word-break: break-word; display: grid; gap: 2px; }
+.cb.me { align-self: flex-end; background: #2a6fdb; color: #fff; border-bottom-right-radius: 6px; }
+.cb.them { align-self: flex-start; background: var(--surface2); color: var(--ink); border-bottom-left-radius: 6px; }
+.cb.fail { background: var(--warn); }
+.cb-t { font-size: 11px; opacity: .7; justify-self: end; }
+.cb.sys { display: block; align-self: center; max-width: 92%; background: #fbefc4; color: #5a4300; text-align: center; font-weight: 600; font-size: 14px; }
+.cb-amt { background: #d7efd9; color: #0b6b36; padding: 1px 8px; border-radius: 999px; font-family: var(--f-mono); }
+.chat-bar { display: flex; gap: 8px; padding: 10px 14px calc(10px + env(safe-area-inset-bottom, 0px)); border-top: 1px solid var(--line); background: var(--bg); }
+.chat-bar input { flex: 1; min-width: 0; font: inherit; font-size: 16px; padding: 11px 14px; border-radius: 999px; border: 2px solid var(--line); background: var(--surface); color: var(--ink); }
+.chat-bar input:focus-visible { outline: none; border-color: var(--accent); }
+.chat-money { display: grid; gap: 10px; padding: 12px 14px; background: var(--surface); border-top: 1px solid var(--line); }
+.cm-row { display: flex; justify-content: space-between; align-items: center; }
+.chat-x { border: 0; background: var(--surface2); color: var(--ink); width: 30px; height: 30px; border-radius: 50%; cursor: pointer; }
+.cm-chips { display: flex; gap: 6px; flex-wrap: wrap; }
 .garage { display: grid; gap: 4px; }
 .garage div { display: flex; justify-content: space-between; gap: 8px; font-size: 14px; }
 .garage div span:first-child { color: var(--muted); }
@@ -3500,7 +3524,7 @@ window.G3 = (function () {
       if (dirty() && S) { showToast('Could not save your game online. Connect to the internet, then log out, so you do not lose progress.'); render(false); return; }
       const t = Auth.session && Auth.session.access_token; if (t) authFetch('/auth/v1/logout', { method: 'POST', token: t }).catch(function () {});
       clearTimeout(Auth.timer); wipeLocal(); [AK.sess, AK.guest].forEach(lsDel);
-      Auth.session = null; Auth.guest = false; Auth.tab = 'login'; Auth.status = ''; Auth.savedAt = 0; S = null; UI.tab = 'home'; UI.sheet = null; UI.phone = 'home'; UI.toast = '';
+      Auth.session = null; Auth.guest = false; Auth.tab = 'login'; Auth.status = ''; Auth.savedAt = 0; chatReset(); UI.chat = null; S = null; UI.tab = 'home'; UI.sheet = null; UI.phone = 'home'; UI.toast = '';
       if (G3.views && G3.views.home) G3.views.home.sig = ''; render();
     };
     (S && dirty() ? Promise.race([cloudPush(true), new Promise(function (r) { setTimeout(r, 6000); })]) : Promise.resolve()).then(done, done);
@@ -3559,9 +3583,213 @@ window.G3 = (function () {
       '<label class="showpw"><input type="checkbox" id="a-show"> Show password</label>';
   }
   function errLine() { return Auth.err ? '<p class="auth-err" role="alert">' + esc(Auth.err) + '</p>' : ''; }
+
+  /* ---------- chat: find players by username, message them, send them money ---------- */
+  const Chat = { uid: '', me: null, meLoaded: false, loadingMe: false, msgs: [], maxId: 0, names: {}, polling: false, last: 0, err: '', q: '', res: null, searching: false, stm: 0, nameErr: '', draft: '', amt: '' };
+  const enc = encodeURIComponent;
+  const RESERVED = ['admin', 'support', 'moderator', 'system', 'abujalife', 'abuja_life', 'staff', 'official'];
+  function chatReset() { Chat.uid = ''; Chat.me = null; Chat.meLoaded = false; Chat.loadingMe = false; Chat.msgs = []; Chat.maxId = 0; Chat.names = {}; Chat.res = null; Chat.q = ''; Chat.err = ''; Chat.polling = false; Chat.draft = ''; Chat.amt = ''; Chat.nameErr = ''; }
+  function chatOn() { return !!(Auth.session && S && !Auth.pulling && !Auth.conflict && !Auth.recovery); }
+  function chatApi(path, o) { return freshToken().then(function (tok) { return authFetch(path, Object.assign({}, o || {}, { token: tok })); }); }
+  function newCid() {
+    if (window.crypto && crypto.randomUUID) return crypto.randomUUID();
+    const hex = n => Array.from({ length: n }, () => Math.floor(Math.random() * 16).toString(16)).join('');
+    return hex(8) + '-' + hex(4) + '-4' + hex(3) + '-a' + hex(3) + '-' + hex(12);
+  }
+  const clock = iso => { const d = new Date(iso); return isNaN(d) ? '' : d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false }); };
+  const who = id => '@' + (Chat.names[id] || 'player');
+  function chatSync() { if (Auth.session && Chat.uid !== Auth.session.user.id) { chatReset(); Chat.uid = Auth.session.user.id; } }
+  function loadMe() {
+    if (!chatOn() || Chat.loadingMe) return Promise.resolve();
+    chatSync(); Chat.loadingMe = true;
+    return chatApi('/rest/v1/profiles?select=user_id,username&user_id=eq.' + enc(Chat.uid)).then(function (rows) {
+      Chat.me = rows && rows[0] || null; Chat.meLoaded = true; if (Chat.me) Chat.names[Chat.uid] = Chat.me.username;
+    }, function (e) { Chat.err = e.message; }).then(function () {
+      Chat.loadingMe = false;
+      if (UI.tab === 'phone' && (UI.phone === 'chat' || UI.phone === 'life') && !UI.chat) render(false);
+      if (Chat.me) chatPoll();
+    });
+  }
+  function createProfile(name) {
+    name = String(name || '').trim(); Chat.nameErr = '';
+    if (!/^[A-Za-z0-9_]{3,16}$/.test(name)) { Chat.nameErr = 'Use 3 to 16 letters, numbers or underscores. No spaces.'; render(false); return; }
+    if (RESERVED.indexOf(name.toLowerCase()) >= 0) { Chat.nameErr = 'That name is reserved. Pick another.'; render(false); return; }
+    chatApi('/rest/v1/profiles', { method: 'POST', prefer: 'return=representation', body: { user_id: Auth.session.user.id, username: name } }).then(function (rows) {
+      Chat.me = Array.isArray(rows) ? rows[0] : rows; Chat.names[Chat.uid] = name; Chat.meLoaded = true; render(false); chatPoll();
+    }, function (e) { Chat.nameErr = e.status === 409 || e.code === '23505' ? 'Someone already has that username. Try another.' : e.message; render(false); });
+  }
+  function doSearch() {
+    const q = Chat.q.replace(/[^A-Za-z0-9_]/g, ''); clearTimeout(Chat.stm);
+    if (q.length < 2) { Chat.res = null; Chat.searching = false; paintSearch(); return; }
+    Chat.searching = true; paintSearch();
+    Chat.stm = setTimeout(function () {
+      chatApi('/rest/v1/profiles?select=user_id,username&username=ilike.*' + enc(q) + '*&user_id=neq.' + enc(Chat.uid) + '&order=username.asc&limit=8').then(function (rows) {
+        if (q !== Chat.q.replace(/[^A-Za-z0-9_]/g, '')) return;
+        Chat.res = Array.isArray(rows) ? rows : []; Chat.res.forEach(function (r) { Chat.names[r.user_id] = r.username; }); Chat.searching = false; Chat.err = ''; paintSearch();
+      }, function (e) { Chat.searching = false; Chat.err = e.message; paintSearch(); });
+    }, 280);
+  }
+  function chatPoll() {
+    if (!chatOn() || !Chat.me || Chat.polling) return Promise.resolve();
+    Chat.polling = true; Chat.last = Date.now();
+    const first = Chat.maxId === 0 && !Chat.msgs.length;
+    const q = first ? '&order=id.desc&limit=300' : '&id=gt.' + Chat.maxId + '&order=id.asc&limit=200';
+    return chatApi('/rest/v1/dms?select=id,cid,from_id,to_id,kind,body,amount,created_at' + q).then(function (rows) {
+      rows = Array.isArray(rows) ? rows : []; if (first) rows.reverse();
+      return ingest(rows, first);
+    }).then(function () { Chat.err = ''; }, function (e) { Chat.err = e.message; }).then(function () { Chat.polling = false; });
+  }
+  function ingest(rows, first) {
+    const me = Chat.uid, added = [];
+    rows.forEach(function (r) {
+      r.id = Number(r.id); r.amount = r.amount === null || r.amount === undefined ? null : Number(r.amount);
+      if (Chat.msgs.some(function (m) { return m.id === r.id; })) return;
+      const pi = Chat.msgs.findIndex(function (m) { return m.pending && m.cid === r.cid; }); if (pi >= 0) Chat.msgs.splice(pi, 1);
+      Chat.msgs.push(r); added.push(r); if (r.id > Chat.maxId) Chat.maxId = r.id;
+    });
+    Chat.msgs.sort(function (a, b) { return (a.id || 9e15) - (b.id || 9e15); });
+    const need = []; Chat.msgs.forEach(function (m) { const o = m.from_id === me ? m.to_id : m.from_id; if (!Chat.names[o] && need.indexOf(o) < 0) need.push(o); });
+    const names = need.length ? chatApi('/rest/v1/profiles?select=user_id,username&user_id=in.(' + need.map(enc).join(',') + ')').then(function (pr) { (pr || []).forEach(function (x) { Chat.names[x.user_id] = x.username; }); }, function () {}) : Promise.resolve();
+    return names.then(function () {
+      /* money that arrived: counted once, using a counter saved with your game */
+      let gain = 0, from = [], top = 0, texts = [];
+      if (typeof S.chatSeen !== 'number') { S.chatSeen = Chat.maxId; save(); }
+      else {
+        added.forEach(function (r) {
+          if (r.id > top) top = r.id;
+          if (r.id <= S.chatSeen || r.to_id !== me) return;
+          if (r.kind === 'money' && r.amount > 0) { gain += r.amount; from.push(who(r.from_id)); } else if (!first) texts.push(r);
+        });
+        if (top > S.chatSeen) {
+          S.chatSeen = top;
+          if (gain) { S.cash += gain; log(S, from[0] + ' sent you ' + fmt(gain) + (from.length > 1 ? ' (and others)' : '') + '.'); }
+          save();
+        }
+      }
+      if (gain) showToast('<b>' + esc(from[0]) + '</b> sent you ' + fmt(gain) + ' 💸');
+      else if (texts.length && !(UI.chat && UI.chat.id === texts[texts.length - 1].from_id)) showToast('New message from <b>' + esc(who(texts[texts.length - 1].from_id)) + '</b>');
+      if (added.length || first) {
+        if (UI.chat) { paintChat(); if (gain) render(false), paintChat(true); }
+        else if (UI.tab === 'phone' && UI.phone === 'chat') paintChatList();
+        else if (UI.tab === 'phone' && UI.phone === 'home') render(false);
+        else if (gain || texts.length) render(false);
+      }
+    });
+  }
+  function chatConvs() {
+    const me = Chat.uid, by = {};
+    Chat.msgs.forEach(function (m) { const o = m.from_id === me ? m.to_id : m.from_id; (by[o] = by[o] || { id: o, msgs: [] }).msgs.push(m); });
+    const list = Object.keys(by).map(function (k) { const c = by[k]; c.last = c.msgs[c.msgs.length - 1]; c.unread = c.msgs.filter(function (m) { return m.from_id !== me && m.id > ((S.chatRead || {})[k] || 0); }).length; return c; });
+    list.sort(function (a, b) { return (b.last.id || 9e15) - (a.last.id || 9e15); });
+    return list;
+  }
+  function chatUnread() { if (!S || !Chat.me) return 0; return chatConvs().reduce(function (n, c) { return n + c.unread; }, 0); }
+  function markRead(o) {
+    let top = 0; Chat.msgs.forEach(function (m) { if (m.from_id === o && m.id > top) top = m.id; });
+    S.chatRead = S.chatRead || {}; if (top > (S.chatRead[o] || 0)) { S.chatRead[o] = top; save(); }
+  }
+  function bubble(m, me, other) {
+    const mine = m.from_id === me, t = '<span class="cb-t">' + clock(m.created_at) + '</span>';
+    if (m.kind === 'money') return '<div class="cb sys">' + (mine ? 'You sent them ' : esc(who(other)) + ' sent you ') + '<span class="cb-amt">' + fmt(m.amount) + '</span> 💸 · ' + clock(m.created_at) + '</div>';
+    return '<div class="cb ' + (mine ? 'me' : 'them') + (m.failed ? ' fail' : '') + '"><span>' + esc(m.body || '') + '</span>' + (m.failed ? '<span class="cb-t">Not sent</span>' : t) + '</div>';
+  }
+  function chatMsgsHtml() {
+    const o = UI.chat.id, me = Chat.uid, list = Chat.msgs.filter(function (m) { return (m.from_id === o && m.to_id === me) || (m.from_id === me && m.to_id === o); });
+    if (!list.length) return '<p class="muted chat-empty">No messages yet. Say hello to ' + esc(who(o)) + '.</p>';
+    return '<div class="chat-day">Today</div>' + list.map(function (m) { return bubble(m, me, o); }).join('');
+  }
+  function paintChat(force) {
+    const el = document.getElementById('chat-msgs'); if (!el || !UI.chat) return;
+    const near = el.scrollHeight - el.scrollTop - el.clientHeight < 90;
+    el.innerHTML = chatMsgsHtml(); if (near || force) el.scrollTop = el.scrollHeight;
+    markRead(UI.chat.id);
+  }
+  function searchHtml() {
+    if (Chat.searching) return '<p class="muted">Searching…</p>';
+    if (Chat.res === null) return Chat.err ? '<p class="auth-err">' + esc(Chat.err) + '</p>' : '';
+    if (!Chat.res.length) return '<p class="muted">No player with that name. Check the spelling.</p>';
+    return '<div class="list">' + Chat.res.map(function (r) { return '<button class="row" data-act="chatopen" data-id="' + esc(r.user_id) + '" data-n="' + esc(r.username) + '"><span class="row-main"><span class="row-title">@' + esc(r.username) + '</span><span class="row-desc">Tap to chat or send money</span></span><span class="row-chips"><span class="chip">Chat</span></span></button>'; }).join('') + '</div>';
+  }
+  function paintSearch() { const el = document.getElementById('c-results'); if (el) el.innerHTML = searchHtml(); }
+  function chatListHtml() {
+    const cs = chatConvs();
+    if (!cs.length) return '<p class="muted">No chats yet. Search for a friend’s username above to start one.</p>';
+    return cs.map(function (c) {
+      const l = c.last, pre = l.kind === 'money' ? (l.from_id === Chat.uid ? 'You sent ' : 'They sent you ') + fmt(l.amount) : (l.from_id === Chat.uid ? 'You: ' : '') + (l.body || '');
+      return '<button class="row" data-act="chatopen" data-id="' + esc(c.id) + '" data-n="' + esc(Chat.names[c.id] || 'player') + '"><span class="row-main"><span class="row-title">' + esc(who(c.id)) + '</span><span class="row-desc">' + esc(pre.slice(0, 60)) + '</span></span><span class="row-chips">' + (c.unread ? '<span class="chip money">' + c.unread + ' new</span>' : '') + '<span class="chip">' + clock(l.created_at) + '</span></span></button>';
+    }).join('');
+  }
+  function paintChatList() { const el = document.getElementById('c-list'); if (el) el.innerHTML = chatListHtml(); }
+  function renderChatApp() {
+    let h = '<h2>Chat</h2>';
+    if (!Auth.session) return h + '<div class="card"><p class="muted">Chat and sending money to friends need an account, so players can find you by username.</p><button class="btn" data-act="aopen" type="button">Create account or log in</button></div>';
+    chatSync();
+    if (!Chat.meLoaded) { if (!Chat.loadingMe) setTimeout(loadMe, 0); return h + (Chat.err ? '<p class="auth-err">' + esc(Chat.err) + '</p>' : '<p class="muted">Loading…</p>'); }
+    if (!Chat.me) {
+      return h + '<div class="card"><h3>Pick your username</h3><p class="muted">Friends find you by this name. It cannot be changed later.</p><form class="authf" data-chatname novalidate><label class="namef"><span class="lab">Username</span><input type="text" id="c-name" maxlength="16" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="e.g. abdul_k"></label>' +
+        (Chat.nameErr ? '<p class="auth-err" role="alert">' + esc(Chat.nameErr) + '</p>' : '') + '<button class="btn" type="submit">Save username</button></form></div>';
+    }
+    chatPoll();
+    return h + '<p class="muted">You are <b>@' + esc(Chat.me.username) + '</b>. Tell your friends to search for you.</p>' +
+      '<label class="namef"><span class="lab">Find a player</span><input type="search" id="c-search" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="Search by username" value="' + esc(Chat.q) + '"></label><div id="c-results">' + searchHtml() + '</div>' +
+      '<h3>Chats</h3><div class="list" id="c-list">' + chatListHtml() + '</div>';
+  }
+  function renderChatView() {
+    const c = UI.chat, mon = UI.chatMoney;
+    let h = '<div class="chatv" role="dialog" aria-modal="true" aria-label="Chat with ' + esc(c.name) + '"><div class="chat-head"><button class="chat-back" data-act="chatclose" type="button" aria-label="Back">‹</button><h2>@' + esc(c.name) + '</h2></div>' +
+      '<div class="chat-actions"><button class="cact money" data-act="chatsend" type="button">💸 Send money</button></div>' +
+      '<div class="chat-msgs" id="chat-msgs">' + chatMsgsHtml() + '</div>';
+    if (mon) {
+      h += '<form class="chat-money" data-chatmoney novalidate><div class="cm-row"><b>Send money to @' + esc(c.name) + '</b><button class="chat-x" data-act="chatsend" type="button" aria-label="Close">✕</button></div>' +
+        '<label class="namef"><span class="lab">Amount (you have ' + fmt(S.cash) + ')</span><input type="text" id="c-amt" inputmode="numeric" autocomplete="off" placeholder="₦0" value="' + esc(Chat.amt) + '"></label>' +
+        '<div class="cm-chips">' + [1000, 10000, 100000, 1000000].map(function (n) { return '<button type="button" class="chip-btn" data-act="camt" data-id="' + n + '">' + fmt(n) + '</button>'; }).join('') + '</div>' +
+        '<p class="auth-err" id="c-amt-err" role="alert" hidden></p><button class="btn" type="submit" id="c-amt-btn">Send</button></form>';
+    }
+    h += '<form class="chat-bar" data-chatform novalidate><input type="text" id="chat-input" maxlength="500" autocomplete="off" placeholder="Message @' + esc(c.name) + '…" value="' + esc(Chat.draft) + '"><button class="btn" type="submit" aria-label="Send message">Send</button></form></div>';
+    return h;
+  }
+  function sendText(body) {
+    body = String(body || '').trim().slice(0, 500); const to = UI.chat && UI.chat.id; if (!body || !to || !Chat.me) return;
+    const m = { id: 0, pending: true, cid: newCid(), from_id: Chat.uid, to_id: to, kind: 'text', body: body, amount: null, created_at: new Date().toISOString() };
+    Chat.msgs.push(m); Chat.draft = ''; paintChat(true);
+    post(m, 2).then(function () { chatPoll(); }, function (e) { m.failed = true; paintChat(); showToast(e.message); });
+  }
+  /* sending retries with the same message id, so a lost reply can never send it twice */
+  function post(m, tries) {
+    return chatApi('/rest/v1/dms', { method: 'POST', prefer: 'return=minimal', body: { cid: m.cid, from_id: m.from_id, to_id: m.to_id, kind: m.kind, body: m.kind === 'text' ? m.body : null, amount: m.amount } }).catch(function (e) {
+      if (e.status === 409) return null;
+      if (e.status && e.status < 500) throw e;
+      if (tries > 0) return new Promise(function (r) { setTimeout(r, 1500); }).then(function () { return post(m, tries - 1); });
+      throw e;
+    });
+  }
+  function sendMoney() {
+    const el = document.getElementById('c-amt'), err = document.getElementById('c-amt-err'), to = UI.chat && UI.chat.id;
+    const amt = parseInt(String((el && el.value) || '').replace(/[^0-9]/g, ''), 10), bad = function (t) { if (err) { err.textContent = t; err.hidden = false; } };
+    if (!amt || amt < 1) return bad('Type how much to send.');
+    if (amt > S.cash) return bad('You only have ' + fmt(S.cash) + '.');
+    if (amt > 1000000000000) return bad('That is too much to send at once.');
+    if (!to || !Chat.me) return;
+    S.cash -= amt; log(S, 'You sent ' + who(to) + ' ' + fmt(amt) + '.'); save();
+    const m = { id: 0, pending: true, cid: newCid(), from_id: Chat.uid, to_id: to, kind: 'money', body: null, amount: amt, created_at: new Date().toISOString() };
+    Chat.msgs.push(m); UI.chatMoney = false; Chat.amt = ''; render(false); paintChat(true);
+    post(m, 3).then(function () { chatPoll(); }, function (e) {
+      S.cash += amt; log(S, 'Your ' + fmt(amt) + ' to ' + who(to) + ' did not go through and was returned.'); save();
+      const i = Chat.msgs.indexOf(m); if (i >= 0) Chat.msgs.splice(i, 1); paintChat(); showToast('Money not sent: ' + e.message + ' You were not charged.'); render(false); paintChat();
+    });
+  }
+  setInterval(function () {
+    if (document.hidden || !chatOn()) return;
+    chatSync();
+    if (!Chat.meLoaded) { if (!Chat.loadingMe) loadMe(); return; }
+    if (!Chat.me) return;
+    const fast = UI.chat || (UI.tab === 'phone' && UI.phone === 'chat');
+    if (Date.now() - Chat.last >= (fast ? 3800 : 24000)) chatPoll();
+  }, 4000);
+
   function accountCard() {
     if (Auth.session) {
-      return '<div class="card"><h3>Account</h3><div class="kv"><div><span>Signed in as</span><span class="num" style="word-break:break-all">' + esc(Auth.session.user.email) + '</span></div><div><span>Online save</span><span id="cloud-stat">' + statusText() + '</span></div></div>' +
+      return '<div class="card"><h3>Account</h3><div class="kv"><div><span>Signed in as</span><span class="num" style="word-break:break-all">' + esc(Auth.session.user.email) + '</span></div><div><span>Username</span><span>' + (Chat.me ? '@' + esc(Chat.me.username) : '<button class="auth-link" data-act="phone" data-id="chat" type="button">Pick one in Chat</button>') + '</span></div><div><span>Online save</span><span id="cloud-stat">' + statusText() + '</span></div></div>' +
         '<div style="margin-top:8px"><button class="btn ghost" data-act="alogout" type="button">Log out</button></div></div>';
     }
     return '<div class="card"><h3>Account</h3><p class="muted">You are playing as a guest, so your game only lives on this phone. Create an account to save it online and play on any phone.</p><button class="btn" data-act="aopen" type="button">Create account or log in</button></div>';
@@ -3588,6 +3816,7 @@ window.G3 = (function () {
     ['shops', 'Shops', '🛍️', 'linear-gradient(145deg,#fda4af,#f97316)'],
     ['houses', 'Houses', '🔑', 'linear-gradient(145deg,#fdba74,#c2410c)'],
     ['cars', 'Cars', '🚗', 'linear-gradient(145deg,#38bdf8,#1d4ed8)'],
+    ['chat', 'Chat', '💭', 'linear-gradient(145deg,#4ade80,#0d9488)'],
     ['boutique', 'Boutique', '👗', 'linear-gradient(145deg,#f9a8d4,#be185d)'],
     ['health', 'Health', '💊', 'linear-gradient(145deg,#fb7185,#be123c)'],
     ['forbes', 'Forbes', '👑', 'linear-gradient(145deg,#14532d,#052e16)'],
@@ -3596,6 +3825,7 @@ window.G3 = (function () {
   ];
   function appBadge(id) {
     if (id === 'log') return Math.min(9, unreadCount(S));
+    if (id === 'chat') return Math.min(9, chatUnread());
     if (id === 'japa' && (S.japa.status === 'approved' || S.japa.status === 'denied')) return 1;
     if (id === 'health' && S.sick) return 1;
     if (id === 'police' && S.unreported > 0) return 1;
@@ -3765,7 +3995,7 @@ window.G3 = (function () {
       '<div class="card"><h3>The goal</h3><p class="muted">Save money, pass IELTS, choose a visa route, avoid fake agents, then japa. Or stay and build a life here. Both are real endings.</p></div>';
   }
   const PHONE_SCREENS = { jobs: () => renderJobs(), log: () => renderMessages(), japa: () => renderJapa(), life: () => renderLife(), bank: () => renderBank(), courses: () => renderCourses(),
-    help: () => renderHelp(), houses: () => renderHouses(), cars: () => renderCars(), boutique: () => renderBoutique(), health: () => renderHealth(), chow: () => renderChow(), shops: () => renderShops(),
+    help: () => renderHelp(), houses: () => renderHouses(), cars: () => renderCars(), chat: () => renderChatApp(), boutique: () => renderBoutique(), health: () => renderHealth(), chow: () => renderChow(), shops: () => renderShops(),
     forbes: () => renderForbes(), police: () => renderPolice(), ride: () => renderRide() };
   function renderPhone() {
     const f = PHONE_SCREENS[UI.phone];
@@ -4035,6 +4265,7 @@ window.G3 = (function () {
     }
     if (UI.sheet) h += renderSheet(UI.sheet);
     h += renderNav();
+    if (UI.chat) h += renderChatView();
     if (S.over) h += renderOver(); else if (S.event) h += renderEvent();
     app.innerHTML = h;
     if (resync !== false) sync3d();
@@ -4176,6 +4407,10 @@ window.G3 = (function () {
       try { navigator.clipboard.writeText(txt).then(() => { UI.copied = true; render(false); }, fail); } catch (err) { fail(); }
       return;
     }
+    if (act === 'chatopen') { UI.chat = { id: id, name: el.dataset.n || (Chat.names[id] || 'player') }; Chat.names[id] = UI.chat.name; UI.chatMoney = false; Chat.draft = ''; render(false); paintChat(true); const ci = document.getElementById('chat-input'); if (ci) ci.focus(); return; }
+    if (act === 'chatclose') { UI.chat = null; UI.chatMoney = false; render(); return; }
+    if (act === 'chatsend') { UI.chatMoney = !UI.chatMoney; render(false); paintChat(true); const ca = document.getElementById('c-amt'); if (ca) ca.focus(); return; }
+    if (act === 'camt') { const ca = document.getElementById('c-amt'); if (ca) { ca.value = parseInt(id, 10).toLocaleString('en-US'); Chat.amt = ca.value; } return; }
     if (act === 'newlife') { UI.confirmNew = true; render(); return; }
     if (act === 'retry3d') {
       if (window.G3 && window.THREE) { G3.ok = true; threeOk = G3.init(document.getElementById('c3d')); if (threeOk) bind3d(); }
@@ -4184,11 +4419,20 @@ window.G3 = (function () {
     if (act === 'newlife-no') { UI.confirmNew = false; render(); return; }
     if (act === 'newlife-yes') { S = null; UI.confirmNew = false; UI.tab = 'home'; UI.sheet = null; try { localStorage.removeItem(KEY); } catch (err) {} cloudWipe(); G3.views.home && (G3.views.home.sig = ''); render(); return; }
   });
-  document.addEventListener('submit', function (e) { if (e.target && e.target.matches && e.target.matches('[data-auth]')) { e.preventDefault(); submitAuth(); } });
+  document.addEventListener('submit', function (e) {
+    const t = e.target; if (!t || !t.matches) return;
+    if (t.matches('[data-auth]')) { e.preventDefault(); submitAuth(); }
+    else if (t.matches('[data-chatname]')) { e.preventDefault(); createProfile((document.getElementById('c-name') || {}).value); }
+    else if (t.matches('[data-chatform]')) { e.preventDefault(); const i = document.getElementById('chat-input'); if (i) { sendText(i.value); i.value = ''; i.focus(); } }
+    else if (t.matches('[data-chatmoney]')) { e.preventDefault(); sendMoney(); }
+  });
   document.addEventListener('change', function (e) { if (e.target && e.target.id === 'a-show') { const pw = document.getElementById('a-pass'); if (pw) pw.type = e.target.checked ? 'text' : 'password'; } });
   document.addEventListener('input', function (e) {
     if (e.target && e.target.id === 'a-email') { Auth.email = e.target.value; return; }
     if (e.target && e.target.id === 'a-pass') { Auth.pass = e.target.value; return; }
+    if (e.target && e.target.id === 'c-search') { Chat.q = e.target.value; doSearch(); return; }
+    if (e.target && e.target.id === 'chat-input') { Chat.draft = e.target.value; return; }
+    if (e.target && e.target.id === 'c-amt') { const d = e.target.value.replace(/[^0-9]/g, ''); e.target.value = d ? parseInt(d, 10).toLocaleString('en-US') : ''; Chat.amt = e.target.value; const er = document.getElementById('c-amt-err'); if (er) er.hidden = true; return; }
     if (!e.target || e.target.id !== 'pname') return;
     const v = e.target.value.slice(0, 16);
     if (S) { S.name = v; save(); } else { UI.name = v; saveLook(); }
