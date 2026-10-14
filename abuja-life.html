@@ -72,7 +72,7 @@ p { margin: 0; }
 .bar i { display: block; height: 100%; background: var(--accent); border-radius: 4px; }
 .bar.low i { background: var(--warn); }
 .goal { pointer-events: auto; background: var(--accent); color: var(--accent-ink); border-radius: 10px; padding: 5px 10px; font-size: 12.5px; font-weight: 700; justify-self: start; max-width: 100%; }
-.toast { position: fixed; z-index: 7; left: 12px; right: 12px; top: calc(140px + env(safe-area-inset-top, 0px)); max-width: 536px; margin-inline: auto; background: var(--glass); border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; font-size: 14px; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); box-shadow: 0 4px 14px rgba(0, 0, 0, .22); }
+.toast { position: fixed; z-index: 7; left: 12px; right: 12px; top: calc(166px + env(safe-area-inset-top, 0px)); max-width: 536px; margin-inline: auto; background: var(--glass); border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; font-size: 14px; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); box-shadow: 0 4px 14px rgba(0, 0, 0, .22); }
 
 /* bottom: dock above the tab bar */
 .nav { position: fixed; left: 0; right: 0; bottom: 0; z-index: 6; background: var(--surface); border-top: 1px solid var(--line); padding: 6px 8px calc(6px + env(safe-area-inset-bottom, 0px)); }
@@ -87,7 +87,7 @@ p { margin: 0; }
 .dock-btns .btn { flex: 1 1 auto; }
 
 /* full pages (Buy, Phone) */
-.page { position: fixed; inset: 0; z-index: 4; overflow-y: auto; background: var(--bg); padding: calc(150px + env(safe-area-inset-top, 0px)) 16px calc(var(--nav-h) + 28px + env(safe-area-inset-bottom, 0px)); display: grid; gap: 14px; align-content: start; }
+.page { position: fixed; inset: 0; z-index: 4; overflow-y: auto; background: var(--bg); padding: calc(172px + env(safe-area-inset-top, 0px)) 16px calc(var(--nav-h) + 28px + env(safe-area-inset-bottom, 0px)); display: grid; gap: 14px; align-content: start; }
 .page > * { width: 100%; max-width: 560px; margin-inline: auto; min-width: 0; }
 .page.nogl { z-index: 3; }
 .seg { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; background: var(--surface2); padding: 4px; border-radius: 12px; }
@@ -192,6 +192,96 @@ p { margin: 0; }
 
 </script>
 <style>
+.jb { background: var(--surface2); border-radius: 26px; padding: 16px 16px 14px; display: grid; gap: 10px; border: 2px solid transparent; }
+.jb.mine { border-color: var(--accent); background: var(--good-bg); }
+.jb-top { display: flex; align-items: center; gap: 12px; }
+.jb-ic { flex: 0 0 52px; width: 52px; height: 52px; border-radius: 50%; background: #fff; display: grid; place-items: center; font-size: 28px; box-shadow: 0 1px 4px rgba(0, 0, 0, .12); }
+.jb-t { display: grid; flex: 1; min-width: 0; line-height: 1.2; }
+.jb-t b { font-size: 19px; }
+.jb-t span { color: var(--muted); font-size: 14px; }
+.jb-pay { display: grid; text-align: right; line-height: 1.2; }
+.jb-pay b { color: var(--accent); font-size: 19px; font-family: var(--f-mono); }
+.jb-pay span { color: var(--muted); font-size: 12px; }
+.jb-d { margin: 0; font-size: 14px; }
+.jb-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.jb-tags span { font-size: 12px; font-weight: 700; color: var(--muted); background: var(--surface); padding: 5px 10px; border-radius: 999px; }
+.jb-reqs { display: flex; flex-wrap: wrap; gap: 6px; }
+.jr { font-size: 12px; font-weight: 700; padding: 4px 10px; border-radius: 999px; }
+.jr.ok { background: var(--good-bg); color: var(--accent); }
+.jr.no { background: var(--warn-bg); color: var(--warn); }
+.jb-btn { border: 0; border-radius: 999px; padding: 14px; font: inherit; font-weight: 800; font-size: 16px; background: var(--accent); color: var(--accent-ink); cursor: pointer; }
+.jb-btn:disabled { background: var(--surface); color: var(--muted); cursor: default; }
+.jb-btn.quit { background: var(--warn-bg); color: var(--warn); }
+.jb-note { margin: 0; font-size: 13px; color: var(--muted); text-align: center; }
+</style>
+<style>
+.stat-chips { display: flex; flex-wrap: wrap; gap: 6px; min-width: 0; }
+.pill.stat { font-size: 12px; font-weight: 700; padding: 5px 10px; white-space: nowrap; }
+.pill.stat.warn { color: var(--warn); }
+.pip-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 11px; color: var(--muted); font-weight: 700; letter-spacing: .04em; text-transform: uppercase; }
+.pip-dots { display: inline-flex; gap: 5px; }
+.pip-dots i { width: 10px; height: 10px; border-radius: 50%; border: 2px solid var(--muted); box-sizing: border-box; }
+.pip-dots i.on { background: var(--accent); border-color: var(--accent); }
+.dock-in.away { display: flex; align-items: center; justify-content: space-between; gap: 10px; font-size: 13px; padding: 10px 12px; }
+.dock-in.away .btn { flex: 0 0 auto; }
+</style>
+<style>
+.catalog { position: fixed; left: 0; right: 0; z-index: 5; bottom: calc(var(--nav-h) + env(safe-area-inset-bottom, 0px)); background: var(--surface); border-radius: 24px 24px 0 0; box-shadow: 0 -8px 28px rgba(0, 0, 0, .22); padding: 14px 14px 12px; max-height: 46vh; display: flex; flex-direction: column; gap: 10px; }
+.catalog.min { padding-bottom: 10px; }
+.cat-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.cat-head h2 { margin: 0; font-size: 22px; }
+.chip-btn { border: 0; background: var(--surface2); color: var(--muted); font: inherit; font-weight: 700; font-size: 13px; padding: 7px 14px; border-radius: 999px; cursor: pointer; }
+.cat-tabs { flex: 0 0 auto; display: flex; gap: 8px; overflow-x: auto; padding-bottom: 2px; scrollbar-width: none; }
+.cat-tabs::-webkit-scrollbar { display: none; }
+.cat-tab { flex: 0 0 auto; border: 0; background: var(--surface2); color: var(--ink); font: inherit; font-weight: 700; font-size: 14px; padding: 9px 14px; border-radius: 999px; cursor: pointer; display: inline-flex; gap: 6px; align-items: center; }
+.cat-tab.on { background: var(--ink); color: var(--surface); }
+.cat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; overflow-y: auto; min-height: 0; padding: 2px 1px 4px; align-content: start; }
+.bc { position: relative; display: flex; flex-direction: column; align-items: stretch; gap: 4px; text-align: left; border: 2px solid transparent; background: var(--surface2); color: var(--ink); font: inherit; border-radius: 20px; padding: 8px 9px 10px; cursor: pointer; }
+.bc.sel { border-color: var(--accent); background: var(--good-bg); }
+.bc.own { opacity: .65; }
+.bq-grid .bc.own { opacity: 1; }
+.bc-top { display: flex; justify-content: space-between; font-size: 11px; font-weight: 700; color: var(--muted); }
+.bc-stars { color: #d9a21b; letter-spacing: -1px; } .bc-stars i, .bc-stars u { font-style: normal; text-decoration: none; } .bc-stars u { color: var(--line); }
+.bc-img { display: grid; place-items: center; height: 76px; }
+.bc-img img { max-width: 100%; max-height: 76px; object-fit: contain; }
+.bc-emoji { font-size: 40px; }
+.bc-name { font-size: 13px; line-height: 1.2; min-height: 2.4em; }
+.bc-price { font-family: var(--f-mono); font-weight: 700; font-size: 13px; color: var(--accent); }
+.bc-price.no { color: var(--muted); }
+.cat-buy { display: flex; align-items: center; gap: 10px; justify-content: space-between; border-top: 1px solid var(--line); padding-top: 10px; }
+.cb-text { display: grid; gap: 2px; min-width: 0; font-size: 13px; }
+.cb-text span { color: var(--muted); }
+.cat-buy .btn { flex: 0 0 auto; }
+.cat-hint { margin: 0; font-size: 13px; color: var(--muted); }
+button.pip-row { background: none; border: 0; padding: 0; width: 100%; cursor: pointer; font-family: inherit; text-align: left; }
+.pip-row .qm { display: inline-grid; place-items: center; width: 14px; height: 14px; border-radius: 50%; border: 1.5px solid var(--muted); font-size: 9px; margin-left: 5px; letter-spacing: 0; }
+.bc-img .bq-svg { width: 100%; height: 76px; display: block; }
+.bq-top { position: sticky; top: -6px; z-index: 3; background: var(--bg); padding: 2px 0 10px; }
+.bq-top .bq-stage { margin-bottom: 10px; }
+.bq-stage { display: grid; grid-template-columns: 96px 1fr; gap: 14px; align-items: center; background: var(--surface2); border: 1px solid var(--line); border-radius: 22px; padding: 10px 14px; margin-bottom: 12px; }
+.bq-pic .look-svg { max-height: 130px; }
+.bq-txt { display: grid; gap: 6px; min-width: 0; }
+.bq-txt b { font-size: 16px; }
+.bq-txt span.muted { font-size: 13px; }
+.cat-grid.bq-grid { overflow: visible; flex: 0 0 auto; min-height: auto; }
+.authf { display: grid; gap: 10px; }
+.auth-err { margin: 0; color: var(--warn); background: var(--warn-bg); border-radius: 10px; padding: 8px 10px; font-size: 13px; font-weight: 600; }
+.auth-info { margin: 0; color: var(--ink); background: var(--good-bg); border-radius: 10px; padding: 8px 10px; font-size: 13px; }
+.auth-fine { margin: 0; font-size: 12px; }
+.auth-link { background: none; border: 0; padding: 4px 0; color: var(--accent); font: inherit; font-weight: 700; font-size: 13px; cursor: pointer; justify-self: start; }
+.showpw { display: flex; gap: 8px; align-items: center; font-size: 13px; color: var(--muted); }
+.garage { display: grid; gap: 4px; }
+.garage div { display: flex; justify-content: space-between; gap: 8px; font-size: 14px; }
+.garage div span:first-child { color: var(--muted); }
+</style>
+<style>
+.lm { position: absolute; left: 0; top: 0; pointer-events: auto; display: flex; align-items: center; gap: 2px; background: var(--glass); border: 1px solid var(--line); border-radius: 999px; padding: 2px; box-shadow: 0 2px 6px rgba(0, 0, 0, .25); color: var(--ink); font: inherit; cursor: pointer; white-space: nowrap; line-height: 1; }
+.lm-i { font-size: 17px; width: 27px; height: 27px; display: grid; place-items: center; }
+.lm-n { font-size: 12px; font-weight: 700; padding: 0 9px 0 3px; }
+.far .lm-n { display: none; }
+.far .lm { padding: 0; }
+</style>
+<style>
 .phone{width:min(100%,340px);margin-inline:auto;background:#12121a;border-radius:44px;padding:10px;box-shadow:0 10px 30px rgba(0,0,0,.35)}
 .phone-screen{position:relative;border-radius:36px;overflow:hidden;min-height:540px;padding:16px 18px 20px;color:#fff;background:linear-gradient(170deg,#3b3ac2 0%,#7c3aed 38%,#f97316 78%,#fbbf24 100%)}
 .ph-status{display:flex;justify-content:space-between;align-items:center;font-size:12.5px;font-weight:700}
@@ -215,18 +305,22 @@ const EDU = ['SSCE', 'OND', 'BSc', 'MSc'];
 /* how your person can look: everything is an index into these lists, so saves stay small */
 const LOOK = {
   skins: ['#e3b98f', '#c98f5e', '#a96c41', '#8a5232', '#6b4430', '#4a2c20'],
-  hairs: [['low', 'Low cut'], ['afro', 'Afro'], ['braids', 'Braids'], ['bald', 'Bald'], ['gele', 'Gele']],
-  outfits: [['tee', 'T-shirt'], ['kaftan', 'Kaftan'], ['dress', 'Dress']],
-  colors: ['#3b6ea5', '#0b7a43', '#d9a21b', '#b5382f', '#f2efe6', '#7a4fa3', '#2b2f3a', '#e07aa0']
+  /* [id, name, price]: price 0 means you start with it, anything else is sold in the Boutique app */
+  hairs: [['low', 'Low cut', 0], ['afro', 'Afro', 0], ['braids', 'Braids', 0], ['bald', 'Bald', 0], ['gele', 'Gele', 0],
+    ['fade', 'High-top fade', 6000], ['cornrow', 'Cornrows', 8000], ['bun', 'Top bun', 7000], ['puff', 'Puffs', 9000], ['twist', 'Twists', 18000], ['dread', 'Dreadlocks', 25000], ['bob', 'Sleek bob wig', 35000]],
+  outfits: [['tee', 'T-shirt', 0], ['kaftan', 'Kaftan', 0], ['dress', 'Dress', 0],
+    ['hoodie', 'Hoodie', 12000], ['jersey', 'Super Eagles jersey', 15000], ['jacket', 'Denim jacket', 22000], ['ankara', 'Ankara gown', 40000], ['suit', 'Business suit', 85000], ['agbada', 'Agbada', 120000]],
+  accs: [['none', 'Nothing', 0], ['cap', 'Cap', 5000], ['glasses', 'Sunglasses', 8000], ['chain', 'Gold chain', 60000]],
+  colors: ['#3b6ea5', '#0b7a43', '#d9a21b', '#b5382f', '#f2efe6', '#7a4fa3', '#2b2f3a', '#e07aa0', '#e8743b', '#14a3a3', '#8a1c2b', '#9ca3af']
 };
 const BG_COLOR = { graduate: 0, ssce: 6, hustler: 2, uncle: 4 };
-function defaultLook(bgId) { return { skin: 4, hair: 0, outfit: 0, color: BG_COLOR[bgId] === undefined ? 0 : BG_COLOR[bgId] }; }
+function defaultLook(bgId) { return { skin: 4, hair: 0, outfit: 0, acc: 0, color: BG_COLOR[bgId] === undefined ? 0 : BG_COLOR[bgId] }; }
 function cleanLook(l, bgId) {
   const d = defaultLook(bgId), o = {};
-  for (const k in d) { const n = l && Number.isInteger(l[k]) ? l[k] : d[k]; const max = { skin: LOOK.skins, hair: LOOK.hairs, outfit: LOOK.outfits, color: LOOK.colors }[k].length; o[k] = n >= 0 && n < max ? n : d[k]; }
+  for (const k in d) { const n = l && Number.isInteger(l[k]) ? l[k] : d[k]; const max = { skin: LOOK.skins, hair: LOOK.hairs, outfit: LOOK.outfits, acc: LOOK.accs, color: LOOK.colors }[k].length; o[k] = n >= 0 && n < max ? n : d[k]; }
   return o;
 }
-function lookSig(l) { return l ? [l.skin, l.hair, l.outfit, l.color].join('.') : ''; }
+function lookSig(l) { return l ? [l.skin, l.hair, l.outfit, l.color, l.acc || 0].join('.') : ''; }
 const SLOTS = ['Morning', 'Afternoon', 'Evening'];
 const SK = { tech: 'Tech', hustle: 'Hustle', social: 'Social' };
 const RNG = { fn: Math.random };
@@ -248,19 +342,86 @@ const CITY = {
   /* rough map positions in km; fares come from the distance */
   coords: {
     wuse: [0, 0], secretariat: [2, -2], garki: [3, -4], maitama: [3, 3], asokoro: [5, -3],
-    jabi: [-3, 3], utako: [-5, 2], gwarinpa: [-8, 7], kubwa: [-16, 12]
+    jabi: [-3, 3], utako: [-5, 2], gwarinpa: [-8, 7], kubwa: [-16, 12], abujacars: [4, 7]
   },
   /* where each district sits on the 3D map (world units) and what it looks like */
   mapPos: {
     wuse: { x: 0, z: 0, kind: 'market' }, secretariat: { x: 18, z: -10, kind: 'gov' }, garki: { x: 38, z: -8, kind: 'garki' },
     asokoro: { x: 40, z: -34, kind: 'asokoro' }, maitama: { x: 16, z: 22, kind: 'maitama' }, jabi: { x: -22, z: 16, kind: 'jabi' },
-    utako: { x: -28, z: -8, kind: 'utako' }, gwarinpa: { x: -56, z: 14, kind: 'gwarinpa' }, kubwa: { x: -84, z: 34, kind: 'kubwa' }
+    utako: { x: -28, z: -8, kind: 'utako' }, gwarinpa: { x: -56, z: 14, kind: 'gwarinpa' }, kubwa: { x: -84, z: 34, kind: 'kubwa' }, abujacars: { x: 18, z: 52, kind: 'carlot' }
   },
-  roads: [['wuse', 'secretariat'], ['secretariat', 'garki'], ['garki', 'asokoro'], ['wuse', 'maitama'], ['wuse', 'utako'], ['wuse', 'jabi'], ['utako', 'gwarinpa'], ['gwarinpa', 'kubwa'], ['jabi', 'maitama']],
+  /* decorative places on the 3D map. hw/hd = half size (world units) used to keep the filler buildings out of the way */
+  landmarks: [
+    { id: 'stadium', name: 'Moshood Abiola Stadium', icon: '🏟️', x: -10, z: -52, hw: 16, hd: 16, line: 'Match day. The whole city is shouting.' },
+    { id: 'airport', name: 'Nnamdi Azikiwe Airport', icon: '✈️', x: -78, z: -36, hw: 30, hd: 20, line: 'Your Japa flight leaves from here, one day.' },
+    { id: 'hospital', name: 'National Hospital', icon: '🏥', x: -8, z: -24, hw: 7, hd: 6, line: 'Feeling unwell? Open the Health app on your phone.' },
+    { id: 'hotel', name: 'Transcorp Hilton', icon: '🏨', x: 30, z: 10, hw: 6, hd: 6, line: 'Rooms start where your rent ends.' },
+    { id: 'church', name: 'National Christian Centre', icon: '⛪', x: 36, z: 24, hw: 7, hd: 8, line: 'Sunday service. Everyone dresses well.' },
+    { id: 'themepark', name: 'Magic Land', icon: '🎢', x: -47, z: 40, hw: 13, hd: 12, line: 'Rides, popcorn and long queues. Fun is a need too.' },
+    { id: 'park', name: 'Millennium Park', icon: '⛲', x: -6, z: 48, hw: 12, hd: 10, line: 'Free to sit here. Nobody charges for fresh air.' },
+    { id: 'cbd', name: 'Central Business District', icon: '🏢', x: 60, z: 6, hw: 9, hd: 9, line: 'Glass towers. Somebody up there has a big salary.' },
+    { id: 'eagle', name: 'Eagle Square', icon: '🦅', x: 23, z: -26, hw: 6, hd: 6, line: 'Flags, speeches and long rallies.' },
+    { id: 'mall', name: 'Jabi Lake Mall', icon: '🛍️', x: -2, z: 30, hw: 6, hd: 6, line: 'Air conditioning and prices to match.' },
+    { id: 'university', name: 'University of Abuja', icon: '🎓', x: -34, z: -36, hw: 12, hd: 9, line: 'Open the Courses app to enrol.' },
+    { id: 'mosque', name: 'National Mosque', icon: '🕌', x: 8, z: -30, hw: 8, hd: 8, line: 'The golden dome is the first thing flights see.' },
+    { id: 'rock', name: 'Aso Rock', icon: '⛰️', x: 58, z: -58, hw: 28, hd: 22, line: 'The rock the whole city grew around.' },
+    { id: 'galleria', name: 'Silverbird Galleria', icon: '🎬', x: -36, z: -58, hw: 6, hd: 6, line: 'Cinema, popcorn and a cold drink after work.' },
+    { id: 'crafts', name: 'Arts and Crafts Village', icon: '🎨', x: -26, z: 52, hw: 6, hd: 5, line: 'Carvings, beads and fabrics. Bargain hard.' },
+    { id: 'ceddi', name: 'Ceddi Plaza', icon: '🏙️', x: 50, z: 38, hw: 5, hd: 5, line: 'The twin towers everyone uses as a landmark.' },
+    { id: 'zuma', name: 'Zuma Rock', icon: '🪨', x: -98, z: -68, hw: 14, hd: 10, line: 'The Gateway to Abuja, standing alone on the highway.' }
+  ],
+  roads: [['wuse', 'secretariat'], ['secretariat', 'garki'], ['garki', 'asokoro'], ['wuse', 'maitama'], ['wuse', 'utako'], ['wuse', 'jabi'], ['utako', 'gwarinpa'], ['gwarinpa', 'kubwa'], ['jabi', 'maitama'], ['maitama', 'abujacars']],
+  scamMsgs: {
+    agent: { from: 'Visa Plug Abuja', frac: 0.3, min: 20000, max: 150000, pay: 'Pay the fee',
+      text: a => 'CONGRATULATIONS! Your UK visa is GUARANTEED in 14 days, no IELTS needed. Pay ' + fmt(a) + ' processing fee to account 0123456789 today only. Slots almost finished!',
+      loss: 'You sent the money and the number went dead. There was never a visa.' },
+    bank: { from: 'GTB Alert', frac: 0.2, min: 10000, max: 60000, pay: 'Click and verify',
+      text: a => 'Dear customer, your account will be BLOCKED in 24 hours. Verify your BVN and OTP now at bit.ly/gtb-verify.',
+      loss: 'You gave out your OTP. Money left your account within minutes.' },
+    job: { from: 'Remote Jobs HR', frac: 0.1, min: 8000, max: 25000, pay: 'Pay registration',
+      text: a => 'Earn ₦30,000 daily from your phone! No experience needed. Pay ' + fmt(a) + ' registration to start today.',
+      loss: 'You paid the registration and nobody ever replied.' },
+    forex: { from: 'Oga Profit', frac: 0.15, min: 10000, max: 50000, pay: 'Send the money',
+      text: a => 'Send ' + fmt(a) + ' and I will double it in 24 hours. 100% safe. Many people have already been paid!',
+      loss: 'You sent it and he blocked you.' }
+  },
+  realMsgs: {
+    family: { from: 'Aunty Bisi', when: s => s.cash < 300000, amt: s => Math.round(wage(s, 12000) / 1000) * 1000,
+      text: (s, m) => 'My dear, I sent ' + fmt(m.amt) + ' to your account. Buy food and rest. God will provide.',
+      label: (s, m) => 'Say thank you', block: () => null,
+      run: (s, m) => { apply(s, { cash: m.amt, mood: 4 }); return 'Aunty Bisi’s ' + fmt(m.amt) + ' landed in your account. You called to thank her.'; } },
+    lead: { from: 'Kunle (friend)', amt: s => Math.round(wage(s, 4500) / 100) * 100,
+      text: () => 'My oga at the market needs an extra hand tomorrow. Tell him I sent you. No fees, just show up.',
+      label: () => 'Go and help (1 slot)', block: s => s.slot + 1 > 3 ? 'Not enough of the day left' : s.energy < 12 ? 'Too tired' : null,
+      run: (s, m) => { s.slot += 1; apply(s, { energy: -12, cash: m.amt, conn: 0.5, xp: { hustle: 1 }, mood: 1 }); return 'You helped out all day and earned ' + fmt(m.amt) + ', plus a new contact.'; } },
+    owambe: { from: 'Chidi', amt: s => pr(s, 3000),
+      text: () => 'Owambe tonight in Jabi. Come and link up, there will be jollof and good connections.',
+      label: (s, m) => 'Go (' + fmt(m.amt) + ' for aso-ebi, 1 slot)', block: (s, m) => s.slot + 1 > 3 ? 'Not enough of the day left' : s.cash < m.amt ? 'Need ' + fmt(m.amt) : null,
+      run: (s, m) => { s.cash -= m.amt; s.slot += 1; apply(s, { fun: 30, food: 20, mood: 5, conn: 0.4, xp: { social: 1 } }); return 'You danced, ate jollof and collected useful phone numbers.'; } },
+    ielts: { from: 'Classmate Ada', when: s => s.japa.prep < CITY.japa.prepNeeded && s.japa.status === 'none',
+      text: () => 'I found a free IELTS speaking practice group in Garki. Want me to add you?',
+      label: () => 'Join (1 slot)', block: s => s.slot + 1 > 3 ? 'Not enough of the day left' : null,
+      run: s => { s.slot += 1; s.japa.prep += 1; apply(s, { mood: 2, xp: { social: 1 } }); return 'You practised speaking for an afternoon. That counts as a prep session.'; } }
+  },
+  /* sold at AbujaCars. shape picks the 3D body, col its paint, stars its comfort in the catalogue */
   cars: {
-    corolla: { name: 'Used Toyota Corolla', cost: 1500000, mood: 6, conn: 0, fuel: 1, desc: 'A reliable tokunbo. Everybody has a cousin who owns one.' },
-    camry: { name: 'Toyota Camry (Muscle)', cost: 4500000, mood: 10, conn: 1, fuel: 1, desc: 'Smooth ride, strong AC. People start taking you seriously.' },
-    suv: { name: 'Lexus SUV', cost: 12000000, mood: 15, conn: 2, fuel: 1.8, desc: 'Big man energy. Guzzles fuel when there is go-slow.' }
+    matiz: { name: 'Daewoo Matiz', cost: 900000, mood: 3, conn: 0, fuel: 0.6, col: 0xd9502a, shape: 'small', stars: 1, desc: 'Tiny, cheap to run and it starts every morning. That is all you asked for.' },
+    corolla: { name: 'Used Toyota Corolla', cost: 1500000, mood: 6, conn: 0, fuel: 1, col: 0xb8bcc4, shape: 'sedan', stars: 1, desc: 'A reliable tokunbo. Everybody has a cousin who owns one.' },
+    accord: { name: 'Honda Accord (Baby Boy)', cost: 2400000, mood: 7, conn: 0.3, fuel: 1, col: 0x7a1f2b, shape: 'sedan', stars: 2, desc: 'Clean lines and a good sound system. Good for impressing nobody in particular.' },
+    camry: { name: 'Toyota Camry (Muscle)', cost: 4500000, mood: 10, conn: 1, fuel: 1, col: 0x23262c, shape: 'sedan', stars: 2, desc: 'Smooth ride, strong AC. People start taking you seriously.' },
+    venza: { name: 'Toyota Venza', cost: 6500000, mood: 11, conn: 1.2, fuel: 1.3, col: 0xe9e4d6, shape: 'big', stars: 2, desc: 'A comfortable crossover for the sensible high-flyer.' },
+    cclass: { name: 'Mercedes C-Class', cost: 8500000, mood: 12, conn: 1.5, fuel: 1.2, col: 0xcfd3d8, shape: 'sedan', stars: 3, desc: 'The three-pointed star. Gate men open early for this one.' },
+    suv: { name: 'Lexus SUV', cost: 12000000, mood: 15, conn: 2, fuel: 1.8, col: 0x2b4f86, shape: 'big', stars: 3, desc: 'Big man energy. Guzzles fuel when there is go-slow.' },
+    prado: { name: 'Toyota Land Cruiser Prado', cost: 18000000, mood: 17, conn: 2.5, fuel: 2, col: 0x1f3b2c, shape: 'big', stars: 3, desc: 'Built for bad roads and big egos. Government people love it.' },
+    rover: { name: 'Range Rover Vogue', cost: 32000000, mood: 20, conn: 3.5, fuel: 2.2, col: 0x1a1d23, shape: 'boxy', stars: 3, desc: 'Every politician’s second choice, after the G-Wagon.' },
+    gwagon: { name: 'Mercedes G-Wagon', cost: 55000000, mood: 25, conn: 5, fuel: 2.4, col: 0x2d3139, shape: 'boxy', stars: 3, desc: 'The loudest way to say you have arrived. The fuel bill arrives too.' }
+  },
+  /* a bike for people who cannot afford a car: you pay fuel only, and it slips through go-slow */
+  bikes: {
+    boxer: { name: 'Bajaj Boxer', cost: 380000, mood: 3, conn: 0, run: 0.3, col: 0xd9a21b, stars: 1, desc: 'The okada man’s best friend. Cheap, tough, and it never stops.' },
+    cg125: { name: 'Honda CG 125', cost: 620000, mood: 5, conn: 0, run: 0.26, col: 0xb5382f, stars: 1, desc: 'Smooth and thrifty. Sips fuel and hardly ever breaks down.' },
+    vespa: { name: 'Vespa scooter', cost: 950000, mood: 7, conn: 0.1, run: 0.2, col: 0xe8e2cf, stars: 2, desc: 'Neat, quiet and stylish. The cheapest bike to run.' },
+    sport: { name: 'Suzuki sport bike', cost: 1800000, mood: 12, conn: 0.4, run: 0.34, col: 0x2b4f86, stars: 3, desc: 'Loud and fast. Heads turn, and so does your fuel gauge.' }
   },
   health: {
     meds: { name: 'Malaria and pain medication', cost: 4500, desc: 'Delivered by a pharmacy rider. Clears a fever fast.' },
@@ -290,16 +451,16 @@ const CITY = {
     ['Blessing Etim', 4200000], ['Yakubu Haruna', 2100000], ['Funke Ojo', 1200000], ['Ibrahim Sule', 640000], ['Chioma Obi', 320000], ['Dayo Fashola', 150000]
   ],
   items: {
-    mattress: { name: 'Proper mattress', cost: 60000, desc: 'Sleep restores 6 more energy a night.' },
-    fan: { name: 'Standing fan', cost: 25000, desc: 'Hot nights stop hurting. A little comfort every night.' },
-    tv: { name: 'Flat-screen TV', cost: 90000, desc: 'Football, news and Nollywood. A little comfort every night.' },
-    sofa: { name: 'Sofa', cost: 80000, desc: 'A place to sit when guests come. A little comfort every night.' },
-    rug: { name: 'Rug', cost: 20000, desc: 'The room feels finished. A little comfort every night.' },
-    plant: { name: 'Potted plant', cost: 8000, desc: 'Cheap, green, and it makes the room breathe.' },
-    fridge: { name: 'Fridge', cost: 180000, desc: 'Every meal you cook at home costs \u20A6300 less.' },
-    cooker: { name: 'Gas cooker', cost: 60000, desc: 'Every meal you cook at home costs \u20A6200 less.' },
-    generator: { name: 'Generator', cost: 120000, desc: 'NEPA wahala costs less. Lights stay on.' },
-    inverter: { name: 'Inverter and solar panels', cost: 450000, desc: 'No more light problems.' }
+    mattress: { name: 'Proper mattress', cost: 60000, cat: 'sleep', size: '2×1', stars: 2, desc: 'Sleep restores 6 more energy a night.' },
+    fan: { name: 'Standing fan', cost: 25000, cat: 'comfort', size: '1×1', stars: 1, desc: 'Hot nights stop hurting. A little comfort every night.' },
+    tv: { name: 'Flat-screen TV', cost: 90000, cat: 'comfort', size: '2×1', stars: 2, desc: 'Football, news and Nollywood. A little comfort every night.' },
+    sofa: { name: 'Sofa', cost: 80000, cat: 'comfort', size: '2×1', stars: 2, desc: 'A place to sit when guests come. A little comfort every night.' },
+    rug: { name: 'Rug', cost: 20000, cat: 'comfort', size: '2×2', stars: 1, desc: 'The room feels finished. A little comfort every night.' },
+    plant: { name: 'Potted plant', cost: 8000, cat: 'comfort', size: '1×1', stars: 1, desc: 'Cheap, green, and it makes the room breathe.' },
+    fridge: { name: 'Fridge', cost: 180000, cat: 'kitchen', size: '1×1', stars: 3, desc: 'Every meal you cook at home costs \u20A6300 less.' },
+    cooker: { name: 'Gas cooker', cost: 60000, cat: 'kitchen', size: '1×1', stars: 2, desc: 'Every meal you cook at home costs \u20A6200 less.' },
+    generator: { name: 'Generator', cost: 120000, cat: 'power', size: '1×1', stars: 2, desc: 'NEPA wahala costs less. Lights stay on.' },
+    inverter: { name: 'Inverter and solar panels', cost: 450000, cat: 'power', size: '2×1', stars: 3, desc: 'No more light problems.' }
   },
   comfortItems: ['fan', 'tv', 'sofa', 'rug', 'plant', 'inverter'],
   japa: {
@@ -327,12 +488,22 @@ const CITY = {
     flat: { name: '2-bed flat in Maitama', place: 'maitama', rent: 300000, rest: 70, mood: 2 }
   },
   backgrounds: [
-    { id: 'graduate', name: 'Fresh graduate', line: 'BSc in hand, NYSC not yet done. Everyone at home keeps asking what is next.', cash: 60000, edu: 2, nysc: false, conn: 0, xp: {} },
-    { id: 'ssce', home: 'shared', name: 'SSCE leaver', line: 'No certificate beyond secondary school. Plenty of strength, little money.', cash: 40000, edu: 0, nysc: false, conn: 0, xp: { hustle: 3 } },
-    { id: 'hustler', name: 'Born hustler', line: 'OND certificate, sharp eyes and a quick mouth. You already know how to make a naira move.', cash: 90000, edu: 1, nysc: false, conn: 1, xp: { hustle: 12 } },
-    { id: 'uncle', name: 'Somebody’s nephew', line: 'Your uncle’s friend is a permanent secretary. Degree done, NYSC done, doors that open.', cash: 120000, edu: 2, nysc: true, conn: 3, xp: { social: 6 } }
+    { id: 'graduate', name: 'Fresh graduate', line: 'BSc in hand, NYSC not yet done. Everyone at home keeps asking what is next.', cash: 1000000, edu: 2, nysc: false, conn: 0, xp: {} },
+    { id: 'ssce', home: 'shared', name: 'SSCE leaver', line: 'No certificate beyond secondary school. Plenty of strength, little money.', cash: 1000000, edu: 0, nysc: false, conn: 0, xp: { hustle: 3 } },
+    { id: 'hustler', name: 'Born hustler', line: 'OND certificate, sharp eyes and a quick mouth. You already know how to make a naira move.', cash: 1000000, edu: 1, nysc: false, conn: 1, xp: { hustle: 12 } },
+    { id: 'uncle', name: 'Somebody’s nephew', line: 'Your uncle’s friend is a permanent secretary. Degree done, NYSC done, doors that open.', cash: 1000000, edu: 2, nysc: true, conn: 3, xp: { social: 6 } }
   ],
   places: {
+    abujacars: {
+      name: 'AbujaCars', tag: 'Buy a car or a bike',
+      line: 'Rows of shiny cars, a few tokunbo bikes, and a salesman who calls everyone “my man”.',
+      actions: [
+        { id: 'testdrive', label: 'Take a test drive', desc: 'The salesman rides along and talks the whole way.', slots: 1, energy: 4, once: true,
+          run: s => { apply(s, { mood: 5, fun: 14, xp: { social: 1 } }); return 'You drove around the block twice. The salesman says it suits you.'; } },
+        { id: 'bargain', label: 'Haggle with the salesman', desc: 'Practice getting the better price.', slots: 1, energy: 5,
+          run: s => { apply(s, { mood: 1, xp: { hustle: 2 } }); return 'You walked out twice. He still would not drop the price, but you learned something.'; } }
+      ]
+    },
     kubwa: {
       name: 'Kubwa and Nyanya', tag: 'Where most people actually live',
       line: 'Long road, cheaper rent, and one shop that sells everything.',
@@ -513,6 +684,9 @@ const CITY = {
     { id: 'dispatch', name: 'Dispatch rider', place: 'gwarinpa', est: s => 7500, var: 0.3, energy: 28, startup: { key: 'bike', cost: 90000, label: 'Motorbike and delivery bag' }, mood: -3,
       blurb: 'Deliveries across the estate and beyond. Your bike is your office.',
       lines: ['You delivered fourteen parcels and got lost twice.', 'A customer said "I am downstairs" and was not.'] },
+    { id: 'carsales', name: 'Car salesman', place: 'abujacars', est: s => 8000 + 2200 * lvl(s, 'social'), var: 0.6, energy: 16, minEdu: 1, skill: { k: 'social', l: 1 }, xp: { social: 1 }, conn: 0.2, mood: 0,
+      blurb: 'Big commissions on good days, long quiet ones on the rest. Smile at everyone.',
+      lines: ['You sold a Camry to a man who only came to look.', 'A customer wanted the price of everything and bought nothing.', 'You washed a Prado twice for a buyer who never showed up.'] },
     { id: 'pharmacy', name: 'Pharmacy attendant', place: 'garki', est: s => 6000, var: 0.05, energy: 14, minEdu: 1,
       blurb: 'Steady counter work. You learn who is sick and who is shy.',
       lines: ['You counted tablets until your eyes blurred.', 'A customer wanted a refund on something already opened.'] },
@@ -530,7 +704,67 @@ const CITY = {
       lines: ['You waited three hours outside a meeting and kept the engine cool.', 'The big man slept in the back. You took the long road on purpose.'] },
     { id: 'creator', name: 'Content creator', place: 'jabi', est: s => 1800 + 600 * lvl(s, 'social'), var: 0.3, energy: 15, startup: { key: 'ring', cost: 40000, label: 'Phone, tripod and ring light' }, xp: { social: 1 },
       blurb: 'Most days are small. Some videos pop off.', viral: true, mood: -1,
-      lines: ['You filmed the same hook nine times.', 'A video got shared in a few big WhatsApp groups.'] }
+      lines: ['You filmed the same hook nine times.', 'A video got shared in a few big WhatsApp groups.'] },
+    { id: 'techco', name: 'Tech company', place: 'wuse', est: s => 9500, var: 0.05, energy: 20, skill: { k: 'tech', l: 1 }, xp: { tech: 1 }, mood: 0,
+      blurb: 'From Wuse intern to CTO. Coding pushes promotions.',
+      lines: ['You fixed a bug that only showed up on the CEO\u2019s phone.', 'Stand-up ran forty minutes. Nobody stood.'] },
+    { id: 'hotel', name: 'Hotel and hospitality', place: 'maitama', est: s => 8500, var: 0.1, energy: 18, minEdu: 1, skill: { k: 'social', l: 1 }, mood: -1,
+      blurb: 'Front desk, smiles and tips at the big hotels. The guest is always right, even when he is wrong.',
+      lines: ['A guest asked for a late checkout and a free breakfast in one sentence.', 'A delegation arrived at 2am. You smiled through it.'] },
+    { id: 'nurse', name: 'Nursing', place: 'garki', est: s => 12000, var: 0.05, energy: 26, minEdu: 2, needNysc: true, bypass: 4, mood: -2,
+      blurb: 'Long shifts, real lives in your hands. The hospital runs on you.',
+      lines: ['You worked a double and a patient said thank you. It carried you home.', 'Three emergencies, one tea break. You took the tea.'] },
+    { id: 'journalist', name: 'Journalism', place: 'wuse', est: s => 8500, var: 0.1, energy: 16, minEdu: 2, skill: { k: 'social', l: 1 }, xp: { social: 1 }, conn: 0.05,
+      blurb: 'Chase the story from the Villa to Wuse Market. Deadlines everywhere.',
+      lines: ['You waited four hours for a minister who never showed. You filed anyway.', 'Your story trended for an hour. Then a footballer sneezed.'] },
+    { id: 'estate', name: 'Real estate agent', place: 'maitama', est: s => 6000, var: 0.75, energy: 18, skill: { k: 'social', l: 2 }, xp: { social: 1 }, mood: 0,
+      blurb: 'Rent, sales and commission. One big deal and the month is made.',
+      lines: ['You showed the same flat to eleven people. Nobody liked the stairs.', 'A client haggled for an hour and then paid cash.'] },
+    { id: 'tailor', name: 'Fashion tailor', place: 'utako', est: s => 6500, var: 0.25, energy: 18, startup: { key: 'machine', cost: 60000, label: 'Sewing machine and fabric' }, xp: { hustle: 1 },
+      blurb: 'Ankara, agbada and owambe orders. December is when you make your money.',
+      lines: ['Six outfits for one wedding, all due on Friday.', 'A client sent a picture from Instagram and said "just like this".'] },
+    { id: 'barber', name: 'Barbing salon', place: 'gwarinpa', est: s => 5800, var: 0.3, energy: 14, startup: { key: 'clippers', cost: 30000, label: 'Clippers, chair and mirror' }, xp: { social: 1 }, mood: 1,
+      blurb: 'Gist, football arguments and sharp lines. Regulars keep you going.',
+      lines: ['You gave a fade, a lecture on Arsenal and change for ₦1,000.', 'A boy said "just trim small" and wanted a new face.'] },
+    { id: 'mechanic', name: 'Auto mechanic', place: 'kubwa', est: s => 7200, var: 0.3, energy: 26, startup: { key: 'tools', cost: 50000, label: 'Tool box and diagnostics' }, xp: { hustle: 1 }, mood: -2,
+      blurb: 'Every second car in Abuja needs you. Grease is part of the job.',
+      lines: ['You found the fault the other mechanic missed.', 'A customer said "it was only making small noise".'] },
+    { id: 'solar', name: 'Solar installer', place: 'gwarinpa', est: s => 9500, var: 0.2, energy: 24, skill: { k: 'tech', l: 1 }, startup: { key: 'solartools', cost: 40000, label: 'Tools and safety kit' }, xp: { tech: 1 }, mood: 0,
+      blurb: 'NEPA keeps failing, so your phone never stops ringing.',
+      lines: ['You mounted six panels on a roof under the afternoon sun.', 'An inverter that was not an inverter. You fixed it anyway.'] },
+    { id: 'cinema', name: 'Cinema crew', place: 'wuse', est: s => 4800, var: 0.05, energy: 12, mood: 2,
+      blurb: 'Popcorn, tickets and free movie gist. No requirements, good vibes.',
+      lines: ['You sold forty tubs of popcorn and watched the end of a film.', 'A couple argued over seat numbers. You settled it.'] },
+    { id: 'chef', name: 'Restaurant kitchen', place: 'garki', est: s => 6800, var: 0.1, energy: 24, mood: -1, xp: { hustle: 1 },
+      blurb: 'Heat, speed and the smell of party jollof. You eat well on the job.',
+      lines: ['Lunch rush: sixty plates in forty minutes.', 'The chef shouted. The jollof was perfect.'] },
+    { id: 'dj', name: 'DJ and events', place: 'jabi', est: s => 7500, var: 0.5, energy: 18, startup: { key: 'sound', cost: 80000, label: 'Controller and speakers' }, xp: { social: 1 }, mood: 2,
+      blurb: 'Weddings, lounges and birthday parties. Play what the aunties want.',
+      lines: ['The dance floor never emptied. Somebody sprayed money.', 'Three people asked for the same song. You played it twice.'] },
+    { id: 'lawyer', name: 'Law firm', place: 'maitama', est: s => 12500, var: 0.1, energy: 18, minEdu: 2, needNysc: true, bypass: 4, skill: { k: 'social', l: 1 }, conn: 0.1,
+      blurb: 'Files, courts and clients who only call when it is urgent.',
+      lines: ['You sat in court from 9am for a ten-minute hearing.', 'A client said "just write a small letter". It was forty pages.'] },
+    { id: 'analyst', name: 'Data analyst', place: 'utako', est: s => 11500, var: 0.05, energy: 18, minEdu: 2, skill: { k: 'tech', l: 2 }, xp: { tech: 1 },
+      blurb: 'Spreadsheets, dashboards and meetings about dashboards.',
+      lines: ['You cleaned a dataset that someone typed with their elbow.', 'Your chart made the boss say "interesting". High praise.'] },
+    { id: 'travel', name: 'Travel agency', place: 'garki', est: s => 8000, var: 0.3, energy: 14, minEdu: 1, skill: { k: 'social', l: 1 }, conn: 0.05,
+      blurb: 'Sell tickets and visa help. You will learn how Japa really works.',
+      lines: ['You booked a family of seven to Dubai. They fought over seats.', 'A client wanted a "direct flight" to a city with no airport.'] },
+    { id: 'engineer', name: 'Civil engineering', place: 'asokoro', est: s => 13000, var: 0.05, energy: 24, minEdu: 2, needNysc: true, bypass: 4, mood: -1,
+      blurb: 'Roads, estates and site visits in the sun. Hard hat required.',
+      lines: ['You checked the foundation twice. It was fine. You checked again.', 'The contractor said "next week". You wrote it down.'] },
+    { id: 'fuel', name: 'Filling station', place: 'kubwa', est: s => 4500, var: 0.05, energy: 20, mood: -2,
+      blurb: 'Pump, count and smile. The queue never ends when fuel scarcity hits.',
+      lines: ['A queue of two hundred cars and one working pump.', 'Someone asked for ₦500 fuel and a free tyre check.'] },
+    { id: 'photo', name: 'Photography', place: 'jabi', est: s => 7000, var: 0.45, energy: 18, startup: { key: 'camera', cost: 85000, label: 'Camera and lens' }, xp: { social: 1 }, mood: 1,
+      blurb: 'Weddings, portraits and Jabi Lake sunsets. Good light is money.',
+      lines: ['You shot a pre-wedding session and got the golden hour.', 'The bride wanted every photo edited. By tonight.'] },
+    { id: 'cleaner', name: 'Office cleaning', place: 'maitama', est: s => 3800, var: 0.05, energy: 22, mood: -2,
+      blurb: 'Early mornings, clean floors and honest pay. No requirements.',
+      lines: ['You finished before the offices opened.', 'Someone left a cup on every desk. You smiled and moved on.'] },
+    { id: 'insurance', name: 'Insurance sales', place: 'wuse', est: s => 7000, var: 0.5, energy: 14, skill: { k: 'social', l: 1 }, xp: { social: 1 },
+      blurb: 'Nobody wants insurance until something happens. Convince them early.',
+      lines: ['Eleven calls. One yes. A good day.', 'A client said "I will think about it" for the ninth time.'] }
   ],
   events: [
     { id: 'nepa', w: 3, text: 'NEPA took light at 7pm. Generator, fuel, noise. The same story.',
@@ -622,12 +856,17 @@ function ensureNeeds(s) {
   if (typeof s.fun !== 'number') s.fun = 70;
   if (typeof s.clean !== 'number') s.clean = 80;
   s.look = cleanLook(s.look, s.bg);
+  if (!s.wardrobe || typeof s.wardrobe !== 'object') s.wardrobe = {};
+  ['hair', 'outfit', 'acc'].forEach(function (k) { if (!Array.isArray(s.wardrobe[k])) s.wardrobe[k] = []; });
   if (typeof s.name !== 'string') s.name = '';
   if (typeof s.slow !== 'boolean') s.slow = false;
   if (typeof s.sick !== 'number') s.sick = 0;
   if (typeof s.pantry !== 'number') s.pantry = 0;
   if (typeof s.unreported !== 'number') s.unreported = 0;
   if (!s.chow || typeof s.chow !== 'object') s.chow = null;
+  if (!Array.isArray(s.inbox)) s.inbox = [];
+  if (typeof s.msgSeq !== 'number') s.msgSeq = 0;
+  if (typeof s.wise !== 'number') s.wise = 0;
   return s;
 }
 /* the need that most needs attention, or null if nothing is low */
@@ -658,9 +897,9 @@ function tripOptions(s, a, b) {
   out.push({ mode: 'cab', name: 'Cab', cost: cab, slots: 0, energy: 0, clean: 0, mood: (rain ? -1 : 0) + (slow ? -1 : 0),
     note: slow ? 'Go-slow: the meter keeps running' : rain ? 'Rain pushes the fare up' : 'Comfortable, priced by distance', block: '' });
   const okBase = Math.max(300, Math.round((150 + km * 26) / 50) * 50);
-  const ownBike = !!s.owned.bike;
-  const ok = ownBike ? Math.max(100, r50(okBase * 0.3 * P)) : r50(okBase * P * (rain ? 1.5 : 1));
-  out.push({ mode: 'okada', name: ownBike ? 'Your motorbike' : 'Okada', cost: ok, slots: 0, energy: 2, clean: rain ? 6 : 3, mood: rain ? -2 : 0,
+  const ownBike = !!s.owned.bike, bk = CITY.bikes[s.owned.bikeId];
+  const ok = ownBike ? Math.max(100, r50(okBase * (bk ? bk.run : 0.3) * P)) : r50(okBase * P * (rain ? 1.5 : 1));
+  out.push({ mode: 'okada', name: ownBike ? (bk ? bk.name : 'Your motorbike') : 'Okada', cost: ok, slots: 0, energy: 2, clean: rain ? 6 : 3, mood: rain ? -2 : 0,
     note: ownBike ? 'Fuel only. Slips through the go-slow' : slow ? 'Slips through the go-slow, but dusty' : 'Cheaper than a cab, but dusty', block: '' });
   const tSlots = km <= 5 ? 0 : km <= 13 ? 1 : 2;
   out.push({ mode: 'trek', name: 'Trek', cost: 0, slots: tSlots, energy: 3 + Math.round(km * 1.8), clean: Math.round(km * 1.2) + (rain ? 8 : 0), mood: rain ? -3 : km > 8 ? -1 : 0,
@@ -670,7 +909,7 @@ function tripOptions(s, a, b) {
     out.push({ mode: 'car', name: s.owned.car ? (CITY.cars[s.owned.carId] || CITY.cars.corolla).name : 'Your car', cost: fuel, slots: 0, energy: 0, clean: 0, mood: slow ? -2 : 0,
       note: slow ? 'Go-slow: you burn fuel idling in traffic' : 'Free when the road is clear', block: '' });
   } else {
-    out.push({ mode: 'car', name: 'Your car', cost: 0, slots: 0, energy: 0, clean: 0, mood: 0, note: 'Buy one in the Cars app', block: 'No car yet' });
+    out.push({ mode: 'car', name: 'Your car', cost: 0, slots: 0, energy: 0, clean: 0, mood: 0, note: 'Buy one at AbujaCars', block: 'No car yet' });
   }
   out.forEach(function (o) {
     if (o.block) return;
@@ -688,16 +927,64 @@ function newGame(bgId, look, name) {
     v: 1, day: 1, slot: 0, home: bg.home || 'room', at: 'kubwa', bg: bg.id,
     cash: bg.cash, energy: 90, mood: 70, food: 80, fun: 70, clean: 80, edu: bg.edu, nysc: !!bg.nysc, conn: bg.conn,
     xp: Object.assign({ tech: 0, hustle: 0, social: 0 }, bg.xp || {}),
-    job: null, tenure: 0, owned: {}, items: {}, nepa: false, enrolled: null, price: 1, rentBump: 0, rain: false, slow: false, sick: 0, pantry: 0, chow: null, unreported: 0,
+    job: null, tenure: 0, owned: {}, items: {}, nepa: false, enrolled: null, price: 1, rentBump: 0, rain: false, slow: false, sick: 0, pantry: 0, chow: null, unreported: 0, inbox: [], msgSeq: 0, wise: 0,
     event: null, over: false, ending: null, done: {}, dayStartCash: bg.cash, log: [], last: '',
     japa: { prep: 0, ielts: 0, status: 'none', route: null, appliedDay: 0, decideDay: 0, expireDay: 0, agent: 0, attempts: 0, denials: 0 },
     stats: { earned: 0, workDays: 0, scams: 0, lost: 0, spent: 0, jobsSeen: {} }
   };
-  s.look = cleanLook(look, bg.id); s.name = String(name || '').trim().slice(0, 16);
+  s.look = cleanLook(look, bg.id); s.name = String(name || '').trim().slice(0, 16); s.wardrobe = { hair: [], outfit: [], acc: [] };
+  ['hair', 'outfit', 'acc'].forEach(function (k) { if (!ownsLook(s, k, s.look[k])) s.look[k] = 0; });
+  deliverMsg(s, 'job');
   log(s, 'Day 1 in Abuja. You have ' + fmt(s.cash) + ' and a plan that is still forming.');
   return s;
 }
 
+/* a career ladder for every job: you start at the bottom and move up every 60 working days */
+const JOB_META = {
+  corper: ['\uD83E\uDE96', ['Corps member']],
+  civil: ['\uD83C\uDFDB\uFE0F', ['Clerical Officer', 'Executive Officer', 'Senior Executive Officer', 'Assistant Director', 'Deputy Director', 'Director']],
+  bank: ['\uD83C\uDFE6', ['Marketer I', 'Marketer II', 'Relationship Officer', 'Senior Officer', 'Branch Manager', 'Regional Head']],
+  trader: ['\uD83E\uDDFA', ['Stall Helper', 'Trader', 'Wholesaler', 'Shop Owner', 'Distributor', 'Market Chief']],
+  pos: ['\uD83D\uDCB3', ['POS Agent', 'Super Agent', 'Multi-Stand Owner', 'Area Agent', 'District Partner', 'Fintech Partner']],
+  bolt: ['\uD83D\uDE95', ['Driver', 'Rated Driver', 'Fleet Driver', 'Fleet Owner', 'Fleet Manager', 'Transport Boss']],
+  shop: ['\uD83D\uDED2', ['Attendant', 'Senior Attendant', 'Supervisor', 'Store Manager', 'Area Manager', 'Partner']],
+  guard: ['\uD83D\uDC82', ['Guard', 'Senior Guard', 'Gate Supervisor', 'Head of Security', 'Security Manager', 'Security Director']],
+  pa: ['\uD83D\uDCCB', ['Errand Boy', 'Junior PA', 'Personal Assistant', 'Senior Aide', 'Chief of Staff', 'Special Adviser']],
+  freelance: ['\uD83D\uDCBB', ['Freelancer', 'Rated Freelancer', 'Top Freelancer', 'Agency Lead', 'Studio Owner', 'Tech Founder']],
+  dispatch: ['\uD83C\uDFCD\uFE0F', ['Rider', 'Senior Rider', 'Fleet Rider', 'Dispatch Lead', 'Fleet Manager', 'Logistics Boss']],
+  pharmacy: ['\uD83D\uDC8A', ['Counter Attendant', 'Dispensing Assistant', 'Senior Attendant', 'Pharmacy Supervisor', 'Branch Manager', 'Partner']],
+  teacher: ['\uD83E\uDDD1\u200D\uD83C\uDFEB', ['Assistant Teacher', 'Class Teacher', 'Senior Teacher', 'Head of Department', 'Vice Principal', 'Principal']],
+  bdc: ['\uD83D\uDCB1', ['Teller', 'Senior Teller', 'Rate Desk Officer', 'Shift Supervisor', 'Branch Manager', 'Partner']],
+  suya: ['\uD83C\uDF62', ['Grill Hand', 'Suya Vendor', 'Spot Owner', 'Two-Spot Owner', 'Caterer', 'Franchise Owner']],
+  chauffeur: ['\uD83D\uDE98', ['Driver', 'Senior Driver', 'Chief Driver', 'Convoy Lead', 'Head of Fleet', 'Protocol Chief']],
+  creator: ['\uD83D\uDCF1', ['Beginner Creator', 'Rising Creator', 'Verified Creator', 'Influencer', 'Brand Partner', 'Media Owner']],
+  techco: ['\uD83D\uDDA5\uFE0F', ['Intern I', 'Intern II', 'Junior Developer', 'Developer', 'Senior Developer', 'CTO']],
+  hotel: ['\uD83C\uDFE8', ['Bellhop', 'Receptionist', 'Front Desk Supervisor', 'Duty Manager', 'Assistant Manager', 'General Manager']],
+  nurse: ['\uD83E\uDE7A', ['Nursing Assistant', 'Staff Nurse', 'Senior Nurse', 'Charge Nurse', 'Matron', 'Chief Nursing Officer']],
+  journalist: ['\uD83C\uDF99\uFE0F', ['Intern Reporter', 'Reporter', 'Senior Reporter', 'Desk Editor', 'Bureau Chief', 'Editor-in-Chief']],
+  estate: ['\uD83C\uDFE0', ['Trainee Agent', 'Agent', 'Senior Agent', 'Sales Manager', 'Director', 'Estate Mogul']],
+  tailor: ['\uD83E\uDDF5', ['Apprentice', 'Tailor', 'Designer', 'Boutique Owner', 'Fashion House Owner', 'Fashion Icon']],
+  barber: ['\uD83D\uDC88', ['Apprentice Barber', 'Barber', 'Senior Barber', 'Salon Owner', 'Two-Salon Owner', 'Grooming Brand Owner']],
+  mechanic: ['\uD83D\uDD27', ['Apprentice', 'Mechanic', 'Senior Mechanic', 'Workshop Owner', 'Auto Dealer', 'Auto Mogul']],
+  solar: ['\u2600\uFE0F', ['Helper', 'Installer', 'Senior Installer', 'Site Lead', 'Solar Contractor', 'Energy Company Owner']],
+  cinema: ['\uD83C\uDFAC', ['Usher', 'Ticket Cashier', 'Shift Supervisor', 'Floor Manager', 'Cinema Manager', 'Regional Manager']],
+  chef: ['\uD83D\uDC68\u200D\uD83C\uDF73', ['Kitchen Hand', 'Line Cook', 'Sous Chef', 'Head Chef', 'Executive Chef', 'Restaurant Owner']],
+  dj: ['\uD83C\uDFA7', ['Open-Mic DJ', 'Party DJ', 'Resident DJ', 'Headliner', 'Festival DJ', 'Celebrity DJ']],
+  lawyer: ['\u2696\uFE0F', ['Law Clerk', 'Junior Associate', 'Associate', 'Senior Associate', 'Partner', 'Senior Advocate']],
+  analyst: ['\uD83D\uDCCA', ['Junior Analyst', 'Data Analyst', 'Senior Analyst', 'Analytics Lead', 'Head of Data', 'Chief Data Officer']],
+  travel: ['\uD83E\uDDF3', ['Ticketing Clerk', 'Travel Consultant', 'Senior Consultant', 'Branch Manager', 'Regional Head', 'Agency Owner']],
+  engineer: ['\uD83D\uDC77', ['Graduate Engineer', 'Site Engineer', 'Project Engineer', 'Senior Engineer', 'Project Manager', 'Director of Works']],
+  fuel: ['\u26FD', ['Pump Attendant', 'Station Cashier', 'Shift Supervisor', 'Station Manager', 'Area Manager', 'Station Owner']],
+  photo: ['\uD83D\uDCF7', ['Assistant Photographer', 'Photographer', 'Senior Photographer', 'Studio Lead', 'Studio Owner', 'Celebrity Photographer']],
+  cleaner: ['\uD83E\uDDF9', ['Cleaner', 'Senior Cleaner', 'Team Lead', 'Supervisor', 'Facility Manager', 'Cleaning Company Owner']],
+  carsales: ['\uD83D\uDE97', ['Showroom Assistant', 'Sales Executive', 'Senior Sales Executive', 'Sales Manager', 'General Manager', 'Dealership Owner']],
+  insurance: ['\uD83D\uDEE1\uFE0F', ['Sales Agent', 'Senior Agent', 'Team Lead', 'Branch Manager', 'Regional Head', 'Agency Director']]
+};
+function jobIcon(j) { return (JOB_META[j.id] || ['\uD83D\uDCBC'])[0]; }
+function jobLadder(j) { return (JOB_META[j.id] || [0, ['Staff']])[1]; }
+function jobRank(s, j) { const l = jobLadder(j); return Math.max(0, Math.min(l.length - 1, 5, Math.floor((s.tenure || 0) / 60))); }
+function jobTitle(s, j) { return jobLadder(j)[jobRank(s, j)]; }
+function jobStartTitle(j) { return jobLadder(j)[0]; }
 function jobById(id) { return CITY.jobs.find(j => j.id === id); }
 function jobReqs(s, j) {
   const r = [];
@@ -757,8 +1044,10 @@ function work(s) {
   if (j.viral && rnd() < 0.08 + 0.02 * lvl(s, 'social')) { const v = Math.round(wage(s, 25000)); p += v; extra = ' A video blew up and added ' + fmt(v) + '.'; }
   apply(s, { cash: p, energy: -j.energy, mood: j.mood === undefined ? -2 : j.mood, xp: j.xp, conn: j.conn });
   apply(s, { fun: -4, clean: j.energy >= 22 ? -8 : -3 });
+  const rank0 = jobRank(s, j);
   s.slot += 2; s.tenure += 1; s.stats.workDays += 1;
   let m = pick(j.lines) + ' You earned ' + fmt(p) + '.' + extra;
+  if (jobRank(s, j) > rank0) { apply(s, { mood: 6, conn: 0.2 }); m += ' Promotion! You are now ' + jobTitle(s, j) + '.'; }
   if (j.corper && s.tenure >= 60) {
     s.nysc = true; s.job = null; s.tenure = 0; apply(s, { conn: 1, mood: 10, cash: 10000 });
     m += ' Passing out parade! NYSC done. You got ₦10,000 and a certificate.';
@@ -828,8 +1117,12 @@ function walkHome(s) {
   return travel(s, homePlace(s), 'trek');
 }
 
-/* a car of your own: free to drive, except in go-slow. Upgrading trades in your old car for half its price. */
+/* a car of your own: free to drive, except in go-slow. You buy it at AbujaCars. Upgrading trades in your old car for half its price. */
 function carTrade(s) { const c = s.owned.car && CITY.cars[s.owned.carId || 'corolla']; return c ? Math.round(c.cost * 0.5) : 0; }
+function carPay(s, id) {
+  const c = CITY.cars[id], cur = s.owned.car && CITY.cars[s.owned.carId || 'corolla'];
+  return c ? c.cost - (cur && c.cost > cur.cost ? carTrade(s) : 0) : 0;
+}
 function carBlock(s, id) {
   const c = CITY.cars[id || 'corolla'];
   if (s.over) return 'Game over';
@@ -837,7 +1130,8 @@ function carBlock(s, id) {
   if (s.owned.car && (s.owned.carId || 'corolla') === (id || 'corolla')) return 'Owned';
   const cur = s.owned.car && CITY.cars[s.owned.carId || 'corolla'];
   if (cur && c.cost <= cur.cost) return 'You already own a better car';
-  const need = c.cost - carTrade(s);
+  if (s.at !== 'abujacars') return 'Go to AbujaCars';
+  const need = carPay(s, id || 'corolla');
   if (need > s.cash) return 'Need ' + fmt(need);
   return null;
 }
@@ -845,10 +1139,64 @@ function buyCar(s, id) {
   id = id || 'corolla';
   const why = carBlock(s, id);
   if (why) return { ok: false, msg: why };
-  const c = CITY.cars[id], pay = c.cost - carTrade(s), upgrade = !!s.owned.car;
+  const c = CITY.cars[id], pay = carPay(s, id), upgrade = !!s.owned.car;
   s.cash -= pay; s.owned.car = true; s.owned.carId = id;
   apply(s, { mood: c.mood, conn: c.conn });
   const m = (upgrade ? 'You traded up to a ' : 'You bought a ') + c.name + ' for ' + fmt(pay) + '. Driving is free now, unless there is go-slow.';
+  log(s, m); return { ok: true, msg: m };
+}
+/* a bike is the cheaper way to have your own wheels: fuel only, and it slips through go-slow */
+function bikeTrade(s) { const b = s.owned.bike && CITY.bikes[s.owned.bikeId]; return b ? Math.round(b.cost * 0.5) : 0; }
+function bikePay(s, id) {
+  const b = CITY.bikes[id], cur = s.owned.bike && CITY.bikes[s.owned.bikeId];
+  return b ? b.cost - (cur && b.cost > cur.cost ? bikeTrade(s) : 0) : 0;
+}
+function bikeBlock(s, id) {
+  const b = CITY.bikes[id];
+  if (s.over) return 'Game over';
+  if (!b) return 'Not available';
+  if (s.owned.bike && s.owned.bikeId === id) return 'Owned';
+  const cur = s.owned.bike && CITY.bikes[s.owned.bikeId];
+  if (cur && b.cost <= cur.cost) return 'You already own a better bike';
+  if (s.at !== 'abujacars') return 'Go to AbujaCars';
+  const need = bikePay(s, id);
+  if (need > s.cash) return 'Need ' + fmt(need);
+  return null;
+}
+function buyBike(s, id) {
+  const why = bikeBlock(s, id);
+  if (why) return { ok: false, msg: why };
+  const b = CITY.bikes[id], pay = bikePay(s, id), upgrade = !!(s.owned.bike && CITY.bikes[s.owned.bikeId]);
+  s.cash -= pay; s.owned.bike = true; s.owned.bikeId = id;
+  apply(s, { mood: b.mood, conn: b.conn });
+  const m = (upgrade ? 'You traded up to a ' : 'You bought a ') + b.name + ' for ' + fmt(pay) + '. You only pay fuel now, and you slip through every go-slow.';
+  log(s, m); return { ok: true, msg: m };
+}
+
+/* ---------- Boutique: hairstyles, clothes and extras. Free ones are yours from day one; the rest you buy once ---------- */
+function lookList(k) { return k === 'hair' ? LOOK.hairs : k === 'outfit' ? LOOK.outfits : k === 'acc' ? LOOK.accs : null; }
+function ownsLook(s, k, i) {
+  const it = (lookList(k) || [])[i]; if (!it) return false;
+  return !it[2] || !!(s.wardrobe && s.wardrobe[k] && s.wardrobe[k].indexOf(i) >= 0);
+}
+function boutiqueBlock(s, k, i) {
+  const it = (lookList(k) || [])[i];
+  if (s.over) return 'Game over';
+  if (!it) return 'Not available';
+  if (ownsLook(s, k, i)) return s.look[k] === i ? 'Wearing' : null;
+  if (it[2] > s.cash) return 'Need ' + fmt(it[2]);
+  return null;
+}
+function boutiqueBuy(s, k, i) {
+  const it = (lookList(k) || [])[i], why = boutiqueBlock(s, k, i);
+  if (!it) return { ok: false, msg: 'Not available' };
+  if (why) return { ok: false, msg: why };
+  let m;
+  if (ownsLook(s, k, i)) { s.look[k] = i; m = 'You put on the ' + it[1].toLowerCase() + '.'; }
+  else {
+    s.cash -= it[2]; s.wardrobe[k].push(i); s.look[k] = i; apply(s, { mood: 4, conn: it[2] >= 60000 ? 0.1 : 0 });
+    m = 'You bought the ' + it[1].toLowerCase() + ' for ' + fmt(it[2]) + '. It was delivered and you are already wearing it.';
+  }
   log(s, m); return { ok: true, msg: m };
 }
 
@@ -857,6 +1205,7 @@ function netWorth(s) {
   let n = s.cash;
   for (const k in s.items) if (s.items[k] && CITY.items[k]) n += Math.round(CITY.items[k].cost * 0.6);
   if (s.owned.car) n += Math.round((CITY.cars[s.owned.carId || 'corolla'] || CITY.cars.corolla).cost * 0.7);
+  if (s.owned.bike && CITY.bikes[s.owned.bikeId]) n += Math.round(CITY.bikes[s.owned.bikeId].cost * 0.7);
   CITY.jobs.forEach(function (j) { if (j.startup && s.owned[j.startup.key] && j.startup.key !== 'ride') n += Math.round(j.startup.cost * 0.5); });
   return n;
 }
@@ -965,6 +1314,58 @@ function reportScam(s) {
   if (rnd() < 0.2) { const back = Math.round(lost * 0.4); apply(s, { cash: back, mood: 6 }); m = 'The officers traced part of it. You got ' + fmt(back) + ' back and a stern warning about agents.'; }
   else { apply(s, { mood: -2 }); m = 'They wrote down your statement and said they would look into it. Nothing came back. At least it is on record.'; }
   log(s, m); return { ok: true, msg: m };
+}
+
+/* messages: some are real chances, some are scams. Ignore, report or fall for them. */
+function msgIsScam(m) { return !!CITY.scamMsgs[m.tpl]; }
+function msgText(s, m) { const sc = CITY.scamMsgs[m.tpl]; return sc ? sc.text(m.amt) : CITY.realMsgs[m.tpl].text(s, m); }
+function msgFrom(m) { return (CITY.scamMsgs[m.tpl] || CITY.realMsgs[m.tpl]).from; }
+function unreadCount(s) { return s.inbox.filter(m => m.state === 'new').length; }
+function deliverMsg(s, tpl) {
+  const sc = CITY.scamMsgs[tpl], re = CITY.realMsgs[tpl];
+  if (!sc && !re) return null;
+  const m = { id: ++s.msgSeq, tpl: tpl, d: s.day, state: 'new', amt: 0, res: '' };
+  if (sc) m.amt = Math.max(sc.min, Math.min(sc.max, Math.round(s.cash * sc.frac / 1000) * 1000));
+  else if (re.amt) m.amt = re.amt(s);
+  s.inbox.push(m);
+  if (s.inbox.length > 16) { const i = s.inbox.findIndex(x => x.state === 'done'); s.inbox.splice(i < 0 ? 0 : i, 1); }
+  return m;
+}
+function msgChoices(s, m) {
+  const sc = CITY.scamMsgs[m.tpl];
+  if (sc) return [
+    { label: sc.pay + ' (' + fmt(m.amt) + ')', block: s.cash < m.amt ? 'Need ' + fmt(m.amt) : null,
+      run: () => { s.cash -= m.amt; scammed(s, m.amt); apply(s, { mood: -8 }); return sc.loss + ' You lost ' + fmt(m.amt) + '.'; } },
+    { label: 'Ignore', block: null, run: () => { s.wise += 1; return 'You ignored it. Wise move.'; } },
+    { label: 'Report as scam', block: null, run: () => { s.wise += 1; apply(s, { mood: 1 }); return 'You reported the number. It may protect someone else.'; } }
+  ];
+  const r = CITY.realMsgs[m.tpl];
+  return [
+    { label: r.label(s, m), block: r.block(s, m), run: () => r.run(s, m) },
+    { label: 'Ignore', block: null, run: () => 'You let it go.' }
+  ];
+}
+function replyMsg(s, id, i) {
+  if (s.over) return { ok: false, msg: 'Game over' };
+  const m = s.inbox.find(x => x.id === id);
+  if (!m || m.state !== 'new') return { ok: false, msg: 'Already handled.' };
+  const ch = msgChoices(s, m)[i];
+  if (!ch) return { ok: false, msg: 'Not possible.' };
+  if (ch.block) return { ok: false, msg: ch.block };
+  const res = ch.run();
+  m.state = 'done'; m.res = res; log(s, res);
+  return { ok: true, msg: res };
+}
+/* each morning old messages fade away and maybe a new one arrives */
+function dailyMessages(s) {
+  s.inbox.forEach(function (m) { if (m.state === 'new' && s.day - m.d >= 3) { m.state = 'done'; m.res = msgIsScam(m) ? 'The message expired.' : 'You missed your chance.'; } });
+  if (unreadCount(s) >= 4 || rnd() > 0.45) return;
+  const pool = [];
+  for (const k in CITY.scamMsgs) pool.push([k, 1.2]);
+  for (const k in CITY.realMsgs) { const r = CITY.realMsgs[k]; if (!r.when || r.when(s)) pool.push([k, k === 'family' ? 2 : k === 'owambe' ? 1 : 1.6]); }
+  let t = pool.reduce((a, p) => a + p[1], 0) * rnd(), pickK = pool[0][0];
+  for (const p of pool) { t -= p[1]; if (t <= 0) { pickK = p[0]; break; } }
+  deliverMsg(s, pickK);
 }
 
 function itemBlock(s, id) {
@@ -1156,6 +1557,7 @@ function endDay(s) {
   log(s, 'Day ' + d + ' closed. Living costs ' + fmt(live) + '.' + rentLine + ' Net for the day: ' + fmt(net) + '.' + (notes.length ? ' ' + notes.join(' ') : ''));
   s.day += 1; s.at = homePlace(s); s.slot = s.mood < 15 ? 1 : 0;
   if (s.mood < 15) log(s, 'You woke up with no strength. The morning is gone.');
+  dailyMessages(s);
   if (s.sick > 0) { s.sick -= 1; apply(s, { energy: -12, mood: -3 }); log(s, s.sick ? 'Still feverish. Your body aches.' : 'The fever finally passed.'); }
   else if (rnd() < (notes.length ? 0.12 : 0.04)) { s.sick = 2; apply(s, { energy: -12, mood: -3 }); log(s, 'You woke up feverish. Malaria again? Order medication or visit the hospital from your phone.'); }
   s.rain = rnd() < 0.12;
@@ -1227,22 +1629,35 @@ window.G3 = (function () {
   const hexNum = function (h) { return parseInt(String(h).replace('#', ''), 16); };
   G.makeAvatar = function (look) {
     const g = new T.Group();
-    const L = look || { skin: 4, hair: 0, outfit: 0, color: 0 };
+    const L = look || { skin: 4, hair: 0, outfit: 0, color: 0, acc: 0 };
     const skin = hexNum(LOOK.skins[L.skin] || LOOK.skins[4]), shirt = hexNum(LOOK.colors[L.color] || LOOK.colors[0]);
-    const hair = LOOK.hairs[L.hair] ? LOOK.hairs[L.hair][0] : 'low', outfit = LOOK.outfits[L.outfit] ? LOOK.outfits[L.outfit][0] : 'tee';
-    const legs = [], arms = [], black = 0x15110f, trouser = 0x2b2f3a;
+    const hair = LOOK.hairs[L.hair] ? LOOK.hairs[L.hair][0] : 'low', outfit = LOOK.outfits[L.outfit] ? LOOK.outfits[L.outfit][0] : 'tee', acc = LOOK.accs[L.acc] ? LOOK.accs[L.acc][0] : 'none';
+    const legs = [], arms = [], black = 0x15110f, suitc = 0x23262c, white = 0xf2efe6, gold = 0xd9a21b;
+    const trouser = outfit === 'suit' ? suitc : 0x2b2f3a, skirty = outfit === 'dress' || outfit === 'ankara';
+    const tc = outfit === 'suit' ? suitc : outfit === 'jersey' ? 0x0b7a43 : outfit === 'jacket' ? 0x3b5b86 : shirt;
+    const sleeve = outfit === 'jersey' ? white : tc, dk = new T.Color(shirt).multiplyScalar(0.68).getHex();
     [-0.11, 0.11].forEach(function (x) {
       const p = new T.Group(); p.position.set(x, 0.52, 0);
-      G.box(p, 0.17, 0.52, 0.19, outfit === 'dress' ? skin : trouser, 0, -0.52, 0); g.add(p); legs.push(p);
+      G.box(p, 0.17, 0.52, 0.19, skirty || outfit === 'jersey' ? skin : trouser, 0, -0.52, 0);
+      if (outfit === 'jersey') G.box(p, 0.185, 0.36, 0.205, white, 0, -0.36, 0);
+      g.add(p); legs.push(p);
     });
-    G.box(g, 0.48, 0.62, 0.27, shirt, 0, 0.52, 0);
+    G.box(g, 0.48, 0.62, 0.27, tc, 0, 0.52, 0);
     if (outfit === 'kaftan') G.box(g, 0.54, 0.5, 0.31, shirt, 0, 0.14, 0);
     if (outfit === 'dress') G.cyl(g, 0.2, 0.36, 0.5, shirt, 0, 0.18, 0, 14);
-    [-0.31, 0.31].forEach(function (x) {
-      const p = new T.Group(); p.position.set(x, 1.1, 0); G.box(p, 0.12, 0.5, 0.14, shirt, 0, -0.5, 0); G.sph(p, 0.075, skin, 0, -0.52, 0); g.add(p); arms.push(p);
+    if (outfit === 'ankara') { G.cyl(g, 0.2, 0.36, 0.5, shirt, 0, 0.18, 0, 14); G.cyl(g, 0.34, 0.34, 0.04, gold, 0, 0.26, 0, 14); G.cyl(g, 0.275, 0.275, 0.04, gold, 0, 0.46, 0, 14); G.box(g, 0.5, 0.05, 0.29, gold, 0, 0.55, 0); }
+    if (outfit === 'hoodie') { const hd = G.sph(g, 0.16, shirt, 0, 1.17, -0.14); hd.scale.set(1.15, 0.8, 0.75); G.box(g, 0.3, 0.12, 0.02, dk, 0, 0.62, 0.14); G.box(g, 0.02, 0.2, 0.02, white, -0.05, 0.9, 0.14); G.box(g, 0.02, 0.2, 0.02, white, 0.05, 0.9, 0.14); }
+    if (outfit === 'jersey') { G.box(g, 0.06, 0.62, 0.285, white, -0.1, 0.52, 0); G.box(g, 0.06, 0.62, 0.285, white, 0.1, 0.52, 0); G.box(g, 0.2, 0.05, 0.285, white, 0, 1.1, 0); }
+    if (outfit === 'jacket') { G.box(g, 0.14, 0.6, 0.285, shirt, 0, 0.52, 0); G.box(g, 0.5, 0.05, 0.285, 0x2c4568, 0, 0.52, 0); }
+    if (outfit === 'suit') { G.box(g, 0.14, 0.42, 0.285, 0xf4f4f0, 0, 0.72, 0); G.box(g, 0.045, 0.36, 0.292, shirt, 0, 0.64, 0); }
+    if (outfit === 'agbada') { G.box(g, 0.76, 0.8, 0.36, shirt, 0, 0.08, 0); G.box(g, 0.1, 0.8, 0.37, gold, 0, 0.08, 0); G.box(g, 0.78, 0.06, 0.37, gold, 0, 0.08, 0); }
+    const ax = outfit === 'agbada' ? 0.44 : 0.31, aw = outfit === 'agbada' ? 0.2 : 0.12;
+    [-ax, ax].forEach(function (x) {
+      const p = new T.Group(); p.position.set(x, 1.1, 0); G.box(p, aw, 0.5, 0.14, outfit === 'agbada' ? shirt : sleeve, 0, -0.5, 0); G.sph(p, 0.075, skin, 0, -0.52, 0); g.add(p); arms.push(p);
     });
     G.sph(g, 0.21, skin, 0, 1.34, 0);
-    if (hair === 'low') { const h = G.sph(g, 0.215, black, 0, 1.4, -0.015); h.scale.set(1, 0.6, 1); }
+    const cap = function (rr, c) { const h = G.sph(g, rr || 0.215, c === undefined ? black : c, 0, 1.4, -0.015); h.scale.set(1, 0.6, 1); return h; };
+    if (hair === 'low') cap();
     else if (hair === 'afro') { const h = G.sph(g, 0.29, black, 0, 1.46, -0.02); h.scale.set(1, 0.9, 1); }
     else if (hair === 'braids') {
       const h = G.sph(g, 0.22, black, 0, 1.4, -0.015); h.scale.set(1, 0.62, 1);
@@ -1251,7 +1666,16 @@ window.G3 = (function () {
       G.sph(g, 0.215, black, 0, 1.4, -0.01).scale.set(1, 0.5, 1);
       const w = G.sph(g, 0.24, shirt === 0xf2efe6 ? 0xd9a21b : (shirt === 0xd9a21b ? 0xb5382f : 0xd9a21b), 0, 1.5, 0); w.scale.set(1.15, 0.85, 1);
       G.box(g, 0.3, 0.2, 0.12, 0xb5382f, 0.14, 1.52, 0);
-    }
+    } else if (hair === 'fade') { cap(); G.box(g, 0.27, 0.1, 0.27, black, 0, 1.46, -0.01); }
+    else if (hair === 'cornrow') { cap(); [-0.12, -0.06, 0, 0.06, 0.12].forEach(function (x) { G.box(g, 0.024, 0.03, 0.36, 0x4a3b33, x, 1.5 - Math.abs(x) * 0.55, -0.02); }); }
+    else if (hair === 'bun') { cap(); G.sph(g, 0.095, black, 0, 1.6, -0.02); }
+    else if (hair === 'puff') { cap(); G.sph(g, 0.105, black, -0.16, 1.55, -0.03); G.sph(g, 0.105, black, 0.16, 1.55, -0.03); }
+    else if (hair === 'twist') { cap(); for (let t = 0; t < 9; t++) { const a = t / 9 * Math.PI * 2; G.sph(g, 0.07, black, Math.cos(a) * 0.14, 1.53 + (t % 2) * 0.03, Math.sin(a) * 0.12 - 0.02); } G.sph(g, 0.08, black, 0, 1.6, -0.02); }
+    else if (hair === 'dread') { cap(); [[-0.2, -0.05], [-0.17, -0.14], [-0.08, -0.19], [0, -0.2], [0.08, -0.19], [0.17, -0.14], [0.2, -0.05]].forEach(function (q, n) { G.box(g, 0.04, 0.3 + (n % 3) * 0.04, 0.04, black, q[0], 1.1 - (n % 3) * 0.04, q[1]); }); }
+    else if (hair === 'bob') { cap(0.228, 0x3a2218); G.box(g, 0.47, 0.3, 0.1, 0x3a2218, 0, 1.1, -0.17); G.box(g, 0.06, 0.28, 0.22, 0x3a2218, -0.215, 1.12, -0.04); G.box(g, 0.06, 0.28, 0.22, 0x3a2218, 0.215, 1.12, -0.04); }
+    if (acc === 'glasses') { G.box(g, 0.13, 0.07, 0.03, 0x101418, -0.085, 1.32, 0.2); G.box(g, 0.13, 0.07, 0.03, 0x101418, 0.085, 1.32, 0.2); G.box(g, 0.05, 0.015, 0.03, 0x101418, 0, 1.36, 0.205); G.box(g, 0.012, 0.012, 0.2, 0x101418, -0.18, 1.36, 0.1); G.box(g, 0.012, 0.012, 0.2, 0x101418, 0.18, 1.36, 0.1); }
+    else if (acc === 'cap') { const cr = G.sph(g, 0.235, shirt, 0, 1.4, -0.01); cr.scale.set(1, 0.62, 1); G.box(g, 0.25, 0.02, 0.16, dk, 0, 1.44, 0.2); }
+    else if (acc === 'chain') { const ring = new T.Mesh(new T.TorusGeometry(0.13, 0.014, 6, 20), G.mat(gold, { emissive: 0x3a2a05 })); ring.position.set(0, 1.0, 0.14); g.add(ring); G.box(g, 0.05, 0.05, 0.02, gold, 0, 0.84, 0.145); }
     g.userData = { legs: legs, arms: arms, phase: 0 };
     g.scale.setScalar(1.15);
     return g;
@@ -1272,8 +1696,13 @@ window.G3 = (function () {
     { sky: 0x18233d, hs: 0x6070b0, hg: 0x2a2a40, hi: 0.62, sun: 0x8aa0e0, si: 0.38, sp: [-8, 14, 8] }
   ];
   const mixc = function (a, b, t) { return new T.Color(a).lerp(new T.Color(b), t); };
+  /* the light follows the real clock on your phone: morning, midday, sunset, night */
+  G.clockSlot = function (d) {
+    d = d || new Date(); const h = typeof window.__bnHour === 'number' ? window.__bnHour : d.getHours() + d.getMinutes() / 60;
+    return h >= 6 && h < 10 ? 0 : h >= 10 && h < 17 ? 1 : h >= 17 && h < 19 ? 2 : 3;
+  };
   G.env = function (s) {
-    const slot = Math.min(3, s.slot), e = ENV[slot];
+    const slot = G.clockSlot(), e = ENV[slot];
     const backup = !!(s.items && (s.items.generator || s.items.inverter));
     const power = !(s.nepa && !backup);
     const r = s.rain ? 0.55 : 0;
@@ -1537,10 +1966,11 @@ window.G3 = (function () {
     box(g, 0.5, 0.14, 0.04, 0x1f9d55, 0, 1.55, -0.1);
     return g;
   };
-  F.bike = function () {
-    const g = new T.Group();
+  F.bike = function (o) {
+    const g = new T.Group(), c = (o && o.c) || 0xd9a21b;
     [-0.8, 0.8].forEach(function (z) { const w = cyl(g, 0.38, 0.38, 0.14, 0x1c1c1c, 0, 0, z, 14); w.rotation.z = P / 2; w.position.y = 0.38; });
-    box(g, 0.2, 0.3, 1.5, 0xd9a21b, 0, 0.5, 0); box(g, 0.5, 0.06, 0.08, 0x333333, 0, 1.0, -0.6); box(g, 0.34, 0.12, 0.7, 0x1f1f1f, 0, 0.85, 0.2); box(g, 0.42, 0.42, 0.42, 0xd9a21b, 0, 0.95, 0.9);
+    box(g, 0.2, 0.3, 1.5, c, 0, 0.5, 0); box(g, 0.5, 0.06, 0.08, 0x333333, 0, 1.0, -0.6); box(g, 0.34, 0.12, 0.7, 0x1f1f1f, 0, 0.85, 0.2); box(g, 0.42, 0.42, 0.42, c, 0, 0.95, 0.9);
+    box(g, 0.1, 0.1, 0.06, 0xfff2c0, 0, 1.0, 1.15); box(g, 0.1, 0.06, 0.06, 0xc23a2a, 0, 0.8, -0.85);
     return g;
   };
   F.grill = function (o, ctx) {
@@ -1553,6 +1983,54 @@ window.G3 = (function () {
     const L = new T.PointLight(0xffe2a0, 0, 18, 1.1); L.position.set(0, y - 0.7, 0); g.add(L); ctx.lamps.push(L); return g;
   };
 
+  F.carc = function (o) {
+    const g = new T.Group(), c = o.c || 0xb8bcc4, sh = o.shape || (o.big ? 'big' : 'sedan');
+    const D = { small: { L: 3.3, W: 1.7, hm: 0.92, cl: 1.7, cz: -0.1 }, sedan: { L: 4.1, W: 1.9, hm: 1, cl: 2.0, cz: -0.1 }, big: { L: 4.3, W: 1.95, hm: 1.18, cl: 2.5, cz: -0.3 }, boxy: { L: 4.2, W: 2.0, hm: 1.32, cl: 3.0, cz: -0.35 } }[sh] || { L: 4.1, W: 1.9, hm: 1, cl: 2.0, cz: -0.1 };
+    const hm = D.hm, gl = 0x9bc9e6, hl = D.L / 2;
+    box(g, D.W, 0.6 * hm, D.L, c, 0, 0.35, 0); box(g, D.W - 0.2, 0.55 * hm, D.cl, c, 0, 0.95 * hm, D.cz);
+    box(g, D.W - 0.28, 0.4 * hm, 0.04, gl, 0, 1.0 * hm, D.cz + D.cl / 2 - 0.02); box(g, D.W - 0.18, 0.42 * hm, 0.04, gl, 0, 1.0 * hm, D.cz - D.cl / 2 - 0.03);
+    box(g, D.cl - 0.28, 0.3 * hm, 0.04, gl, (D.W - 0.2) / 2, 1.0 * hm, D.cz).rotation.y = P / 2; box(g, D.cl - 0.28, 0.3 * hm, 0.04, gl, -(D.W - 0.2) / 2, 1.0 * hm, D.cz).rotation.y = P / 2;
+    if (sh === 'big' || sh === 'boxy') box(g, D.W - 0.6, 0.06, D.cl - 0.5, 0x222428, 0, 0.95 * hm + 0.55 * hm, D.cz);
+    if (sh === 'boxy') { const sp = cyl(g, 0.38, 0.38, 0.18, 0x1c1c1c, 0, 0.5, -hl - 0.12, 14); sp.rotation.x = P / 2; }
+    const lx = D.W * 0.315;
+    box(g, 0.5, 0.18, 0.05, 0xfff2c0, lx, 0.55, hl + 0.01); box(g, 0.5, 0.18, 0.05, 0xfff2c0, -lx, 0.55, hl + 0.01); box(g, 0.5, 0.14, 0.05, 0xc23a2a, lx, 0.55, -hl - 0.01); box(g, 0.5, 0.14, 0.05, 0xc23a2a, -lx, 0.55, -hl - 0.01);
+    const wz = hl - 0.75, wx = D.W / 2, wr = 0.4 * (sh === 'small' ? 0.9 : sh === 'boxy' ? 1.12 : 1);
+    [[-wx, wz], [wx, wz], [-wx, -wz], [wx, -wz]].forEach(function (q) { const w = cyl(g, wr, wr, 0.28, 0x1c1c1c, q[0], 0, q[1], 14); w.rotation.z = P / 2; w.position.y = wr; });
+    return g;
+  };
+  /* small pictures of things for the Buy catalogue: drawn once with the same models the house uses */
+  const THUMBS = {};
+  G.thumb = function (id) {
+    if (id in THUMBS) return THUMBS[id];
+    let url = null;
+    try {
+      const r = G.renderer; if (!r) return null;
+      const ctx = { tvs: [], bulbs: [], glass: [], lamps: [], fans: [], gen: null, smoke: null, own: {}, items: {} };
+      const make = {
+        mattress: function () { return F.bed({ mattress: true }); }, fan: function () { return F.fan({}, ctx); }, tv: function () { return F.tv({}, ctx); }, sofa: function () { return F.sofa({}); },
+        rug: function () { return F.rug({}); }, plant: function () { return F.plant(); }, fridge: function () { return F.fridge(); }, cooker: function () { return F.cooker(); },
+        generator: function () { return F.generator({}, ctx); }, inverter: function () { return F.solar(); }
+      }[id] || (CITY.cars[id] ? function () { return F.carc({ c: CITY.cars[id].col, shape: CITY.cars[id].shape }); } : CITY.bikes[id] ? function () { return F.bike({ c: CITY.bikes[id].col }); } : null);
+      if (!make) { THUMBS[id] = null; return null; }
+      const obj = make(), sc = new T.Scene(), S = 256;
+      sc.add(new T.HemisphereLight(0xffffff, 0x8a8a8a, 0.95)); const sun = new T.DirectionalLight(0xffffff, 0.8); sun.position.set(4, 8, 6); sc.add(sun);
+      sc.add(obj); obj.rotation.y = (id === 'rug' ? 0.6 : 0.5);
+      obj.updateMatrixWorld(true); const bb = new T.Box3().setFromObject(obj), ct = bb.getCenter(new T.Vector3()), sz = bb.getSize(new T.Vector3());
+      const cam = new T.OrthographicCamera(-1, 1, 1, -1, 0.1, 60), rad = Math.max(sz.x, sz.y * 1.15, sz.z) * 0.5 + 0.08;
+      cam.left = -rad; cam.right = rad; cam.top = rad; cam.bottom = -rad;
+      cam.position.set(ct.x + 6, ct.y + 6.2, ct.z + 8); cam.lookAt(ct); cam.updateProjectionMatrix();
+      const rt = new T.WebGLRenderTarget(S, S), oc = new T.Color(), oa = r.getClearAlpha(); r.getClearColor(oc);
+      const ob = sc.background; sc.background = null;
+      r.setRenderTarget(rt); r.setClearColor(0x000000, 0); r.clear(); r.render(sc, cam); r.setRenderTarget(null); r.setClearColor(oc, oa);
+      const buf = new Uint8Array(S * S * 4); r.readRenderTargetPixels(rt, 0, 0, S, S, buf); rt.dispose();
+      const cv = document.createElement('canvas'); cv.width = S; cv.height = S; const c2 = cv.getContext('2d'), im = c2.createImageData(S, S);
+      for (let y = 0; y < S; y++) im.data.set(buf.subarray((S - 1 - y) * S * 4, (S - y) * S * 4), y * S * 4);
+      c2.putImageData(im, 0, 0); url = cv.toDataURL('image/png');
+      let any = false; for (let i = 3; i < buf.length; i += 997) if (buf[i] > 0) { any = true; break; } if (!any) url = null;
+    } catch (e) { url = null; }
+    THUMBS[id] = url; return url;
+  };
+
   /* ---------- the four homes ---------- */
   const DEFS = {
     shared: {
@@ -1560,7 +2038,7 @@ window.G3 = (function () {
       fence: { kind: 'zinc', w: 18, d: 14 }, windows: [[1.7, 2.0]], parts: [],
       base: [['bunk', -2.9, -1.2, 0, {}], ['table', 2.7, -2.3, 0, { w: 1.1, d: 0.7 }], ['chair', 2.7, -1.45, P, {}], ['radio', 2.7, -2.3, 0, {}]],
       desk: null, bed: [-2.9, -1.2, 0.5],
-      slots: { fan: [0.3, -1.8, 0], tv: [3.4, 0.6, -P / 2], sofa: [1.2, 1.9, P, { len: 1.8 }], rug: [0.2, 0.5, 0, { w: 2.4, d: 1.6, c: 0xb5503c }], plant: [3.4, -0.5, 0], fridge: [-3.5, 1.9, P / 2], cooker: [-3.5, 2.7, P / 2], generator: [5.6, 1.4, -P / 2], solar: [5.8, -1.8, -P / 2], car: [-5.2, 5.2, P / 2], bike: [-5.4, 5.6, 0], grill: [5.2, 4.4, 0] },
+      slots: { fan: [0.3, -1.8, 0], tv: [3.4, 0.6, -P / 2], sofa: [1.2, 1.9, P, { len: 1.8 }], rug: [0.2, 0.5, 0, { w: 2.4, d: 1.6, c: 0xb5503c }], plant: [3.4, -0.5, 0], fridge: [-3.5, 1.9, P / 2], cooker: [-3.5, 2.7, P / 2], generator: [5.6, 1.4, -P / 2], solar: [5.8, -1.8, -P / 2], car: [-5.2, 5.2, P / 2], bike: [-0.6, 5.6, 0], grill: [5.2, 4.4, 0] },
       st: { bed: [-2.9, 0.5, P], kitchen: [-2.4, 2.3, -P / 2], bath: [7.0, -0.2, P / 2], relax: [1.0, 1.2, P / 2] }, stall: [7.4, -0.2, -P / 2],
       way: [[-1, 0.5], [1.4, 0.2], [0.6, -1.2], [2.6, 1.4], [-2, 1.2]], lamps: [[0, 0]]
     },
@@ -1570,7 +2048,7 @@ window.G3 = (function () {
       parts: [[2.2, -3, 2.2, -1.7], [2.2, -0.9, 2.2, -0.4], [2.2, -0.4, 4.5, -0.4]],
       base: [['bed', -3.4, -1.6, 0, { blanket: 0x5a7fa8 }], ['toilet', 4.0, -2.4, -P / 2, {}], ['sink', 4.0, -1.0, -P / 2, {}], ['wardrobe', -4.1, 0.4, P / 2, {}]],
       desk: [0.4, -2.4, 0, 1.4], bed: [-3.4, -1.6, 0.5],
-      slots: { fan: [0.8, 0.8, 0], tv: [-4.1, 2.2, P / 2], sofa: [1.4, 2.3, P, { len: 2.0 }], rug: [0.4, 1.1, 0, { w: 3, d: 1.8, c: 0x9a4a3a }], plant: [4.0, 0.6, 0], fridge: [4.1, 1.4, -P / 2], cooker: [4.1, 2.3, -P / 2], generator: [6.4, 1.2, -P / 2], solar: [6.6, -2, -P / 2], car: [-6, 5.4, P / 2], bike: [-6.2, 5.8, 0], grill: [6.2, 4.8, 0] },
+      slots: { fan: [0.8, 0.8, 0], tv: [-4.1, 2.2, P / 2], sofa: [1.4, 2.3, P, { len: 2.0 }], rug: [0.4, 1.1, 0, { w: 3, d: 1.8, c: 0x9a4a3a }], plant: [4.0, 0.6, 0], fridge: [4.1, 1.4, -P / 2], cooker: [4.1, 2.3, -P / 2], generator: [6.4, 1.2, -P / 2], solar: [6.6, -2, -P / 2], car: [-6.2, 5.4, P / 2], bike: [-1.2, 5.8, 0], grill: [6.2, 4.8, 0] },
       st: { bed: [-2.2, -1.6, -P / 2], kitchen: [3.2, 1.9, P / 2], bath: [3.2, -1.3, P / 2], relax: [0.4, 1.6, -P / 2] },
       way: [[-1.5, 0.6], [1, 0.8], [-0.5, 1.8], [2, 1.3], [-2.8, 1.8]], lamps: [[0, 0]]
     },
@@ -1632,7 +2110,7 @@ window.G3 = (function () {
   }
 
   /* ---------- moving around: what blocks you, what you can tap, and how to get from A to B ---------- */
-  const SOLID = { bed: 1, bunk: 1, sofa: 1, tv: 1, fridge: 1, cooker: 1, counter: 1, table: 1, desk: 1, wardrobe: 1, toilet: 1, sink: 1, tub: 1, pool: 1, generator: 1, solar: 1, car: 1, bike: 1, grill: 1, plant: 1, fan: 1 };
+  const SOLID = { carc: 1, bed: 1, bunk: 1, sofa: 1, tv: 1, fridge: 1, cooker: 1, counter: 1, table: 1, desk: 1, wardrobe: 1, toilet: 1, sink: 1, tub: 1, pool: 1, generator: 1, solar: 1, car: 1, bike: 1, grill: 1, plant: 1, fan: 1 };
   const PICK = { bed: 'bed', bunk: 'bed', fridge: 'kitchen', cooker: 'kitchen', counter: 'kitchen', table: 'kitchen', toilet: 'bath', sink: 'bath', tub: 'bath', stall: 'bath', tv: 'relax', sofa: 'relax', desk: 'desk' };
 
   function makeNav(def, placed) {
@@ -1828,8 +2306,9 @@ window.G3 = (function () {
     if (it.cooker) put('cooker', S.cooker[0], S.cooker[1], S.cooker[2]);
     if (it.generator) { const g = put('generator', S.generator[0], S.generator[1], S.generator[2]); g.position.y = 0; ctx.gen.world = g.position.clone(); }
     if (it.inverter) { const g = put('solar', S.solar[0], S.solar[1], S.solar[2]); g.position.y = 0; }
-    if (own.ride || own.car) { const g = put('car', S.car[0], S.car[1], S.car[2]); g.position.y = 0; }
-    else if (own.bike) { const g = put('bike', S.bike[0], S.bike[1], S.bike[2]); g.position.y = 0; }
+    if (own.car) { const cid = own.carId || 'corolla', cm = CITY.cars[cid] || CITY.cars.corolla, g = put('carc', S.car[0], S.car[1], S.car[2], { c: cm.col, shape: cm.shape }); g.position.y = 0; }
+    else if (own.ride) { const g = put('car', S.car[0], S.car[1], S.car[2]); g.position.y = 0; }
+    if (own.bike) { const bm = CITY.bikes[own.bikeId], g = put('bike', S.bike[0], S.bike[1], S.bike[2], { c: bm ? bm.col : 0xd9a21b }); g.position.y = 0; }
     if (own.grill) { const g = put('grill', S.grill[0], S.grill[1], 0); g.position.y = 0; ctx.smoke.world = g.position.clone(); }
     if (def.stall) { const g = put('stall', def.stall[0], def.stall[1], def.stall[2]); g.position.y = 0; }
     // lamps
@@ -1864,10 +2343,12 @@ window.G3 = (function () {
     const c = camera, d = 70, a = V.az, e = V.el;
     const need = ((def.W + def.D) * 0.72 + 3.5) / 2, needH = ((def.W + def.D) * 0.72 * Math.sin(e) + 3.2 * Math.cos(e) + 3) / 2 + 1.2;
     let hh = Math.max(needH, need / V.aspect) / V.zoom, hw = hh * V.aspect;
-    c.left = -hw; c.right = hw; c.top = hh; c.bottom = -hh;
+    let off = 0; if (V.buy) { hh *= 1.4; hw = hh * V.aspect; off = hh * 0.36; }
+    c.left = -hw; c.right = hw; c.top = hh - off; c.bottom = -hh - off;
     c.position.set(V.target.x + Math.sin(a) * Math.cos(e) * d, V.target.y + Math.sin(e) * d, V.target.z + Math.cos(a) * Math.cos(e) * d);
     c.lookAt(V.target); c.updateProjectionMatrix();
   }
+  V.setBuy = function (on) { on = !!on; if (V.buy !== on) { V.buy = on; frame(); G.once(); } };
   V.resize = function (w, h) { V.aspect = w / h; frame(); };
   V.drag = function (dx) { V.az = Math.max(0.5, Math.min(1.1, V.az - dx * 0.004)); frame(); };
   V.pinch = function (r) { V.zoom = Math.max(0.8, Math.min(2.4, V.zoom * r)); frame(); };
@@ -1949,7 +2430,7 @@ window.G3 = (function () {
     ctx.glass.forEach(function (g) { g.m.color.copy(env.sky).lerp(new T.Color(0xffffff), env.night ? 0.05 : 0.35); });
     V.rain.visible = env.rain;
     V.away = s.at !== CITY.homes[s.home].place;
-    V.sleeping = env.slot === 3;
+    V.sleeping = s.slot >= 3;
     V.avatar.visible = !V.away;
     if (!V.job) {
       if (V.sleeping) { lieDown(); }
@@ -2058,6 +2539,15 @@ window.G3 = (function () {
       box(g, 1.8, 2.4, 1.6, 0x2a6a4a, 8, 0, 5); box(g, 2.2, 0.3, 2, 0xffffff, 8, 2.4, 5);
       box(g, 18, 0.35, 2.2, 0x3a3a42, 0, 5, -2.8); [[-8, -2.8], [8, -2.8]].forEach(function (p) { box(g, 0.5, 5, 0.5, 0x888888, p[0], 0, p[1]); });
     },
+    carlot: function (g) {
+      box(g, 12, 4.6, 6, 0xeceef0, 0, 0, -6.5); box(g, 12.4, 0.5, 6.4, 0xc0392b, 0, 4.6, -6.5); box(g, 10.4, 3.1, 0.12, 0x9bc9e6, 0, 0.5, -3.4);
+      box(g, 12.4, 0.3, 1.6, 0xc0392b, 0, 3.9, -2.9); [-5, 5].forEach(function (x) { box(g, 0.3, 3.9, 0.3, 0x888c92, x, 0, -2.9); });
+      const cols = [0xd9502a, 0x23262c, 0xe9e4d6, 0x2b4f86, 0x7a1f2b, 0xcfd3d8, 0x1f3b2c];
+      for (let i = 0; i < 7; i++) { const c = carMesh(cols[i]); c.position.set(-8.4 + i * 2.8, 0.1, i % 2 ? 5.2 : 8.4); c.rotation.y = i % 2 ? 0.3 : -0.25; g.add(c); }
+      [-7, 0, 7].forEach(function (x, n) { const b = new T.Group(); b.position.set(x, 0.1, 1.3); b.rotation.y = 0.6 * (n - 1); g.add(b);
+        [-0.55, 0.55].forEach(function (z) { const w = cyl(b, 0.34, 0.34, 0.14, 0x1c1c1c, 0, 0, z, 10); w.rotation.z = P / 2; w.position.y = 0.34; }); box(b, 0.22, 0.28, 1.2, [0xd9a21b, 0xb5382f, 0x2b4f86][n], 0, 0.45, 0); box(b, 0.5, 0.06, 0.08, 0x333333, 0, 0.95, -0.4); });
+      [[-9.8, 3], [9.8, 3], [-9.8, 10.4], [9.8, 10.4]].forEach(function (q, n) { cyl(g, 0.06, 0.06, 4.2, 0xdddddd, q[0], 0, q[1], 5); sph(g, 0.55, [0xe8743b, 0x3b6ea5, 0xd9a21b, 0xb5382f][n], q[0], 4.6, q[1]); });
+    },
     gwarinpa: function (g) {
       for (let i = 0; i < 4; i++) for (let j = 0; j < 3; j++) house(g, -7.5 + i * 5, -6 + j * 5.8, 3.4, 3, 2.6, 0, 1);
     },
@@ -2065,7 +2555,7 @@ window.G3 = (function () {
       for (let i = 0; i < 5; i++) for (let j = 0; j < 4; j++) { const h = house(g, -8.5 + i * 4.3, -7 + j * 4.5, 2.8, 2.6, 2.2, 0, 1); }
     }
   };
-  const PLAZA = { market: 0xcfc8b8, gov: 0xd8d4c4, garki: 0xcfd2d4, maitama: 0xc6d8b4, asokoro: 0xc6d8b4, jabi: 0xb8cf9a, utako: 0xcfc4ae, gwarinpa: 0xd0d8b8, kubwa: 0xd6c9a8 };
+  const PLAZA = { market: 0xcfc8b8, gov: 0xd8d4c4, garki: 0xcfd2d4, maitama: 0xc6d8b4, asokoro: 0xc6d8b4, jabi: 0xb8cf9a, utako: 0xcfc4ae, gwarinpa: 0xd0d8b8, kubwa: 0xd6c9a8, carlot: 0xb9bbc0 };
 
   function billboard(p, x, z, rot, lines, bg, fg) {
     const tex = G.canvasTex(512, 256, function (c, w, h) {
@@ -2122,6 +2612,302 @@ window.G3 = (function () {
     g.scale.setScalar(0.85); return g;
   }
 
+  /* ---------- more detail: landmarks, a street grid with filler buildings, trees, lamps ---------- */
+  function instanced(geo, mat, list, colors) {
+    const m = new T.InstancedMesh(geo, mat, list.length), o = new T.Object3D(), c = new T.Color();
+    list.forEach(function (q, i) {
+      o.position.set(q.x, q.y || 0, q.z); o.rotation.set(0, q.ry || 0, 0); o.scale.set(q.sx || 1, q.sy || 1, q.sz || 1); o.updateMatrix(); m.setMatrixAt(i, o.matrix);
+      if (colors) { c.setHex(q.c); m.setColorAt(i, c); }
+    });
+    m.instanceMatrix.needsUpdate = true; if (m.instanceColor) m.instanceColor.needsUpdate = true;
+    return m;
+  }
+  function stadium(p, x, z) {
+    const g = new T.Group(); g.position.set(x, 0, z); p.add(g);
+    const bowl = new T.Mesh(new T.CylinderGeometry(15, 11, 6, 36, 1, true), new T.MeshLambertMaterial({ color: 0xe8e4d8, side: T.DoubleSide })); bowl.position.y = 3; g.add(bowl);
+    const ring = new T.Mesh(new T.TorusGeometry(15, 0.5, 6, 36), G.mat(0xc23a2a)); ring.rotation.x = P / 2; ring.position.y = 6; g.add(ring);
+    G.plane(g, 20, 26, 0x9a4a3a, 0, 0.15, 0);
+    G.plane(g, 16, 22, 0x4f9a4a, 0, 0.22, 0); G.plane(g, 16.2, 0.2, 0xffffff, 0, 0.25, 0); G.plane(g, 0.2, 22, 0xffffff, 0, 0.25, 0);
+    const c0 = new T.Mesh(new T.RingGeometry(2.2, 2.4, 20), G.mat(0xffffff)); c0.rotation.x = -P / 2; c0.position.y = 0.3; g.add(c0);
+    [[-13, -13], [13, -13], [-13, 13], [13, 13]].forEach(function (q) { cyl(g, 0.25, 0.25, 11, 0x888e96, q[0], 0, q[1], 6); G.glow(V.glows, 0xf4f4f0, 2.4, 0.9, 0.6, g, q[0], 11, q[1], 0xfff6c0); });
+  }
+  /* a passenger jet, nose towards +x, about 10 units long */
+  function jet(col) {
+    const g = new T.Group(), body = G.mat(0xf4f4f0);
+    const fus = new T.Mesh(new T.CylinderGeometry(0.75, 0.75, 8, 12), body); fus.rotation.z = P / 2; fus.position.y = 1.1; fus.castShadow = true; g.add(fus);
+    const nose = new T.Mesh(new T.SphereGeometry(0.75, 12, 8), body); nose.scale.set(1.6, 1, 1); nose.position.set(4, 1.1, 0); g.add(nose);
+    const tail = new T.Mesh(new T.ConeGeometry(0.75, 2.8, 12), body); tail.rotation.z = P / 2; tail.position.set(-5.3, 1.3, 0); g.add(tail);
+    const wl = G.box(g, 1.8, 0.12, 4.8, 0xdcdcd6, -0.2, 0.75, 2.5); wl.rotation.y = -0.5; const wr = G.box(g, 1.8, 0.12, 4.8, 0xdcdcd6, -0.2, 0.75, -2.5); wr.rotation.y = 0.5;
+    [1.9, -1.9].forEach(function (zz) { const e = G.cyl(g, 0.34, 0.34, 1.5, 0x9aa0a8, 0.35, 0.05, zz, 10); e.rotation.z = P / 2; });
+    G.box(g, 1.7, 2.3, 0.14, col, -4.5, 1.2, 0); G.box(g, 1.2, 0.1, 3.4, 0xdcdcd6, -4.6, 1.45, 0);
+    G.box(g, 5.4, 0.16, 0.04, 0x2b3a4a, 0.8, 1.45, 0.76); G.box(g, 5.4, 0.16, 0.04, 0x2b3a4a, 0.8, 1.45, -0.76);
+    G.box(g, 7.2, 0.22, 1.56, col, -0.4, 0.72, 0);
+    g.scale.setScalar(1.1); return g;
+  }
+  function airport(p, x, z) {
+    const g = new T.Group(); g.position.set(x, 0, z); p.add(g);
+    G.plane(g, 62, 40, 0x86ad6b, 0, 0.1, 0);
+    G.plane(g, 52, 12, 0xc9c8bd, 0, 0.13, -2.5);
+    // runway and taxiway
+    box(g, 60, 0.1, 5.6, 0x34373d, 0, 0.1, 9); box(g, 60, 0.1, 1.8, 0x3b3e45, 0, 0.1, 3.4);
+    [-18, 0, 18].forEach(function (cx) { box(g, 1.8, 0.1, 4.2, 0x3b3e45, cx, 0.1, 5.5); });
+    for (let i = 0; i < 15; i++) box(g, 2.4, 0.04, 0.26, 0xf2efe6, -28 + i * 4, 0.2, 9);
+    [-28.5, 28.5].forEach(function (ex) { for (let k = 0; k < 5; k++) box(g, 3, 0.04, 0.35, 0xf2efe6, ex > 0 ? ex - 2 : ex + 2, 0.2, 7.4 + k * 0.9); });
+    const edge = []; for (let i = 0; i < 16; i++) { edge.push({ x: -28 + i * 3.8, y: 0.14, z: 6.0 }); edge.push({ x: -28 + i * 3.8, y: 0.14, z: 12.0 }); }
+    const em = new T.MeshLambertMaterial({ color: 0xfff2c0, emissive: 0x000000 }); V.glows.push({ m: em, on: 0xffd36a });
+    g.add(instanced(new T.BoxGeometry(0.4, 0.2, 0.4), em, edge));
+    // terminal with a curved-roof look, sign and glass front
+    box(g, 26, 4.2, 7, 0xe8e6de, 0, 0, -10); box(g, 27, 0.6, 8, 0x3a6ea5, 0, 4.2, -10); box(g, 21, 0.5, 6, 0xdcdcd6, 0, 4.8, -10); box(g, 14, 0.5, 5, 0xcfcfc8, 0, 5.3, -10);
+    [-16, 16].forEach(function (wx) { box(g, 8, 3, 5.4, 0xd8d6cc, wx, 0, -9.5); box(g, 8.4, 0.4, 5.8, 0x3a6ea5, wx, 3, -9.5); });
+    G.glow(V.glows, 0x6f8fa4, 24, 2.1, 0.1, g, 0, 1, -6.44, 0xffe9a0);
+    const sign = G.canvasTex(512, 96, function (c, w, h) {
+      c.fillStyle = '#0b3d8a'; c.fillRect(0, 0, w, h); c.fillStyle = '#ffffff'; c.textAlign = 'center'; c.textBaseline = 'middle';
+      c.font = '800 34px system-ui, sans-serif'; c.fillText('NNAMDI AZIKIWE', w / 2, h * 0.34); c.font = '700 26px system-ui, sans-serif'; c.fillText('INTERNATIONAL AIRPORT ABUJA', w / 2, h * 0.72);
+    });
+    const sg = new T.Mesh(new T.PlaneGeometry(14, 2.6), new T.MeshBasicMaterial({ map: sign })); sg.position.set(0, 6.5, -7.45); g.add(sg);
+    box(g, 14.4, 0.2, 0.3, 0xdcdcd6, 0, 7.8, -7.6); [-6.8, 6.8].forEach(function (sx) { box(g, 0.2, 2.6, 0.2, 0x888e96, sx, 5.5, -7.5); });
+    // control tower
+    cyl(g, 0.9, 1.2, 14, 0xdcdcd6, 22, 0, -12, 10); box(g, 4.2, 2.4, 4.2, 0x2a3a4a, 22, 14, -12); G.glow(V.glows, 0x7fb6d8, 4.3, 1.4, 4.3, g, 22, 14.5, -12, 0xffe9a0);
+    box(g, 4.8, 0.4, 4.8, 0xd0302a, 22, 16.4, -12); cyl(g, 0.08, 0.08, 3, 0x888888, 22, 16.8, -12, 5); sph(g, 0.25, 0xd0302a, 22, 20, -12, { emissive: 0x880000 });
+    // gates with parked jets (nose to the terminal) and bridges
+    [[-13, 0xc23a2a], [0, 0x0b7a43], [13, 0x2a6fb0]].forEach(function (q) {
+      box(g, 1.0, 1.0, 3.8, 0x9aa0a8, q[0], 1.0, -4.8);
+      const j = jet(q[1]); j.position.set(q[0], 0.12, -1.0); j.rotation.y = P / 2; g.add(j);
+      box(g, 1.6, 0.9, 1.2, 0xd9a21b, q[0] + 3.4, 0, 0.6); box(g, 1.1, 0.5, 1.6, 0x888e96, q[0] - 3.6, 0, 1.8);
+    });
+    // hangar, windsock, parking
+    box(g, 10, 4.5, 8, 0xc9c6bb, -27, 0, -8); box(g, 10.4, 0.5, 8.4, 0x888e96, -27, 4.5, -8); box(g, 6, 3.4, 0.2, 0x3a3f46, -27, 0, -3.9);
+    cyl(g, 0.1, 0.1, 4, 0xdddddd, -29, 0, 14, 6); cone(g, 0.5, 1.8, 0xe07a1a, -28.4, 3.3, 14, 8).rotation.z = -P / 2;
+    G.plane(g, 24, 6, 0x6e727a, 0, 0.14, -17);
+    for (let i = 0; i < 8; i++) { const c = carMesh(pickc([0x2a8fd9, 0xf4f4f0, 0xc23a2a, 0x3a3a42, 0xd9a21b])); c.position.set(-9.5 + i * 2.7, 0.14, -17); c.rotation.y = P / 2; g.add(c); }
+    tree(g, 15, -17, 0.9); tree(g, -15, -17, 0.9);
+    // the plane you can watch land and take off
+    const mj = jet(0x0b7a43); g.add(mj); V.planes.push({ g: mj, ph: 'park', t: 0, d: 2 });
+  }
+  const PLANE_PH = { park: ['takeoff', 3.5], takeoff: ['gap1', 11], gap1: ['land', 5], land: ['gap2', 11], gap2: ['park', 3] };
+  function planeTick(a, dt) {
+    a.t += dt; const m = a.g, d = PLANE_PH[a.ph][1];
+    if (a.t >= d) { a.t = 0; a.ph = PLANE_PH[a.ph][0]; }
+    const u = a.t / PLANE_PH[a.ph][1], ph = a.ph; m.visible = ph !== 'gap1' && ph !== 'gap2';
+    if (ph === 'park') { m.position.set(-24, 0.12, 9); m.rotation.set(0, 0, 0); }
+    else if (ph === 'takeoff') {
+      if (u < 0.45) { const v = u / 0.45; m.position.set(-24 + 40 * v * v, 0.12, 9); m.rotation.z = 0; }
+      else { const w = (u - 0.45) / 0.55; m.position.set(16 + 70 * w, 0.12 + 28 * Math.pow(w, 1.4), 9); m.rotation.z = 0.28 * Math.min(1, w * 4); }
+    } else if (ph === 'land') {
+      if (u < 0.62) { const v = u / 0.62; m.position.set(-95 + 71 * v, 0.12 + 20 * (1 - v) * (1 - v), 9); m.rotation.z = -0.2 * (1 - v); }
+      else { const v = (u - 0.62) / 0.38; m.position.set(-24 + 40 * (1 - (1 - v) * (1 - v)), 0.12, 9); m.rotation.z = 0; }
+    }
+  }
+
+  function hospital(p, x, z) {
+    const g = new T.Group(); g.position.set(x, 0, z); p.add(g);
+    box(g, 12, 6.5, 7, 0xf4f1ea, 0, 0, 0); box(g, 12.4, 0.4, 7.4, 0xd8d2c4, 0, 6.5, 0); windowsStrip(g, 12, 6.5, 7, 0, 0, 0, 3);
+    box(g, 2.6, 0.5, 0.2, 0xd0302a, 0, 7.4, 3.6); box(g, 0.5, 2.6, 0.2, 0xd0302a, 0, 6.35, 3.62); box(g, 2.6, 0.5, 0.22, 0xd0302a, 0, 7.4, 3.62); box(g, 0.5, 2.6, 0.22, 0xd0302a, 0, 6.35, 3.64);
+    box(g, 4, 0.3, 3, 0xcfc8b8, 0, 2.6, 5.2); [[-1.8, 6.4], [1.8, 6.4]].forEach(function (q) { cyl(g, 0.1, 0.1, 2.6, 0x888888, q[0], 0, q[1], 6); });
+    const amb = carMesh(0xf4f4f0); amb.position.set(6.5, 0.1, 5.5); amb.rotation.y = P / 2; amb.scale.setScalar(0.8); g.add(amb); box(amb, 0.5, 0.3, 0.5, 0xd0302a, 0, 1.4, 0);
+    tree(g, -7, 4, 0.8);
+  }
+  function tower(p, x, z, w, h, c, rows) {
+    const g = new T.Group(); g.position.set(x, 0, z); p.add(g);
+    box(g, w, h, w, c, 0, 0, 0); box(g, w + 0.5, 0.5, w + 0.5, 0xd8d8d0, 0, h, 0);
+    for (let r = 0; r < rows; r++) { G.glow(V.glows, 0x7faac8, w - 0.6, 0.7, 0.06, g, 0, 1.5 + r * (h - 3) / rows, w / 2 + 0.02, 0xffe9a0); G.glow(V.glows, 0x7faac8, 0.06, 0.7, w - 0.6, g, w / 2 + 0.02, 1.5 + r * (h - 3) / rows, 0, 0xffe9a0); }
+    cyl(g, 0.12, 0.12, 4, 0x888888, 0, h + 0.5, 0, 5); return g;
+  }
+  function hotel(p, x, z) {
+    const g = tower(p, x, z, 7, 26, 0xd9d4c4, 11);
+    box(g, 10, 2, 8, 0xc8c2b0, 0, 0, 0); box(g, 7.4, 1.6, 0.3, 0x1f7a4a, 0, 24.4, 3.6);
+  }
+  function church(p, x, z) {
+    const g = new T.Group(); g.position.set(x, 0, z); p.add(g);
+    box(g, 6, 5, 11, 0xf4f1ea, 0, 0, 0);
+    const roof = new T.Mesh(new T.CylinderGeometry(0.01, 4.6, 3, 4, 1), G.mat(0x8a5a3c)); roof.rotation.y = P / 4; roof.scale.set(1, 1, 1.8); roof.position.y = 6.5; g.add(roof);
+    box(g, 2.8, 12, 2.8, 0xf4f1ea, 0, 0, 6.5); cone(g, 2.3, 4, 0x6b6f7a, 0, 12, 6.5, 4);
+    box(g, 0.25, 2, 0.25, 0xe6b422, 0, 16, 6.5); box(g, 1.1, 0.25, 0.25, 0xe6b422, 0, 17.2, 6.5);
+    G.glow(V.glows, 0x8a63c8, 0.2, 2.6, 1.6, g, 3.05, 1.6, 0, 0xffd0ff); G.glow(V.glows, 0x8a63c8, 0.2, 2.6, 1.6, g, -3.05, 1.6, 0, 0xffd0ff);
+    tree(g, -6, -6, 0.9); tree(g, 6, -6, 0.9);
+  }
+  function themepark(p, x, z, spin) {
+    const g = new T.Group(); g.position.set(x, 0, z); p.add(g);
+    G.plane(g, 26, 24, 0xcdbf9a, 0, 0.18, 0);
+    // ferris wheel
+    const wheel = new T.Group(); wheel.position.set(-5, 8.2, 0); g.add(wheel);
+    const rim = new T.Mesh(new T.TorusGeometry(6.5, 0.22, 6, 28), G.mat(0xf4f4f0)); wheel.add(rim);
+    const rim2 = new T.Mesh(new T.TorusGeometry(3.2, 0.14, 6, 20), G.mat(0xe0b422)); wheel.add(rim2);
+    const cabs = [];
+    for (let i = 0; i < 10; i++) {
+      const a = i / 10 * P * 2, sp = new T.Mesh(new T.BoxGeometry(13, 0.08, 0.08), G.mat(0xdcdcd6)); sp.rotation.z = a; if (i < 5) wheel.add(sp);
+      const cab = new T.Group(); cab.position.set(Math.cos(a) * 6.5, Math.sin(a) * 6.5, 0); wheel.add(cab);
+      const b = new T.Mesh(new T.BoxGeometry(1.1, 1, 1), G.mat(CANOPY[i % CANOPY.length])); b.position.y = -0.8; cab.add(b); cabs.push(cab);
+    }
+    [-1, 1].forEach(function (s) { const leg = box(g, 0.4, 9, 0.4, 0x888e96, -5 + s * 2.4, 0, 0); leg.rotation.z = -s * 0.28; });
+    spin.push({ g: wheel, kids: cabs, v: 0.22 });
+    // roller coaster: a hump track on pillars
+    for (let i = 0; i < 16; i++) {
+      const u = i / 15, px = 2 + u * 9, h = 2 + Math.abs(Math.sin(u * P * 2)) * 6 + 1.5;
+      box(g, 0.9, 0.35, 0.9, 0xd9502a, px, h, 6 - Math.sin(u * P) * 7); cyl(g, 0.1, 0.1, h, 0x888e96, px, 0, 6 - Math.sin(u * P) * 7, 5);
+    }
+    // carousel
+    cyl(g, 2.6, 2.6, 0.5, 0xe6d9bf, 6, 0.1, -6, 16); cyl(g, 0.2, 0.2, 3, 0x888888, 6, 0.6, -6, 6); cone(g, 3.2, 1.8, 0xd9502a, 6, 3.4, -6, 16);
+    for (let i = 0; i < 4; i++) box(g, 0.5, 1, 0.5, CANOPY[i], 6 + Math.cos(i * 1.57) * 1.8, 0.6, -6 + Math.sin(i * 1.57) * 1.8);
+    stall(g, -9, -8, 0xd9502a); stall(g, -9, 8, 0x2a8fd9);
+  }
+  function cityPark(p, x, z) {
+    const g = new T.Group(); g.position.set(x, 0, z); p.add(g);
+    G.plane(g, 24, 20, 0x6aa85a, 0, 0.12, 0);
+    const pond = new T.Mesh(new T.CylinderGeometry(5, 5, 0.12, 24), G.mat(0x4aa3c8, { emissive: 0x0a2a3a })); pond.position.set(0, 0.2, 0); g.add(pond);
+    cyl(g, 0.3, 0.5, 1.2, 0xdcdcd6, 0, 0.1, 0, 10); sph(g, 0.5, 0xbfe3f2, 0, 2.2, 0, { transparent: true, opacity: 0.7 });
+    [0, 1, 2, 3, 4, 5].forEach(function (i) { const a = i * 1.047; box(g, 0.1, 1.4, 0.1, 0xdff3ff, Math.cos(a) * 0.9, 0.9, Math.sin(a) * 0.9).rotation.z = Math.cos(a) * 0.4; });
+    box(g, 24, 0.06, 1.6, 0xe6dfc8, 0, 0.15, 0); box(g, 1.6, 0.06, 20, 0xe6dfc8, 0, 0.16, 0);
+    for (let i = 0; i < 12; i++) { const a = i / 12 * P * 2; tree(g, Math.cos(a) * 9.5, Math.sin(a) * 8, 0.8 + (i % 3) * 0.12); }
+    [[-4, 3], [4, -3], [-4, -3], [4, 3]].forEach(function (q) { box(g, 1.4, 0.4, 0.5, 0x8a5a3c, q[0] * 1.6, 0.2, q[1] * 1.7); });
+  }
+  function cbd(p, x, z) {
+    tower(p, x - 4, z - 3, 6, 34, 0x9cb4c8, 14); tower(p, x + 4, z + 2, 6, 24, 0xb8c4cc, 10); tower(p, x - 3, z + 5, 5, 17, 0xc8bca8, 7);
+    const g = new T.Group(); g.position.set(x, 0, z); p.add(g); G.plane(g, 20, 20, 0xcfd2d4, 0, 0.12, 0);
+  }
+  function eagleSquare(p, x, z) {
+    const g = new T.Group(); g.position.set(x, 0, z); p.add(g);
+    G.plane(g, 13, 13, 0xe6dfc8, 0, 0.14, 0); G.plane(g, 8, 8, 0xd9d2bd, 0, 0.16, 0);
+    cyl(g, 0.9, 1.3, 3, 0xcfc8b8, 0, 0.1, 0, 10); cyl(g, 0.4, 0.5, 5, 0xe8e4d8, 0, 3, 0, 8);
+    box(g, 3.4, 0.35, 0.5, 0x3a2a1c, 0, 9, 0); box(g, 0.6, 0.8, 0.5, 0x3a2a1c, 0, 9.3, 0); sph(g, 0.38, 0x3a2a1c, 0, 10.4, 0);
+    [[-5, -5], [5, -5], [-5, 5], [5, 5]].forEach(function (q) { flag(g, q[0], q[1]); });
+  }
+  function mall(p, x, z) {
+    const g = new T.Group(); g.position.set(x, 0, z); p.add(g);
+    box(g, 11, 5.5, 8, 0xe6d9bf, 0, 0, 0); box(g, 11.4, 0.5, 8.4, 0x2a8fd9, 0, 5.5, 0); windowsStrip(g, 11, 5.5, 8, 0, 0, 0, 2);
+    box(g, 6, 1.4, 0.3, 0xd9502a, 0, 4.3, 4.2);
+    for (let i = 0; i < 4; i++) { const c = carMesh(pickc([0x2a8fd9, 0xf4f4f0, 0xc23a2a, 0x3a3a42])); c.position.set(-4.5 + i * 3, 0.1, 8.5); g.add(c); }
+    G.plane(g, 13, 16, 0x6e727a, 0, 0.12, 4);
+  }
+  function university(p, x, z) {
+    const g = new T.Group(); g.position.set(x, 0, z); p.add(g);
+    G.plane(g, 24, 18, 0x7ab060, 0, 0.12, 0);
+    box(g, 9, 6, 5, 0xe8dcc0, -6, 0, -3); windowsStrip(g, 9, 6, 5, -6, 0, -3, 3); box(g, 7, 4.5, 4.5, 0xd8c8b0, 6, 0, -3); windowsStrip(g, 7, 4.5, 4.5, 6, 0, -3, 2);
+    box(g, 3, 10, 3, 0xe8dcc0, 0, 0, -4); G.sph(g, 1.4, 0xd9b24a, 0, 10.4, -4); box(g, 0.1, 1.2, 0.1, 0x555555, 0, 11.6, -4);
+    box(g, 14, 0.05, 1.2, 0xe6dfc8, 0, 0.16, 3); tree(g, -10, 4, 0.9); tree(g, 10, 4, 0.9); tree(g, -3, 6, 0.8); tree(g, 3, 6, 0.8);
+  }
+  function galleria(p, x, z) {
+    const g = new T.Group(); g.position.set(x, 0, z); p.add(g);
+    box(g, 11, 6, 8, 0xdcd6c8, 0, 0, 0); box(g, 11.4, 0.5, 8.4, 0x6a3fb0, 0, 6, 0); windowsStrip(g, 11, 6, 8, 0, 0, 0, 2);
+    const tex = G.canvasTex(512, 128, function (c, w, h) { c.fillStyle = '#1a1030'; c.fillRect(0, 0, w, h); c.fillStyle = '#ffd24a'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.font = '800 44px system-ui, sans-serif'; c.fillText('SILVERBIRD', w / 2, h * 0.38); c.font = '600 28px system-ui, sans-serif'; c.fillStyle = '#ffffff'; c.fillText('GALLERIA  ·  CINEMA', w / 2, h * 0.76); });
+    const s = new T.Mesh(new T.PlaneGeometry(8, 2), new T.MeshBasicMaterial({ map: tex })); s.position.set(0, 4.2, 4.1); g.add(s);
+    box(g, 12, 0.1, 6, 0xcfc8b8, 0, 0, 7);
+  }
+  function craftsVillage(p, x, z) {
+    const g = new T.Group(); g.position.set(x, 0, z); p.add(g);
+    G.plane(g, 13, 10, 0xd8c79a, 0, 0.12, 0);
+    [[-4, -2], [0, -3], [4, -2], [-3, 2.5], [3, 2.5]].forEach(function (q, i) { cyl(g, 1.5, 1.5, 1.8, 0xc9a56a, q[0], 0.1, q[1], 12); cone(g, 2.0, 1.8, 0x8a6a3a, q[0], 1.9, q[1], 12); });
+    stall(g, 0, 3.4, 0xd9502a); stall(g, -5.2, 2.2, 0x3aa65a); tree(g, 5.5, 3, 0.8);
+  }
+  function ceddi(p, x, z) {
+    tower(p, x - 2.8, z, 4.6, 32, 0xc8d4dc, 13); tower(p, x + 2.8, z, 4.6, 32, 0xc8d4dc, 13);
+    const g = new T.Group(); g.position.set(x, 0, z); p.add(g); box(g, 3.6, 2, 3, 0xe0e6ea, 0, 22, 0); G.plane(g, 12, 12, 0xcfd2d4, 0, 0.12, 0); tree(g, -5, 5, 0.8); tree(g, 5, 5, 0.8);
+  }
+  function zumaRock(p, x, z) {
+    const g = new T.Group(); g.position.set(x, 0, z); p.add(g);
+    [[0, 0, 0, 11, 17, 0x8a8271], [6, -1, 2, 7, 10, 0x938a77], [-6, -1, 1, 6, 8, 0x7f7766], [1, 12, 0, 6, 8, 0x9a927f]].forEach(function (b) {
+      const m = new T.Mesh(new T.SphereGeometry(1, 16, 10), G.mat(b[5])); m.scale.set(b[3], b[4], b[3] * 0.85); m.position.set(b[0], b[1] + b[4] * 0.55, b[2]); g.add(m);
+    });
+    for (let i = 0; i < 8; i++) { const a = rnd() * P * 2, r = 12 + rnd() * 6; sph(g, 1 + rnd(), 0x4f8a45, Math.cos(a) * r, 0.7, Math.sin(a) * r * 0.7 + 4); }
+  }
+  const LMK = { stadium: stadium, airport: airport, hospital: hospital, hotel: hotel, church: church, themepark: themepark, park: cityPark, galleria: galleria, crafts: craftsVillage, ceddi: ceddi, zuma: zumaRock, cbd: cbd, eagle: eagleSquare, mall: mall, university: university };
+
+  function inRect(x, z, cx, cz, hw, hd, m) { return Math.abs(x - cx) < hw + m && Math.abs(z - cz) < hd + m; }
+  function nearRoad(x, z, m) {
+    for (const k in V.paths) {
+      const pts = V.paths[k];
+      for (let i = 0; i < pts.length - 1; i++) {
+        const x1 = Math.min(pts[i][0], pts[i + 1][0]), x2 = Math.max(pts[i][0], pts[i + 1][0]), z1 = Math.min(pts[i][1], pts[i + 1][1]), z2 = Math.max(pts[i][1], pts[i + 1][1]);
+        if (x > x1 - m && x < x2 + m && z > z1 - m && z < z2 + m) return true;
+      }
+    }
+    return false;
+  }
+  function blocked(x, z, m) {
+    for (const id in CITY.mapPos) { const q = CITY.mapPos[id]; if (inRect(x, z, q.x, q.z, 11, 11, m)) return true; }
+    for (let i = 0; i < CITY.landmarks.length; i++) { const l = CITY.landmarks[i]; if (inRect(x, z, l.x, l.z, l.hw, l.hd, m)) return true; }
+    return false;
+  }
+
+  function addDetail(root) {
+    V.spin = []; V.planes = [];
+    // landmarks
+    CITY.landmarks.forEach(function (l) { if (LMK[l.id]) LMK[l.id](root, l.x, l.z, V.spin); });
+    // street grid: one big canvas texture, lots for buildings or parks
+    const X0 = -104, Z0 = -65, C = 13, NX = 13, NZ = 10, SC = 8, kinds = [];
+    const tex = G.canvasTex(NX * C * SC, NZ * C * SC, function (c, w, h) {
+      c.fillStyle = '#4a4d54'; c.fillRect(0, 0, w, h);
+      for (let j = 0; j < NZ; j++) for (let i = 0; i < NX; i++) {
+        const cx = X0 + (i + 0.5) * C, cz = Z0 + (j + 0.5) * C, bad = blocked(cx, cz, 4) || nearRoad(cx, cz, 7);
+        const r = rnd(), park = !bad && r < 0.14, k = bad ? 'x' : (park ? 'p' : 'b'); kinds.push({ i: i, j: j, cx: cx, cz: cz, k: k });
+        c.fillStyle = bad ? '#7ea565' : (park ? '#6fae5c' : '#cbc7b6'); c.fillRect(i * C * SC + 1.3 * SC, j * C * SC + 1.3 * SC, (C - 2.6) * SC, (C - 2.6) * SC);
+      }
+      c.fillStyle = 'rgba(240,236,214,0.7)';
+      for (let i = 0; i <= NX; i++) for (let d = 0; d < h; d += 3.2 * SC) c.fillRect(i * C * SC - 0.12 * SC, d, 0.24 * SC, 1.5 * SC);
+      for (let j = 0; j <= NZ; j++) for (let d = 0; d < w; d += 3.2 * SC) c.fillRect(d, j * C * SC - 0.12 * SC, 1.5 * SC, 0.24 * SC);
+    });
+    tex.anisotropy = 8;
+    const gp = new T.Mesh(new T.PlaneGeometry(NX * C, NZ * C), new T.MeshLambertMaterial({ map: tex })); gp.rotation.x = -P / 2; gp.position.set(X0 + NX * C / 2, 0.03, Z0 + NZ * C / 2); gp.receiveShadow = false; root.add(gp);
+    // filler buildings: instanced, windows light up at night
+    const wall = G.canvasTex(128, 128, function (c, w, h) {
+      c.fillStyle = '#ffffff'; c.fillRect(0, 0, w, h); c.fillStyle = '#6a7f92';
+      for (let r = 0; r < 4; r++) for (let q = 0; q < 4; q++) c.fillRect(q * 32 + 7, r * 32 + 8, 18, 15);
+    });
+    const mask = G.canvasTex(128, 128, function (c, w, h) {
+      c.fillStyle = '#000000'; c.fillRect(0, 0, w, h); c.fillStyle = '#ffffff';
+      for (let r = 0; r < 4; r++) for (let q = 0; q < 4; q++) c.fillRect(q * 32 + 7, r * 32 + 8, 18, 15);
+    });
+    wall.wrapS = wall.wrapT = mask.wrapS = mask.wrapT = T.RepeatWrapping;
+    const side = new T.MeshLambertMaterial({ map: wall, emissiveMap: mask, emissive: 0x000000 }), roofM = new T.MeshLambertMaterial({ color: 0x8b9097 });
+    V.glows.push({ m: side, on: 0xffe9a0 });
+    const mats = [side, side, roofM, roofM, side, side], HS = [4, 7, 11, 17], buckets = [[], [], [], []];
+    const TINT = [0xf2e6d0, 0xd9e6c8, 0xe6d0c8, 0xd0dde6, 0xf0d9a8, 0xe0e0e0, 0xc9d3dc];
+    const trees = [];
+    kinds.forEach(function (q) {
+      if (q.k === 'b') {
+        const dc = Math.hypot(q.cx, q.cz), hv = rnd() * 0.8 + Math.max(0, 1 - dc / 90) * 0.7, b = hv > 1.05 ? 3 : hv > 0.7 ? 2 : hv > 0.4 ? 1 : 0;
+        buckets[b].push({ x: q.cx + (rnd() - 0.5) * 1.6, z: q.cz + (rnd() - 0.5) * 1.6, sx: 5.2 + rnd() * 3.2, sz: 5.2 + rnd() * 3.2, c: pickc(TINT) });
+      } else if (q.k === 'p') {
+        for (let n = 0; n < 5; n++) trees.push({ x: q.cx + (rnd() - 0.5) * 8, z: q.cz + (rnd() - 0.5) * 8, s: 0.8 + rnd() * 0.6 });
+      }
+    });
+    buckets.forEach(function (list, bi) {
+      if (!list.length) return;
+      const h = HS[bi], geo = new T.BoxGeometry(1, h, 1); geo.translate(0, h / 2, 0);
+      const uv = geo.attributes.uv; for (let n = 0; n < uv.count; n++) uv.setY(n, uv.getY(n) * h / 12);
+      const im = instanced(geo, mats, list, true); root.add(im);
+    });
+    // trees along the roads and in parks (instanced trunks and canopies)
+    for (const k in V.paths) {
+      const pts = V.paths[k];
+      for (let i = 0; i < pts.length - 1; i++) {
+        const x1 = pts[i][0], z1 = pts[i][1], x2 = pts[i + 1][0], z2 = pts[i + 1][1], len = Math.hypot(x2 - x1, z2 - z1), n = Math.floor(len / 8);
+        for (let u = 0; u < n; u++) {
+          const t = (u + 0.5) / n, x = x1 + (x2 - x1) * t, z = z1 + (z2 - z1) * t, off = u % 2 ? 3.1 : -3.1, hz = Math.abs(z2 - z1) < 0.01;
+          const tx = hz ? x : x + off, tz = hz ? z + off : z; if (blocked(tx, tz, 1)) continue;
+          trees.push({ x: tx, z: tz, s: 0.75 + rnd() * 0.35 });
+        }
+      }
+    }
+    const trunk = new T.CylinderGeometry(0.2, 0.28, 1.6, 6); trunk.translate(0, 0.8, 0); const crown = new T.IcosahedronGeometry(1.25, 0); crown.translate(0, 2.5, 0);
+    const GREENS = [0x3f8a45, 0x4f9a55, 0x5aa65a, 0x2f7a40];
+    root.add(instanced(trunk, G.mat(0x6b4a2f), trees.map(function (q) { return { x: q.x, z: q.z, sx: q.s, sy: q.s, sz: q.s }; })));
+    root.add(instanced(crown, new T.MeshLambertMaterial({ color: 0xffffff }), trees.map(function (q) { return { x: q.x, z: q.z, sx: q.s, sy: q.s, sz: q.s, c: pickc(GREENS) }; }), true));
+    // street lamps along the main roads, lit at night
+    const lamps = [];
+    for (const k in V.paths) {
+      const pts = V.paths[k];
+      for (let i = 0; i < pts.length - 1; i++) {
+        const x1 = pts[i][0], z1 = pts[i][1], x2 = pts[i + 1][0], z2 = pts[i + 1][1], len = Math.hypot(x2 - x1, z2 - z1), n = Math.floor(len / 14), hz = Math.abs(z2 - z1) < 0.01;
+        for (let u = 0; u < n; u++) { const t = (u + 0.5) / n, x = x1 + (x2 - x1) * t, z = z1 + (z2 - z1) * t, tx = hz ? x : x + 2.2, tz = hz ? z + 2.2 : z; if (!blocked(tx, tz, 1)) lamps.push({ x: tx, z: tz }); }
+      }
+    }
+    const pole = new T.CylinderGeometry(0.1, 0.12, 5, 5); pole.translate(0, 2.5, 0); const head = new T.SphereGeometry(0.45, 8, 6); head.translate(0, 5.2, 0);
+    root.add(instanced(pole, G.mat(0x555a60), lamps));
+    const hm = new T.MeshLambertMaterial({ color: 0xfff2c0, emissive: 0x000000 }); V.glows.push({ m: hm, on: 0xffe9a0 });
+    root.add(instanced(head, hm, lamps));
+  }
+
   function build() {
     G.dispose(V.root); V.plazas = []; V.glows = []; V.cars = []; V.paths = {}; seed = 7;
     const root = V.root;
@@ -2133,7 +2919,7 @@ window.G3 = (function () {
       const pz = G.plane(g, 22, 22, PLAZA[m.kind], 0, 0.14, 0); pz.userData.place = id; V.plazas.push(pz);
       KIND[m.kind](g);
     }
-    mosque(root, 8, -30); asoRock(root, 58, -58);
+    mosque(root, 8, -30); asoRock(root, 58, -58); addDetail(root);
     // a few palms along the roads
     for (let i = 0; i < 70; i++) {
       const k = Object.keys(CITY.mapPos), a = CITY.mapPos[k[i % k.length]], x = a.x + (rnd() - 0.5) * 80, z = a.z + (rnd() - 0.5) * 60;
@@ -2145,9 +2931,13 @@ window.G3 = (function () {
     billboard(root, 28, -2.5, 0, ['NEPA TAKE LIGHT?', 'Buy an inverter'], '#d9a21b', '#14201a');
     billboard(root, -40, 6, 0, ['HUSTLE DAILY', 'Suya spot, Utako'], '#c23a2a', '#ffffff');
     billboard(root, 26, 14, 0, ['GOOD LIFE ESTATES', 'Own a home in Maitama'], '#2a8fd9', '#ffffff');
+    billboard(root, 46, 20, P, ['CHOWDECK', 'Hungry? Order in'], '#d9502a', '#ffffff');
+    billboard(root, -34, 36, 0, ['MAGIC LAND', 'Weekend ticket sale'], '#8a3fd0', '#ffffff');
+    billboard(root, 31, 41, 0, ['ABUJACARS', 'Cars and bikes for every pocket'], '#c0392b', '#ffffff');
+    billboard(root, -6, -44, 0, ['MATCH DAY', 'Stadium tonight'], '#1f7a4a', '#ffffff');
     // traffic
     const names = Object.keys(V.paths);
-    for (let i = 0; i < 12; i++) {
+    for (let i = 0; i < 20; i++) {
       const c = carMesh(i % 3 === 0 ? 0xd9a21b : (i % 3 === 1 ? 0xf4f4f0 : pickc([0x2a8fd9, 0xc23a2a, 0x3a3a42])));
       const nm = names[i % names.length]; c.userData = { pts: V.paths[nm], u: rnd(), sp: 0.012 + rnd() * 0.012, dir: i % 2 ? 1 : -1, lane: i % 2 ? 0.9 : -0.9 }; root.add(c); V.cars.push(c);
     }
@@ -2186,7 +2976,7 @@ window.G3 = (function () {
   /* screen position of a district, for the HTML pins */
   const tmp = new T.Vector3();
   V.screenPos = function (id) {
-    const m = CITY.mapPos[id]; tmp.set(m.x, 9, m.z); tmp.project(camera);
+    const m = CITY.mapPos[id] || CITY.landmarks.find(function (l) { return l.id === id; }); tmp.set(m.x, id === 'cbd' || id === 'hotel' || id === 'ceddi' ? 32 : (id === 'rock' || id === 'zuma' ? 16 : (id === 'airport' ? 16 : 9)), m.z); tmp.project(camera);
     const size = G.size();
     return { x: (tmp.x * 0.5 + 0.5) * size.w, y: (-tmp.y * 0.5 + 0.5) * size.h, ok: tmp.z < 1 && Math.abs(tmp.x) < 1.25 && Math.abs(tmp.y) < 1.25 };
   };
@@ -2219,6 +3009,8 @@ window.G3 = (function () {
       mk.position.set(pos.x, 0, pos.z); u.av.rotation.y = Math.atan2(pos.dx, pos.dz); G.walkPose(u.av, k < 1, dt * 1.4);
       if (k >= 1) { V.anim = null; V.at = a.to; G.walkPose(u.av, false, 0); }
     }
+    (V.planes || []).forEach(function (a) { planeTick(a, dt); });
+    (V.spin || []).forEach(function (s) { s.g.rotation.z += dt * s.v; s.kids.forEach(function (k) { k.rotation.z = -s.g.rotation.z; }); });
     V.cars.forEach(function (c) {
       const d = c.userData; d.u += dt * d.sp * d.dir; if (d.u > 1) { d.u = 1; d.dir = -1; } if (d.u < 0) { d.u = 0; d.dir = 1; }
       const p = pathAt(d.pts, d.u), len = Math.hypot(p.dx, p.dz) || 1, nx = -p.dz / len, nz = p.dx / len;
@@ -2235,27 +3027,23 @@ window.G3 = (function () {
   const stageEl = document.getElementById('stage');
   let S = null;
   const LKEY = 'being-a-nigerian-look';
-  const UI = { tab: 'home', sheet: null, phone: 'home', fb: 'players', toast: '', confirmNew: false, confirmStay: false, look: defaultLook('graduate'), name: '', busy: false, prompt: null };
+  const UI = { tab: 'home', sheet: null, phone: 'home', fb: 'players', mt: 'inbox', jf: 'all', bcat: 'sleep', bsel: null, bhide: false, toast: '', confirmNew: false, confirmStay: false, look: defaultLook('graduate'), name: '', busy: false, prompt: null };
   try { const r = JSON.parse(localStorage.getItem(LKEY) || 'null'); if (r) { UI.look = cleanLook(r.look); UI.name = String(r.name || '').slice(0, 16); } } catch (e) {}
   function saveLook() { try { localStorage.setItem(LKEY, JSON.stringify({ look: UI.look, name: UI.name })); } catch (e) {} }
   let threeOk = false, toastTimer = 0;
 
-  function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} try { if (S) boardSubmit(false); } catch (e) {} }
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} try { if (S) boardSubmit(false); } catch (e) {} try { markDirty(); } catch (e) {} }
+  function normalizeSave(o) {
+    if (!(o && o.v === 1 && CITY.places[o.at] && CITY.homes[o.home])) return null;
+    o.items = o.items || {}; o.nepa = !!o.nepa; o.ending = o.ending || null; o.owned = o.owned || {};
+    o.japa = Object.assign({ prep: 0, ielts: 0, status: 'none', route: null, appliedDay: 0, decideDay: 0, expireDay: 0, agent: 0, attempts: 0, denials: 0 }, o.japa || {});
+    o.stats = Object.assign({ earned: 0, workDays: 0, scams: 0, lost: 0, spent: 0, jobsSeen: {} }, o.stats || {});
+    o.stats.jobsSeen = o.stats.jobsSeen || {};
+    ensureNeeds(o);
+    return o;
+  }
   function load() {
-    try {
-      const r = localStorage.getItem(KEY);
-      if (r) {
-        const o = JSON.parse(r);
-        if (o && o.v === 1 && CITY.places[o.at] && CITY.homes[o.home]) {
-          o.items = o.items || {}; o.nepa = !!o.nepa; o.ending = o.ending || null; o.owned = o.owned || {};
-          o.japa = Object.assign({ prep: 0, ielts: 0, status: 'none', route: null, appliedDay: 0, decideDay: 0, expireDay: 0, agent: 0, attempts: 0, denials: 0 }, o.japa || {});
-          o.stats = Object.assign({ earned: 0, workDays: 0, scams: 0, lost: 0, spent: 0, jobsSeen: {} }, o.stats || {});
-          o.stats.jobsSeen = o.stats.jobsSeen || {};
-          ensureNeeds(o);
-          return o;
-        }
-      }
-    } catch (e) {}
+    try { const r = localStorage.getItem(KEY); if (r) return normalizeSave(JSON.parse(r)); } catch (e) {}
     return null;
   }
 
@@ -2285,12 +3073,14 @@ window.G3 = (function () {
     return S.cash >= need ? 'Japa: you can apply. Open Phone, then Japa' : 'Japa: save ' + fmt(need) + ' for proof of funds';
   }
   function renderHud() {
-    const slotName = S.slot >= 3 ? 'Night' : SLOTS[S.slot];
+    const chips = (S.rain ? '<span class="pill stat">\uD83C\uDF27\uFE0F Rain</span>' : '') + (S.slow ? '<span class="pill stat">\uD83D\uDEA6 Go-slow</span>' : '') + (S.sick ? '<span class="pill stat warn">\uD83E\uDD12 Unwell: Health app</span>' : '');
+    const left = Math.max(0, 3 - S.slot), pips = '<span class="pip-dots" aria-hidden="true">' + [0, 1, 2].map(function (i) { return '<i class="' + (i < left ? 'on' : '') + '"></i>'; }).join('') + '</span>';
     return '<header class="hud"><div class="hud-in">' +
-      '<div class="hud-row"><div class="pill clock"><b>Day ' + S.day + '</b><span>' + slotName + (S.rain ? ' · Rain' : '') + '</span></div>' +
+      '<div class="hud-row"><div class="stat-chips">' + chips + '</div>' +
       '<div class="pill cashp"><span class="lab">Cash</span><span class="num' + (S.cash < 0 ? ' neg' : '') + '">' + fmt(S.cash) + '</span></div></div>' +
       '<div class="hud-row2"><div class="pill meters"><div class="m-row">' + bar('Energy', S.energy) + bar('Mood', S.mood) + '</div>' +
-      '<div class="m-row m3">' + bar('Food', S.food) + bar('Fun', S.fun) + bar('Clean', S.clean) + '</div></div></div>' +
+      '<div class="m-row m3">' + bar('Food', S.food) + bar('Fun', S.fun) + bar('Clean', S.clean) + '</div>' +
+      '<button type="button" class="pip-row" data-act="pips" aria-label="What are actions?"><span>' + (left ? 'Actions left today' : 'Day is done: sleep in your bed') + '<span class="qm" aria-hidden="true">?</span></span>' + pips + '</button></div></div>' +
       '<div class="goal' + (worstNeed(S) ? ' warn' : '') + '" role="status">' + nextGoal() + '</div></div></header>';
   }
   const ICON = {
@@ -2374,6 +3164,10 @@ window.G3 = (function () {
     else h += '<button class="btn ghost" data-act="endday">' + (S.slot >= 3 ? 'Sleep until morning' : 'End the day') + '</button>';
     return h + '</div></div></div>';
   }
+  function renderAway() {
+    const hp = homePlace(S); if (S.at === hp || UI.busy) return '';
+    return '<div class="dock"><div class="dock-in away"><span><b>' + CITY.places[S.at].name + '</b> is where you are. Home is in ' + CITY.places[hp].name + '.</span><button class="btn" data-act="sheet" data-id="' + hp + '">Go home</button></div></div>';
+  }
   function renderMapBar() {
     return '<div class="dock"><div class="dock-in"><div class="loc"><span class="lab">Abuja</span><b>Tap a place to visit</b>' + (S.slow ? '<span class="slow">Go-slow today: cabs and cars suffer, okadas slip through</span>' : '') + '</div>' + quickActions(true) + '<div class="dock-btns"><button class="btn ghost" data-act="findme">Find me</button><button class="btn ghost" data-act="overview">See all of Abuja</button></div></div></div>';
   }
@@ -2399,6 +3193,7 @@ window.G3 = (function () {
         const chips = (o.block === 'No car yet' ? '<span class="chip">Locked</span>' : o.cost ? chipMoney(o.cost) : '<span class="chip">Free</span>') + (o.slots ? '<span class="chip">' + o.slots + ' slot' + (o.slots > 1 ? 's' : '') + '</span>' : '') + (o.energy ? '<span class="chip">-' + o.energy + ' energy</span>' : '');
         return row('data-act="go" data-id="' + id + '" data-mode="' + o.mode + '"', o.name, o.note, chips, !!o.block, o.mode === 'cab' && !o.block ? 'primary' : '');
       }).join('') + '</div>';
+      if (id === 'abujacars') h += '<p class="muted">Get here first, then you can buy a car or a bike.</p>';
       const jobs = CITY.jobs.filter(j => j.place === id);
       if (jobs.length) h += '<div class="eyebrow">Work here</div><p class="muted">' + jobs.map(j => j.name).join(', ') + '</p>';
     } else {
@@ -2409,6 +3204,7 @@ window.G3 = (function () {
       } else if (j) {
         h += '<div class="banner">Your job (' + j.name + ') is in ' + CITY.places[j.place].name + '. Open the Map and go there to work.</div>';
       }
+      if (id === 'abujacars') h += '<div class="card"><h3>Showroom</h3><p class="muted">Pay in full, and your old car or bike is traded in for half its price.</p>' + wheelRows() + '</div>';
       h += '<div class="list"><h3>Do something here</h3>';
       for (const a of actionList(S)) {
         const why = actionBlock(S, a), c = a.cost ? a.cost(S) : 0, slots = a.slots === undefined ? 1 : a.slots;
@@ -2429,20 +3225,43 @@ window.G3 = (function () {
   }
 
   /* ---------- shop ---------- */
-  function renderBuy() {
-    let h = '<h2>Buy for your home</h2><p class="muted">Everything is delivered to ' + CITY.homes[S.home].name + ' and appears in your house.</p>';
-    h += '<div class="list">';
-    for (const id in CITY.items) {
-      const it = CITY.items[id], own = !!S.items[id], why = own ? 'Owned' : (S.cash < it.cost ? 'Need ' + fmt(it.cost) : '');
-      h += row('data-act="buy" data-id="' + id + '"', it.name, it.desc, own ? '<span class="chip">Owned</span>' : chipMoney(it.cost), !!why);
+  const BCATS = [['sleep', 'Sleep', '🛏️'], ['kitchen', 'Kitchen', '🍳'], ['comfort', 'Comfort', '🛋️'], ['power', 'Power', '⚡'], ['wheels', 'Wheels', '🚗']];
+  const SHAPE_SIZE = { small: '2×3', sedan: '2×4', big: '2×5', boxy: '2×5' };
+  const CAT_EMOJI = { mattress: '🛏️', fan: '🌀', tv: '📺', sofa: '🛋️', rug: '🟥', plant: '🪴', fridge: '🧊', cooker: '🍳', generator: '⛽', inverter: '☀️', corolla: '🚗', camry: '🚘', suv: '🚙', boxer: '🏍️', cg125: '🏍️', vespa: '🛵', sport: '🏍️' };
+  function catalogEntries(cat) {
+    const out = [];
+    if (cat === 'wheels') {
+      const lot = S.at === 'abujacars';
+      for (const id in CITY.cars) {
+        const c = CITY.cars[id], why = carBlock(S, id), own = why === 'Owned', trade = S.owned.car && c.cost > (CITY.cars[S.owned.carId || 'corolla'] || { cost: 0 }).cost ? carTrade(S) : 0;
+        out.push({ id: id, act: !why ? 'buycar' : why === 'Go to AbujaCars' ? 'sheet' : 'buycar', bid: why === 'Go to AbujaCars' ? 'abujacars' : id, name: c.name, cost: carPay(S, id), desc: c.desc + (trade ? ' Your old car is traded in for ' + fmt(trade) + '.' : ''), size: SHAPE_SIZE[c.shape] || '2×4', stars: c.stars, own: own,
+          why: why === 'Go to AbujaCars' ? '' : why, blabel: why === 'Go to AbujaCars' ? 'Go to AbujaCars to buy' : '' });
+      }
+      for (const id in CITY.bikes) {
+        const b = CITY.bikes[id], why = bikeBlock(S, id), own = why === 'Owned';
+        out.push({ id: id, act: !why ? 'buybike' : why === 'Go to AbujaCars' ? 'sheet' : 'buybike', bid: why === 'Go to AbujaCars' ? 'abujacars' : id, name: b.name, cost: bikePay(S, id), desc: b.desc + ' Fuel only, and it slips through go-slow.', size: '1×2', stars: b.stars, own: own,
+          why: why === 'Go to AbujaCars' ? '' : why, blabel: why === 'Go to AbujaCars' ? 'Go to AbujaCars to buy' : '' });
+      }
+      return out;
     }
-    h += '</div>';
-    h += '<h3>Get around</h3><p class="muted">See every car and its price in the Cars app on your phone.</p><div class="list">' + row('data-act="buycar" data-id="corolla"', CITY.cars.corolla.name, CITY.cars.corolla.desc, S.owned.car ? '<span class="chip">Owned</span>' : chipMoney(CITY.cars.corolla.cost), !!carBlock(S, 'corolla')) + '</div>';
-    const owned = [];
-    if (S.owned.laptop) owned.push('laptop'); if (S.owned.pos) owned.push('POS terminal'); if (S.owned.ring) owned.push('ring light'); if (S.owned.grill) owned.push('grill');
-    if (S.owned.ride) owned.push('car'); if (S.owned.bike) owned.push('motorbike');
-    if (owned.length) h += '<div class="card"><h3>Work equipment</h3><p class="muted">You own: ' + owned.join(', ') + '. These appear at your home too.</p></div>';
-    return h;
+    for (const id in CITY.items) { const it = CITY.items[id]; if (it.cat !== cat) continue; const why = itemBlock(S, id); out.push({ id: id, act: 'buy', name: it.name, cost: it.cost, desc: it.desc, size: it.size, stars: it.stars, own: !!S.items[id], why: why }); }
+    return out;
+  }
+  function renderBuy() {
+    const cat = UI.bcat || 'sleep', list = catalogEntries(cat), sel = list.find(function (e) { return e.id === UI.bsel; });
+    const head = '<div class="cat-head"><h2>Catalogue</h2><button class="chip-btn" data-act="bhide">' + (UI.bhide ? 'Show' : 'Hide') + '</button></div>';
+    if (UI.bhide) return '<div class="catalog min" role="region" aria-label="Catalogue">' + head + '</div>';
+    let h = '<div class="catalog" role="region" aria-label="Catalogue">' + head;
+    h += '<div class="cat-tabs" role="tablist">' + BCATS.map(function (c) { return '<button role="tab" class="cat-tab' + (c[0] === cat ? ' on' : '') + '" data-act="bcat" data-id="' + c[0] + '"' + (c[0] === cat ? ' aria-selected="true"' : '') + '><span>' + c[2] + '</span>' + c[1] + '</button>'; }).join('') + '</div>';
+    h += '<div class="cat-grid">' + list.map(function (e) {
+      const th = threeOk ? G3.thumb(e.id) : null, stars = '★'.repeat(e.stars) + '☆'.repeat(3 - e.stars);
+      return '<button class="bc' + (e.own ? ' own' : '') + (sel && sel.id === e.id ? ' sel' : '') + '" data-act="bsel" data-id="' + e.id + '"><span class="bc-top"><span class="bc-size">' + e.size + '</span><span class="bc-stars" aria-label="Comfort ' + e.stars + ' of 3">' + stars + '</span></span>' +
+        '<span class="bc-img">' + (th ? '<img alt="" src="' + th + '">' : '<span class="bc-emoji">' + (CAT_EMOJI[e.id] || '📦') + '</span>') + '</span><b class="bc-name">' + esc(e.name) + '</b><span class="bc-price' + (!e.own && S.cash < e.cost ? ' no' : '') + '">' + (e.own ? 'Owned ✓' : fmt(e.cost)) + '</span></button>';
+    }).join('') + '</div>';
+    if (sel) {
+      h += '<div class="cat-buy"><div class="cb-text"><b>' + esc(sel.name) + '</b><span>' + esc(sel.desc) + '</span></div><button class="btn" data-act="' + sel.act + '" data-id="' + (sel.bid || sel.id) + '"' + (sel.why ? ' disabled' : '') + '>' + (sel.own ? 'Owned' : (sel.why ? esc(sel.why) : (sel.blabel || 'Buy ' + fmt(sel.cost)))) + '</button></div>';
+    } else h += '<p class="cat-hint">Tap something to see what it does. It appears in your house when you buy it. Cars and bikes are sold at AbujaCars.</p>';
+    return h + '</div>';
   }
 
   /* ---------- phone: jobs, japa, life, log ---------- */
@@ -2495,14 +3314,267 @@ window.G3 = (function () {
       .then(function () { Board.at = 0; Board.posted = true; return true; }, function (e) { Board.last = null; Board.postErr = (e && e.message) || 'network error'; return false; });
   }
 
+
+  /* ---------- accounts: email and password through Supabase Auth, plus an online copy of your save ---------- */
+  const AK = { sess: 'bn-auth', guest: 'bn-guest', owner: 'bn-owner', sync: 'bn-sync', dirty: 'bn-dirty' };
+  const Auth = { session: null, guest: false, show: false, tab: 'login', busy: false, err: '', info: '', email: '', pass: '', pulling: false, conflict: null, recovery: false, wait: false, status: '', savedAt: 0, rev: 0, lastPush: 0, timer: 0, pushing: false, again: false, wiping: null, refreshing: null };
+  function lsGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+  function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+  function lsDel(k) { try { localStorage.removeItem(k); } catch (e) {} }
+  try { Auth.session = JSON.parse(lsGet(AK.sess) || 'null'); } catch (e) {}
+  if (Auth.session && !(Auth.session.access_token && Auth.session.refresh_token && Auth.session.user && Auth.session.user.id)) Auth.session = null;
+  Auth.guest = lsGet(AK.guest) === '1';
+  function needsAuth() { return !Auth.session && !Auth.guest; }
+  const AUTH_TEXT = { invalid_credentials: 'Wrong email or password.', email_not_confirmed: 'Confirm your email first. Check your inbox (and spam).', user_already_exists: 'That email already has an account. Log in instead.',
+    email_exists: 'That email already has an account. Log in instead.', over_email_send_rate_limit: 'Too many emails sent. Wait a few minutes and try again.', over_request_rate_limit: 'Too many tries. Wait a few minutes and try again.',
+    signup_disabled: 'Sign up is switched off right now.', same_password: 'Pick a password you have not used before.', validation_failed: 'That email does not look right.' };
+  function authMsg(status, j) {
+    const code = j && (j.error_code || j.code);
+    if (code && AUTH_TEXT[code]) return AUTH_TEXT[code];
+    if (status === 429) return 'Too many tries. Wait a few minutes and try again.';
+    if (status === 400 && j && /invalid login/i.test(j.msg || j.error_description || '')) return AUTH_TEXT.invalid_credentials;
+    if (j && (j.msg || j.error_description || j.message)) return String(j.msg || j.error_description || j.message).slice(0, 140);
+    return 'Something went wrong (' + status + '). Try again.';
+  }
+  function authFetch(path, o) {
+    o = o || {};
+    const ctl = typeof AbortController === 'function' ? new AbortController() : null, tm = setTimeout(function () { if (ctl) ctl.abort(); }, 12000);
+    const hd = { apikey: BOARD.key, 'Content-Type': 'application/json' };
+    if (o.token) hd.Authorization = 'Bearer ' + o.token;
+    if (o.prefer) hd.Prefer = o.prefer;
+    const body = o.body ? JSON.stringify(o.body) : undefined;
+    return fetch(BOARD.url.replace(/\/$/, '') + path, { method: o.method || 'GET', headers: hd, body: body, signal: ctl && ctl.signal, keepalive: !!(o.keep && body && body.length < 60000) }).then(function (r) {
+      clearTimeout(tm);
+      return r.text().then(function (t) {
+        let j = null; try { j = t ? JSON.parse(t) : null; } catch (e) {}
+        if (!r.ok) { const er = new Error(authMsg(r.status, j)); er.status = r.status; er.code = j && (j.error_code || j.code); throw er; }
+        return j;
+      });
+    }, function () { clearTimeout(tm); const er = new Error('No internet. Check your connection and try again.'); er.net = true; throw er; });
+  }
+  function setSession(t) {
+    const now = Math.floor(Date.now() / 1000);
+    Auth.session = { access_token: t.access_token, refresh_token: t.refresh_token, expires_at: t.expires_at || now + (t.expires_in || 3600), user: { id: t.user.id, email: t.user.email || '' } };
+    lsSet(AK.sess, JSON.stringify(Auth.session));
+  }
+  /* a token lasts an hour: renew it quietly before it runs out */
+  function freshToken() {
+    const ss = Auth.session; if (!ss) return Promise.reject(new Error('Not logged in'));
+    if (ss.expires_at - 90 > Date.now() / 1000) return Promise.resolve(ss.access_token);
+    if (Auth.refreshing) return Auth.refreshing;
+    Auth.refreshing = authFetch('/auth/v1/token?grant_type=refresh_token', { method: 'POST', body: { refresh_token: ss.refresh_token } }).then(function (t) {
+      Auth.refreshing = null; setSession(t); return Auth.session.access_token;
+    }, function (e) {
+      Auth.refreshing = null;
+      if (!e.net && (e.status === 400 || e.status === 401 || e.status === 403)) { Auth.session = null; lsDel(AK.sess); Auth.err = 'Your login expired. Please log in again.'; render(); }
+      throw e;
+    });
+    return Auth.refreshing;
+  }
+  const dirty = () => lsGet(AK.dirty) === '1';
+  function markDirty() {
+    if (!Auth.session || !S) return;
+    Auth.rev++; lsSet(AK.dirty, '1'); Auth.status = ''; scheduleSync();
+  }
+  function scheduleSync() {
+    clearTimeout(Auth.timer);
+    Auth.timer = setTimeout(function () { cloudPush(false); }, Math.max(2500, 8000 - (Date.now() - Auth.lastPush)));
+  }
+  function cloudPush(keep) {
+    if (!Auth.session || !S || Auth.conflict || Auth.pulling || Auth.recovery) return Promise.resolve(false);
+    if (Auth.pushing) { Auth.again = true; return Promise.resolve(false); }
+    Auth.pushing = true; Auth.lastPush = Date.now(); Auth.status = 'saving'; accountNote();
+    const rev = Auth.rev, uid = Auth.session.user.id, body = { user_id: uid, data: S, day: S.day, board: { ident: boardIdent(false), on: boardJoined() } };
+    return (Auth.wiping || Promise.resolve()).then(function () { return freshToken(); }).then(function (tok) {
+      return authFetch('/rest/v1/saves?on_conflict=user_id', { method: 'POST', token: tok, prefer: 'resolution=merge-duplicates,return=representation', body: body, keep: keep });
+    }).then(function (rows) {
+      const row = Array.isArray(rows) ? rows[0] : rows;
+      lsSet(AK.sync, JSON.stringify({ uid: uid, at: row && row.updated_at })); lsSet(AK.owner, uid);
+      if (rev === Auth.rev) lsDel(AK.dirty); else Auth.again = true;
+      Auth.status = 'saved'; Auth.savedAt = Date.now(); return true;
+    }, function (e) { Auth.status = e && e.net ? 'offline' : 'error'; Auth.again = true; return false; }).then(function (ok) {
+      Auth.pushing = false; accountNote();
+      if (Auth.again) { Auth.again = false; if (dirty()) { clearTimeout(Auth.timer); Auth.timer = setTimeout(function () { cloudPush(false); }, ok ? 2500 : 20000); } }
+      return ok;
+    });
+  }
+  function statusText() {
+    const st = Auth.status;
+    if (st === 'saving') return 'Saving…';
+    if (st === 'offline') return 'Offline, will retry';
+    if (st === 'error') return 'Could not save, will retry';
+    if (dirty()) return 'Waiting to save';
+    return Auth.savedAt ? 'Saved just now' : 'Saved';
+  }
+  function accountNote() { const el = document.getElementById('cloud-stat'); if (el) el.textContent = statusText(); }
+  function cloudGet() {
+    const uid = Auth.session.user.id;
+    return freshToken().then(function (tok) { return authFetch('/rest/v1/saves?select=data,board,day,updated_at&user_id=eq.' + encodeURIComponent(uid), { token: tok }); }).then(function (rows) { return Array.isArray(rows) && rows.length ? rows[0] : null; });
+  }
+  function wipeLocal() { [KEY, AK.owner, AK.sync, AK.dirty, 'bn-board', 'bn-board-on'].forEach(lsDel); }
+  function adoptCloud(row) {
+    const uid = Auth.session.user.id, o = normalizeSave(JSON.parse(JSON.stringify(row.data)));
+    if (!o) { Auth.conflict = null; if (S) { lsSet(AK.owner, uid); lsSet(AK.dirty, '1'); cloudPush(false); } render(); return; }
+    S = o; lsSet(KEY, JSON.stringify(S)); lsSet(AK.owner, uid); lsSet(AK.sync, JSON.stringify({ uid: uid, at: row.updated_at })); lsDel(AK.dirty);
+    const b = row.board;
+    if (b && b.ident && b.ident.id && b.ident.secret) { lsSet('bn-board', JSON.stringify(b.ident)); if (b.on) lsSet('bn-board-on', '1'); else lsDel('bn-board-on'); }
+    Auth.conflict = null; Auth.status = 'saved'; Auth.savedAt = Date.now();
+    UI.tab = 'home'; UI.sheet = null; UI.phone = 'home'; if (G3.views && G3.views.home) G3.views.home.sig = ''; render();
+  }
+  /* work out which copy wins when you log in: the online one, this phone's, or ask */
+  function decide(row) {
+    const uid = Auth.session.user.id, owner = lsGet(AK.owner); let sync = null; try { sync = JSON.parse(lsGet(AK.sync) || 'null'); } catch (e) {}
+    if (!row) {
+      if (S && owner && owner !== uid) { wipeLocal(); S = null; }
+      else if (S) { lsSet(AK.owner, uid); lsSet(AK.dirty, '1'); cloudPush(false); }
+      render(); return;
+    }
+    if (!S) { adoptCloud(row); return; }
+    if (owner === uid) {
+      if (sync && sync.uid === uid && sync.at === row.updated_at) { if (dirty()) cloudPush(false); render(); return; }
+      if (!dirty()) { adoptCloud(row); return; }
+    } else if (!owner && S.day <= 1 && !(S.stats && S.stats.workDays)) { adoptCloud(row); return; }
+    Auth.conflict = { row: row }; render();
+  }
+  function reconcile() {
+    if (!Auth.session) return Promise.resolve();
+    Auth.pulling = true; if (!S) render(false);
+    return cloudGet().then(function (row) { Auth.pulling = false; decide(row); }, function (e) {
+      Auth.pulling = false;
+      if (S) { lsSet(AK.owner, lsGet(AK.owner) || Auth.session.user.id); lsSet(AK.dirty, '1'); Auth.status = 'offline'; }
+      if (!S && e && !e.net) Auth.err = e.message;
+      render();
+    });
+  }
+  function afterLogin(tok, newGuest) {
+    setSession(tok); Auth.guest = false; lsDel(AK.guest); Auth.show = false; Auth.wait = false; Auth.busy = false; Auth.err = ''; Auth.info = ''; Auth.pass = '';
+    return reconcile();
+  }
+  function emailOk(v) { return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v); }
+  function submitAuth() {
+    if (Auth.busy) return;
+    const em = (document.getElementById('a-email') || {}).value, pw = (document.getElementById('a-pass') || {}).value;
+    if (typeof em === 'string') Auth.email = em.trim(); if (typeof pw === 'string') Auth.pass = pw;
+    Auth.err = ''; Auth.info = '';
+    if (Auth.recovery) {
+      if (Auth.pass.length < 8) { Auth.err = 'Use at least 8 characters.'; render(); return; }
+      Auth.busy = true; render();
+      freshToken().then(function (tok) { return authFetch('/auth/v1/user', { method: 'PUT', token: tok, body: { password: Auth.pass } }); }).then(function () {
+        Auth.recovery = false; Auth.busy = false; Auth.pass = ''; showToast('Password changed. You are logged in.'); return reconcile();
+      }, function (e) { Auth.busy = false; Auth.err = e.message; render(); });
+      return;
+    }
+    if (!emailOk(Auth.email)) { Auth.err = 'Type a valid email, like you@gmail.com.'; render(); return; }
+    const signup = Auth.tab === 'signup';
+    if (!Auth.pass) { Auth.err = 'Type your password.'; render(); return; }
+    if (signup && Auth.pass.length < 8) { Auth.err = 'Use at least 8 characters for your password.'; render(); return; }
+    Auth.busy = true; render();
+    const req = signup ? authFetch('/auth/v1/signup', { method: 'POST', body: { email: Auth.email, password: Auth.pass } })
+      : authFetch('/auth/v1/token?grant_type=password', { method: 'POST', body: { email: Auth.email, password: Auth.pass } });
+    req.then(function (t) {
+      if (t && t.access_token && t.user) return afterLogin(t);
+      Auth.busy = false;
+      const u = t && (t.user || (t.id && t.email ? t : null));
+      if (signup && u && u.identities && !u.identities.length) { Auth.err = AUTH_TEXT.user_already_exists; Auth.tab = 'login'; }
+      else if (signup) Auth.wait = true;
+      else Auth.err = 'Could not log in. Try again.';
+      render();
+    }, function (e) {
+      Auth.busy = false; Auth.err = e.message;
+      if (signup && /already/i.test(e.message)) Auth.tab = 'login';
+      render();
+    });
+  }
+  function forgotPassword() {
+    const em = (document.getElementById('a-email') || {}).value; if (typeof em === 'string') Auth.email = em.trim();
+    Auth.err = ''; Auth.info = '';
+    if (!emailOk(Auth.email)) { Auth.err = 'Type your email above first, then tap Forgot password.'; render(); return; }
+    Auth.busy = true; render();
+    authFetch('/auth/v1/recover?redirect_to=' + encodeURIComponent(location.origin + location.pathname), { method: 'POST', body: { email: Auth.email } }).then(function () {
+      Auth.busy = false; Auth.info = 'If that email has an account, a reset link is on its way. Check your spam folder too.'; render();
+    }, function (e) { Auth.busy = false; Auth.err = e.message; render(); });
+  }
+  function logOut() {
+    if (!Auth.session) return;
+    const done = function () {
+      if (dirty() && S) { showToast('Could not save your game online. Connect to the internet, then log out, so you do not lose progress.'); render(false); return; }
+      const t = Auth.session && Auth.session.access_token; if (t) authFetch('/auth/v1/logout', { method: 'POST', token: t }).catch(function () {});
+      clearTimeout(Auth.timer); wipeLocal(); [AK.sess, AK.guest].forEach(lsDel);
+      Auth.session = null; Auth.guest = false; Auth.tab = 'login'; Auth.status = ''; Auth.savedAt = 0; S = null; UI.tab = 'home'; UI.sheet = null; UI.phone = 'home'; UI.toast = '';
+      if (G3.views && G3.views.home) G3.views.home.sig = ''; render();
+    };
+    (S && dirty() ? Promise.race([cloudPush(true), new Promise(function (r) { setTimeout(r, 6000); })]) : Promise.resolve()).then(done, done);
+  }
+  /* starting a new life also clears the online copy, so the old life does not come back */
+  function cloudWipe() {
+    if (!Auth.session) return;
+    const uid = Auth.session.user.id; lsDel(AK.dirty); lsDel(AK.sync);
+    Auth.wiping = freshToken().then(function (tok) { return authFetch('/rest/v1/saves?user_id=eq.' + encodeURIComponent(uid), { method: 'DELETE', token: tok }); }).catch(function () {}).then(function () { Auth.wiping = null; });
+  }
+  function handleAuthHash() {
+    const h = (location.hash || '').replace(/^#/, ''); if (h.indexOf('access_token=') < 0) return;
+    let p; try { p = new URLSearchParams(h); } catch (e) { return; }
+    const tok = p.get('access_token'), type = p.get('type');
+    try { history.replaceState(null, '', location.pathname + location.search); } catch (e) {}
+    authFetch('/auth/v1/user', { token: tok }).then(function (u) {
+      setSession({ access_token: tok, refresh_token: p.get('refresh_token') || '', expires_in: parseInt(p.get('expires_in'), 10) || 3600, user: u });
+      Auth.guest = false; lsDel(AK.guest);
+      if (type === 'recovery') { Auth.recovery = true; render(); } else reconcile();
+    }, function () { Auth.err = 'That link has expired. Request a new one.'; Auth.tab = 'login'; render(); });
+  }
+  document.addEventListener('visibilitychange', function () { if (document.hidden && Auth.session && S && dirty()) cloudPush(true); });
+  window.addEventListener('pagehide', function () { if (Auth.session && S && dirty()) cloudPush(true); });
+  window.addEventListener('online', function () { if (Auth.session && S && dirty()) cloudPush(false); });
+
+  function renderAuth() {
+    const eyebrow = '<div class="eyebrow">Abuja Life</div>';
+    if (Auth.conflict) {
+      const row = Auth.conflict.row, cs = row.data || {}, sum = function (o) { let nw = 0; try { nw = netWorth(o); } catch (e) {} return 'Day ' + (o.day || 1) + ' · ' + (o.name ? esc(o.name) + ' · ' : '') + fmt(nw) + ' net worth'; };
+      return '<div class="veil"><div class="sheet auth" role="dialog" aria-modal="true">' + eyebrow + '<h2>Which game do you want to keep?</h2><p class="muted">You have a saved game on your account and a different one on this phone. Pick one. The other one is replaced.</p><div class="list">' +
+        row0('data-act="cloudpick" data-id="cloud"', 'Your online game', sum(cs)) + row0('data-act="cloudpick" data-id="local"', 'The game on this phone', S ? sum(S) : 'No game') + '</div></div></div>';
+    }
+    if (Auth.session && !S && Auth.pulling) return '<div class="veil"><div class="sheet auth" role="status">' + eyebrow + '<h2>Loading your game…</h2><p class="muted">Getting your saved life from the cloud.</p></div></div>';
+    if (Auth.recovery) {
+      return '<div class="veil"><div class="sheet auth">' + eyebrow + '<h2>Choose a new password</h2><form class="authf" data-auth novalidate>' + pwField('new-password') + errLine() +
+        '<button class="btn" type="submit"' + (Auth.busy ? ' disabled' : '') + '>' + (Auth.busy ? 'Please wait…' : 'Save new password') + '</button></form></div></div>';
+    }
+    if (Auth.wait) {
+      return '<div class="veil"><div class="sheet auth" role="status">' + eyebrow + '<h2>Check your email</h2><p class="muted">We sent a link to <b>' + esc(Auth.email) + '</b>. Tap it to confirm your account, then come back here and log in.</p>' +
+        '<button class="btn" data-act="atab" data-id="login" type="button">I have confirmed, log in</button></div></div>';
+    }
+    const signup = Auth.tab === 'signup';
+    return '<div class="veil"><div class="sheet auth">' + eyebrow + '<h2>' + (signup ? 'Create your account' : 'Welcome back') + '</h2>' +
+      '<p class="muted">' + (signup ? 'Save your life online and play it on any phone.' : 'Log in to pick up where you stopped.') + '</p>' +
+      '<div class="seg" style="grid-template-columns:repeat(2,1fr)" role="tablist"><button type="button" role="tab" data-act="atab" data-id="login"' + (!signup ? ' aria-selected="true"' : '') + '>Log in</button><button type="button" role="tab" data-act="atab" data-id="signup"' + (signup ? ' aria-selected="true"' : '') + '>Sign up</button></div>' +
+      '<form class="authf" data-auth novalidate><label class="namef"><span class="lab">Email</span><input type="email" id="a-email" autocomplete="email" autocapitalize="none" autocorrect="off" spellcheck="false" inputmode="email" placeholder="you@gmail.com" value="' + esc(Auth.email) + '"></label>' +
+      pwField(signup ? 'new-password' : 'current-password') + errLine() +
+      (Auth.info ? '<p class="auth-info" role="status">' + esc(Auth.info) + '</p>' : '') +
+      '<button class="btn" type="submit"' + (Auth.busy ? ' disabled' : '') + '>' + (Auth.busy ? 'Please wait…' : signup ? 'Create account' : 'Log in') + '</button>' +
+      (signup ? '<p class="muted auth-fine">We keep your email and your game so you can log in again. Your password is encrypted.</p>' : '<button class="auth-link" type="button" data-act="aforgot">Forgot password?</button>') + '</form>' +
+      (Auth.show ? '<button class="btn ghost" type="button" data-act="aback">Back to my game</button>' : '<button class="btn ghost" type="button" data-act="aguest">Continue as guest</button><p class="muted auth-fine">Guest progress stays on this phone only.</p>') + '</div></div>';
+  }
+  function row0(attrs, title, desc) { return row(attrs, title, desc, '', false); }
+  function pwField(ac) {
+    return '<label class="namef"><span class="lab">' + (Auth.recovery ? 'New password' : 'Password') + '</span><input type="password" id="a-pass" autocomplete="' + ac + '" autocapitalize="none" placeholder="At least 8 characters" value="' + esc(Auth.pass) + '"></label>' +
+      '<label class="showpw"><input type="checkbox" id="a-show"> Show password</label>';
+  }
+  function errLine() { return Auth.err ? '<p class="auth-err" role="alert">' + esc(Auth.err) + '</p>' : ''; }
+  function accountCard() {
+    if (Auth.session) {
+      return '<div class="card"><h3>Account</h3><div class="kv"><div><span>Signed in as</span><span class="num" style="word-break:break-all">' + esc(Auth.session.user.email) + '</span></div><div><span>Online save</span><span id="cloud-stat">' + statusText() + '</span></div></div>' +
+        '<div style="margin-top:8px"><button class="btn ghost" data-act="alogout" type="button">Log out</button></div></div>';
+    }
+    return '<div class="card"><h3>Account</h3><p class="muted">You are playing as a guest, so your game only lives on this phone. Create an account to save it online and play on any phone.</p><button class="btn" data-act="aopen" type="button">Create account or log in</button></div>';
+  }
+
   /* the in-game calendar: Day 1 is a Monday */
   const WD = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
   const MO = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-  const CLOCK = [[8, 30], [13, 30], [18, 30], [23, 30]];
-  function gameDate(day) { const d = new Date(Date.UTC(2026, 9, 4 + day)); return { wd: WD[(day - 1) % 7], text: WD[(day - 1) % 7] + ' ' + d.getUTCDate() + ' ' + MO[d.getUTCMonth()] }; }
+  /* the phone shows the real time and date of the player */
+  function gameDate() { const d = new Date(), wd = WD[(d.getDay() + 6) % 7]; return { wd: wd, text: wd + ' ' + d.getDate() + ' ' + MO[d.getMonth()] }; }
   function clockText(slot, short) {
-    const c = CLOCK[Math.min(3, slot)], h12 = c[0] % 12 || 12;
-    return short ? h12 + ':' + (c[1] < 10 ? '0' : '') + c[1] : h12 + ':' + (c[1] < 10 ? '0' : '') + c[1] + (c[0] < 12 ? 'AM' : 'PM');
+    const d = new Date(), h = d.getHours(), m = d.getMinutes(), h12 = h % 12 || 12, mm = (m < 10 ? '0' : '') + m;
+    return short ? h12 + ':' + mm : h12 + ':' + mm + (h < 12 ? 'AM' : 'PM');
   }
   const APPS = [
     ['jobs', 'Jobs', '💼', 'linear-gradient(145deg,#34d399,#059669)'],
@@ -2516,20 +3588,21 @@ window.G3 = (function () {
     ['shops', 'Shops', '🛍️', 'linear-gradient(145deg,#fda4af,#f97316)'],
     ['houses', 'Houses', '🔑', 'linear-gradient(145deg,#fdba74,#c2410c)'],
     ['cars', 'Cars', '🚗', 'linear-gradient(145deg,#38bdf8,#1d4ed8)'],
+    ['boutique', 'Boutique', '👗', 'linear-gradient(145deg,#f9a8d4,#be185d)'],
     ['health', 'Health', '💊', 'linear-gradient(145deg,#fb7185,#be123c)'],
     ['forbes', 'Forbes', '👑', 'linear-gradient(145deg,#14532d,#052e16)'],
     ['police', 'Police', '🚓', 'linear-gradient(145deg,#3b82f6,#1e3a8a)'],
     ['help', 'Help & guide', '💡', 'linear-gradient(145deg,#fde68a,#f59e0b)']
   ];
   function appBadge(id) {
-    if (id === 'log') { const n = S.log.filter(l => l.d === S.day).length; return n ? Math.min(9, n) : 0; }
+    if (id === 'log') return Math.min(9, unreadCount(S));
     if (id === 'japa' && (S.japa.status === 'approved' || S.japa.status === 'denied')) return 1;
     if (id === 'health' && S.sick) return 1;
     if (id === 'police' && S.unreported > 0) return 1;
     return 0;
   }
   function renderPhoneHome() {
-    const gd = gameDate(S.day), dark = document.documentElement.getAttribute('data-theme') === 'dark';
+    const gd = gameDate(), dark = document.documentElement.getAttribute('data-theme') === 'dark';
     let h = '<div class="phone"><div class="phone-screen"><div class="ph-status"><span>' + clockText(S.slot) + '</span><span class="ph-island"></span><span>●●● 4G ▭</span></div>' +
       '<div class="ph-clock num">' + clockText(S.slot, true) + '</div><div class="ph-date">' + gd.text + ' · ' + CITY.name.split(',')[0] + '</div>' +
       '<button class="ph-pill" data-act="theme" type="button">' + (dark ? '☀️ Day mode' : '🌙 Night mode') + '</button><div class="ph-grid">';
@@ -2561,13 +3634,49 @@ window.G3 = (function () {
     }
     return h + '</div>';
   }
-  function renderCars() {
-    let h = '<h2>Cars</h2><p class="muted">Own a car and driving is free, unless there is go-slow. Upgrading trades in your old car for half its price.' + (S.slow ? ' <b>Go-slow today.</b>' : '') + '</p><div class="list">';
+  /* the cars and bikes on sale: the same rows in the Cars app and inside AbujaCars */
+  function wheelRows() {
+    let h = '<h3>Cars</h3><div class="list">';
     for (const id in CITY.cars) {
-      const c = CITY.cars[id], why = carBlock(S, id), own = S.owned.car && (S.owned.carId || 'corolla') === id, pay = c.cost - carTrade(S);
-      h += appRow('buycar', id, c.name, c.desc + (S.owned.car && !own && !why ? ' You pay ' + fmt(pay) + ' after trade-in.' : ''), own ? '<span class="chip">Owned</span>' : chipMoney(c.cost), why);
+      const c = CITY.cars[id], why = carBlock(S, id), own = why === 'Owned', pay = carPay(S, id), tr = S.owned.car && c.cost > (CITY.cars[S.owned.carId || 'corolla'] || { cost: 0 }).cost ? carTrade(S) : 0;
+      h += appRow('buycar', id, c.name, c.desc + (tr && !own ? ' You pay ' + fmt(pay) + ' after trade-in.' : ''), own ? '<span class="chip">Owned</span>' : chipMoney(pay), why);
     }
-    return h + '</div>' + (S.job === 'bolt' && S.owned.ride && !S.owned.car ? '<div class="card"><p class="muted">Your Bolt car lets you drive free only while you work as a driver.</p></div>' : '');
+    h += '</div><h3>Bikes</h3><div class="list">';
+    for (const id in CITY.bikes) {
+      const b = CITY.bikes[id], why = bikeBlock(S, id), own = why === 'Owned', pay = bikePay(S, id);
+      h += appRow('buybike', id, b.name, b.desc + ' Fuel only.', own ? '<span class="chip">Owned</span>' : chipMoney(pay), why);
+    }
+    return h + '</div>';
+  }
+  function renderCars() {
+    const car = S.owned.car && CITY.cars[S.owned.carId || 'corolla'], bike = S.owned.bike && (CITY.bikes[S.owned.bikeId] || { name: 'Motorbike' }), lot = S.at === 'abujacars';
+    let h = '<h2>Cars and bikes</h2><p class="muted">Cars and bikes are sold at AbujaCars. A car is free to drive except in go-slow. A bike costs a little fuel and slips through traffic. Upgrading trades in your old one for half its price.' + (S.slow ? ' <b>Go-slow today.</b>' : '') + '</p>';
+    h += '<div class="card"><h3>Your garage</h3><div class="garage"><div><span>Car</span><b>' + (car ? esc(car.name) : (S.job === 'bolt' && S.owned.ride ? 'Bolt car (while you drive)' : 'None')) + '</b></div><div><span>Bike</span><b>' + (bike ? esc(bike.name) : 'None') + '</b></div></div></div>';
+    h += lot ? '<div class="banner">You are at AbujaCars. Pick what you like.</div>' : '<button class="btn" style="width:100%;margin:4px 0 12px" data-act="sheet" data-id="abujacars">Go to AbujaCars</button>';
+    return h + wheelRows();
+  }
+  const BQ_TABS = [['hair', 'Hair', '💇🏾'], ['outfit', 'Clothes', '👕'], ['acc', 'Extras', '🕶️'], ['color', 'Colour', '🎨']];
+  function renderBoutique() {
+    const tab = UI.bq || 'hair', lst = lookList(tab), sel = Number.isInteger(UI.bi) && lst && lst[UI.bi] ? UI.bi : null, pv = Object.assign({}, S.look);
+    if (sel !== null) pv[tab] = sel;
+    let name = 'This is you today', note = 'Tap anything below to try it on.', btn = '';
+    if (sel !== null) {
+      const it = lst[sel], why = boutiqueBlock(S, tab, sel), own = ownsLook(S, tab, sel);
+      name = it[1]; note = own ? (why === 'Wearing' ? 'You are wearing this.' : 'You own this. Put it on any time.') : fmt(it[2]) + '. Delivered to your door.';
+      btn = '<button class="btn" data-act="bqbuy" data-k="' + tab + '" data-id="' + sel + '"' + (why && why !== 'Wearing' ? ' disabled' : why === 'Wearing' ? ' disabled' : '') + '>' + (why === 'Wearing' ? 'Wearing' : why ? esc(why) : own ? 'Wear it' : 'Buy ' + fmt(it[2]) + ' and wear it') + '</button>';
+    }
+    let h = '<h2>Boutique</h2><p class="muted">Hairstyles, clothes and extras, delivered to your door. Whatever you buy is yours for good, and your character wears it straight away.</p>';
+    h += '<div class="bq"><div class="bq-top"><div class="bq-stage"><div class="bq-pic">' + lookSvg(pv) + '</div><div class="bq-txt"><b>' + esc(name) + '</b><span class="muted">' + note + '</span>' + btn + '</div></div>';
+    h += '<div class="cat-tabs" role="tablist">' + BQ_TABS.map(function (c) { return '<button role="tab" class="cat-tab' + (c[0] === tab ? ' on' : '') + '" data-act="bq" data-id="' + c[0] + '"' + (c[0] === tab ? ' aria-selected="true"' : '') + '><span>' + c[2] + '</span>' + c[1] + '</button>'; }).join('') + '</div></div>';
+    if (tab === 'color') {
+      const sw = (k, list) => '<div class="opts" role="group" aria-label="' + k + '">' + list.map((c, i) => '<button type="button" class="sw" data-act="look" data-k="' + k + '" data-id="' + i + '" style="background:' + c + '" aria-pressed="' + (S.look[k] === i) + '" aria-label="' + k + ' ' + (i + 1) + '"></button>').join('') + '</div>';
+      return h + '<div class="card"><h3>Outfit colour</h3>' + sw('color', LOOK.colors) + '<h3>Skin tone</h3>' + sw('skin', LOOK.skins) + '<p class="muted">Colours and skin tones are free.</p></div></div>';
+    }
+    h += '<div class="cat-grid bq-grid" style="margin-top:12px">' + lst.map(function (it, i) {
+      const own = ownsLook(S, tab, i), worn = S.look[tab] === i, view = tab === 'outfit' ? '' : 'head';
+      return '<button class="bc' + (own ? ' own' : '') + (sel === i ? ' sel' : '') + '" data-act="bqsel" data-id="' + i + '"><span class="bc-top"><span class="bc-size">' + (worn ? 'Wearing' : own ? 'Owned' : '') + '</span></span><span class="bc-img">' + lookSvg(Object.assign({}, S.look, { [tab]: i }), view || 'body') + '</span><b class="bc-name">' + esc(it[1]) + '</b><span class="bc-price' + (!own && S.cash < it[2] ? ' no' : '') + '">' + (own ? (worn ? 'On you ✓' : 'Yours ✓') : fmt(it[2])) + '</span></button>';
+    }).join('') + '</div></div>';
+    return h;
   }
   function renderHealth() {
     let h = '<h2>Health</h2>' + (S.sick ? '<div class="banner"><b>You are unwell.</b> A fever drains your energy each morning until it passes. Medication clears it today.</div>' : '<div class="banner">You feel fine. Keep eating, washing and resting to stay that way.</div>') + '<div class="list">';
@@ -2649,14 +3758,14 @@ window.G3 = (function () {
     return h;
   }
   function renderHelp() {
-    return '<h2>Help and guide</h2><div class="card"><h3>The day</h3><p class="muted">Each day has three slots: morning, afternoon, evening. Working takes two. Then you sleep and the next day starts.</p></div>' +
+    return '<h2>Help and guide</h2><div class="card"><h3>The day</h3><p class="muted">Each day gives you 3 actions (the dots at the top). Working takes 2, most other things like eating out, studying, applying or a test drive take 1, and rides in a cab, okada or your own car take none. When the dots run out, go home and sleep to start a new day. The time on your phone follows the real clock, but your day only moves when you use your actions.</p></div>' +
       '<div class="card"><h3>Your needs</h3><p class="muted">Keep food, fun and clean above 25 or you pay for it overnight. Eat, bathe and unwind at home or out.</p></div>' +
-      '<div class="card"><h3>Getting around</h3><p class="muted">Cab is priced by distance. Okada is cheaper but dusty. Trekking is free but slow and tiring. A car is free, except when there is go-slow. See every car in the Cars app.</p></div>' +
-      '<div class="card"><h3>Your phone</h3><p class="muted">Order food on Chowdeck, groceries from Shops, medication from Health, find a new home in Houses, check your rank on Forbes, and report scams to the Police.</p></div>' +
+      '<div class="card"><h3>Getting around</h3><p class="muted">Cab is priced by distance. Okada is cheaper but dusty. Trekking is free but slow and tiring. A car or a bike is free or cheap to run, and you buy one at AbujaCars on the map. Cars are free except in go-slow; a bike only costs a little fuel and slips through traffic.</p></div>' +
+      '<div class="card"><h3>Your phone</h3><p class="muted">Check Messages for real chances and scams, order food on Chowdeck, groceries from Shops, medication from Health, find a new home in Houses, change your look in the Boutique, check your rank on Forbes, and report scams to the Police.</p></div>' +
       '<div class="card"><h3>The goal</h3><p class="muted">Save money, pass IELTS, choose a visa route, avoid fake agents, then japa. Or stay and build a life here. Both are real endings.</p></div>';
   }
-  const PHONE_SCREENS = { jobs: () => renderJobs(), log: () => renderLog(), japa: () => renderJapa(), life: () => renderLife(), bank: () => renderBank(), courses: () => renderCourses(),
-    help: () => renderHelp(), houses: () => renderHouses(), cars: () => renderCars(), health: () => renderHealth(), chow: () => renderChow(), shops: () => renderShops(),
+  const PHONE_SCREENS = { jobs: () => renderJobs(), log: () => renderMessages(), japa: () => renderJapa(), life: () => renderLife(), bank: () => renderBank(), courses: () => renderCourses(),
+    help: () => renderHelp(), houses: () => renderHouses(), cars: () => renderCars(), boutique: () => renderBoutique(), health: () => renderHealth(), chow: () => renderChow(), shops: () => renderShops(),
     forbes: () => renderForbes(), police: () => renderPolice(), ride: () => renderRide() };
   function renderPhone() {
     const f = PHONE_SCREENS[UI.phone];
@@ -2665,46 +3774,68 @@ window.G3 = (function () {
   }
 
   /* ---------- your look: a small drawing plus the choices ---------- */
-  function lookSvg(l) {
+  function lookSvg(l, view) {
     l = cleanLook(l);
-    const skin = LOOK.skins[l.skin], col = LOOK.colors[l.color], hair = LOOK.hairs[l.hair][0], outfit = LOOK.outfits[l.outfit][0], K = '#15110f';
-    const gele = col.toLowerCase() === '#d9a21b' ? '#b5382f' : '#d9a21b';
-    let v = '<svg class="look-svg" viewBox="0 0 100 140" role="img" aria-label="Your character">';
+    const skin = LOOK.skins[l.skin], col = LOOK.colors[l.color], hair = LOOK.hairs[l.hair][0], outfit = LOOK.outfits[l.outfit][0], acc = LOOK.accs[l.acc || 0][0], K = '#15110f';
+    const gele = col.toLowerCase() === '#d9a21b' ? '#b5382f' : '#d9a21b', GOLD = '#d9a21b', W = '#f2efe6', SUIT = '#23262c', BOB = '#3a2218';
+    const skirty = outfit === 'dress' || outfit === 'ankara', tc = outfit === 'suit' ? SUIT : outfit === 'jersey' ? '#0b7a43' : outfit === 'jacket' ? '#3b5b86' : col, sl = outfit === 'jersey' ? W : tc;
+    const legc = skirty || outfit === 'jersey' ? skin : (outfit === 'suit' ? SUIT : '#2b2f3a');
+    const vb = view === 'head' ? '16 2 68 68' : '0 0 100 140';
+    let v = '<svg class="' + (view ? 'bq-svg' : 'look-svg') + '" viewBox="' + vb + '" role="img" aria-label="Your character">';
+    /* hair that sits behind the body */
     if (hair === 'afro') v += '<circle cx="50" cy="32" r="23" fill="' + K + '"/>';
     if (hair === 'braids') v += [34, 42, 50, 58, 66].map(x => '<rect x="' + (x - 2) + '" y="32" width="4" height="40" rx="2" fill="' + K + '"/>').join('');
-    v += '<rect x="36" y="98" width="12" height="36" rx="3" fill="' + (outfit === 'dress' ? skin : '#2b2f3a') + '"/><rect x="52" y="98" width="12" height="36" rx="3" fill="' + (outfit === 'dress' ? skin : '#2b2f3a') + '"/>';
+    if (hair === 'dread') v += [30, 35, 40, 60, 65, 70].map((x, n) => '<rect x="' + (x - 2) + '" y="30" width="4" height="' + (30 + (n % 3) * 7) + '" rx="2" fill="' + K + '"/>').join('');
+    if (hair === 'bob') v += '<path d="M29 34 Q29 12 50 12 Q71 12 71 34 L73 66 L61 66 L61 44 L39 44 L39 66 L27 66 Z" fill="' + BOB + '"/>';
+    v += '<rect x="36" y="98" width="12" height="36" rx="3" fill="' + legc + '"/><rect x="52" y="98" width="12" height="36" rx="3" fill="' + legc + '"/>';
+    if (outfit === 'jersey') v += '<rect x="35.5" y="98" width="13" height="15" rx="3" fill="' + W + '"/><rect x="51.5" y="98" width="13" height="15" rx="3" fill="' + W + '"/>';
     if (outfit === 'kaftan') v += '<rect x="28" y="52" width="44" height="64" rx="5" fill="' + col + '"/>';
     else if (outfit === 'dress') v += '<rect x="32" y="52" width="36" height="22" rx="4" fill="' + col + '"/><path d="M32 70 L68 70 L80 114 L20 114 Z" fill="' + col + '"/>';
-    else v += '<rect x="30" y="52" width="40" height="48" rx="5" fill="' + col + '"/>';
-    v += '<rect x="19" y="54" width="10" height="36" rx="4" fill="' + col + '"/><rect x="71" y="54" width="10" height="36" rx="4" fill="' + col + '"/><circle cx="24" cy="92" r="5" fill="' + skin + '"/><circle cx="76" cy="92" r="5" fill="' + skin + '"/>';
+    else if (outfit === 'ankara') v += '<rect x="32" y="52" width="36" height="22" rx="4" fill="' + col + '"/><path d="M32 70 L68 70 L80 114 L20 114 Z" fill="' + col + '"/><rect x="32" y="68" width="36" height="4" fill="' + GOLD + '"/><circle cx="40" cy="86" r="3" fill="' + GOLD + '"/><circle cx="58" cy="92" r="3" fill="' + W + '"/><circle cx="48" cy="102" r="3" fill="' + GOLD + '"/><circle cx="30" cy="106" r="2.6" fill="' + W + '"/><circle cx="70" cy="106" r="2.6" fill="' + GOLD + '"/><circle cx="62" cy="78" r="2.6" fill="' + GOLD + '"/>';
+    else if (outfit === 'agbada') v += '<path d="M28 52 L72 52 L86 118 L14 118 Z" fill="' + col + '"/><rect x="46" y="52" width="8" height="66" fill="' + GOLD + '"/><path d="M28 52 L8 94 L24 100 L34 66 Z" fill="' + col + '"/><path d="M72 52 L92 94 L76 100 L66 66 Z" fill="' + col + '"/>';
+    else v += '<rect x="30" y="52" width="40" height="48" rx="5" fill="' + tc + '"/>';
+    if (outfit === 'hoodie') v += '<ellipse cx="50" cy="54" rx="17" ry="7" fill="' + col + '" stroke="rgba(0,0,0,.25)"/><rect x="38" y="84" width="24" height="10" rx="3" fill="rgba(0,0,0,.2)"/><rect x="46" y="56" width="2" height="14" fill="' + W + '"/><rect x="52" y="56" width="2" height="14" fill="' + W + '"/>';
+    if (outfit === 'jersey') v += '<rect x="39" y="52" width="6" height="48" fill="' + W + '"/><rect x="55" y="52" width="6" height="48" fill="' + W + '"/><rect x="42" y="50" width="16" height="4" fill="' + W + '"/>';
+    if (outfit === 'jacket') v += '<rect x="42" y="52" width="16" height="48" fill="' + col + '"/><rect x="30" y="76" width="40" height="3" fill="#2c4568"/>';
+    if (outfit === 'suit') v += '<polygon points="43,52 57,52 50,76" fill="#f4f4f0"/><rect x="48.4" y="62" width="3.2" height="26" fill="' + col + '"/>';
+    if (outfit === 'agbada') v += '<circle cx="24" cy="97" r="5" fill="' + skin + '"/><circle cx="76" cy="97" r="5" fill="' + skin + '"/>';
+    else v += '<rect x="19" y="54" width="10" height="36" rx="4" fill="' + sl + '"/><rect x="71" y="54" width="10" height="36" rx="4" fill="' + sl + '"/><circle cx="24" cy="92" r="5" fill="' + skin + '"/><circle cx="76" cy="92" r="5" fill="' + skin + '"/>';
+    if (acc === 'chain') v += '<path d="M40 54 Q50 72 60 54" stroke="' + GOLD + '" stroke-width="2.4" fill="none"/><circle cx="50" cy="68" r="3.2" fill="' + GOLD + '"/>';
     v += '<circle cx="50" cy="36" r="16" fill="' + skin + '"/>';
-    if (hair === 'low') v += '<path d="M34 34 A16 16 0 0 1 66 34 Q50 24 34 34 Z" fill="' + K + '"/>';
+    const cp = '<path d="M34 34 A16 16 0 0 1 66 34 Q50 24 34 34 Z" fill="' + K + '"/>';
+    if (hair === 'low' || hair === 'braids') v += cp;
     if (hair === 'afro') v += '<path d="M30 34 A20 20 0 0 1 70 34 Q50 22 30 34 Z" fill="' + K + '"/>';
-    if (hair === 'braids') v += '<path d="M34 34 A16 16 0 0 1 66 34 Q50 24 34 34 Z" fill="' + K + '"/>';
     if (hair === 'gele') v += '<ellipse cx="50" cy="22" rx="21" ry="12" fill="' + gele + '"/><rect x="58" y="14" width="18" height="12" rx="4" fill="#b5382f"/>';
+    if (hair === 'fade') v += cp + '<rect x="37" y="14" width="26" height="12" rx="3" fill="' + K + '"/>';
+    if (hair === 'cornrow') v += cp + '<path d="M41 24 L41 34 M46 21 L46 32 M51 20 L51 31 M56 21 L56 32 M61 24 L61 34" stroke="#5a4a40" stroke-width="1.6" stroke-linecap="round"/>';
+    if (hair === 'bun') v += cp + '<circle cx="50" cy="16" r="8" fill="' + K + '"/>';
+    if (hair === 'puff') v += cp + '<circle cx="32" cy="22" r="9" fill="' + K + '"/><circle cx="68" cy="22" r="9" fill="' + K + '"/>';
+    if (hair === 'twist') v += cp + [[36, 24], [42, 18], [50, 15], [58, 18], [64, 24], [34, 31], [66, 31]].map(q => '<circle cx="' + q[0] + '" cy="' + q[1] + '" r="5" fill="' + K + '"/>').join('');
+    if (hair === 'dread') v += cp;
+    if (hair === 'bob') v += '<path d="M33 36 A17 17 0 0 1 67 36 Q50 22 33 36 Z" fill="' + BOB + '"/>';
     v += '<circle cx="44" cy="38" r="1.7" fill="' + K + '"/><circle cx="56" cy="38" r="1.7" fill="' + K + '"/><path d="M45 44 Q50 48 55 44" stroke="' + K + '" stroke-width="1.6" fill="none" stroke-linecap="round"/>';
+    if (acc === 'glasses') v += '<rect x="36" y="34" width="12" height="8" rx="2.4" fill="#101418"/><rect x="52" y="34" width="12" height="8" rx="2.4" fill="#101418"/><rect x="47" y="36" width="6" height="2" fill="#101418"/>';
+    if (acc === 'cap') v += '<path d="M33 31 A17 17 0 0 1 67 31 Z" fill="' + col + '"/><rect x="33" y="29" width="34" height="4" rx="1.5" fill="' + col + '"/><rect x="45" y="30" width="30" height="4.5" rx="2.2" fill="rgba(0,0,0,.32)"/>';
     return v + '</svg>';
   }
-  function lookEditor(l) {
+  /* mode 'start': only what everybody starts with. Otherwise only what you own; the rest is in the Boutique */
+  function lookEditor(l, mode) {
     l = cleanLook(l);
+    const start = mode === 'start', have = (k, i) => start ? !(lookList(k)[i][2]) : ownsLook(S, k, i);
     const sw = (k, list) => '<div class="opts" role="group" aria-label="' + k + '">' + list.map((c, i) => '<button type="button" class="sw" data-act="look" data-k="' + k + '" data-id="' + i + '" style="background:' + c + '" aria-pressed="' + (l[k] === i) + '" aria-label="' + k + ' ' + (i + 1) + '"></button>').join('') + '</div>';
-    const op = (k, list) => '<div class="opts" role="group" aria-label="' + k + '">' + list.map((c, i) => '<button type="button" class="opt" data-act="look" data-k="' + k + '" data-id="' + i + '" aria-pressed="' + (l[k] === i) + '">' + c[1] + '</button>').join('') + '</div>';
+    const op = (k, list) => '<div class="opts" role="group" aria-label="' + k + '">' + list.map((c, i) => have(k, i) ? '<button type="button" class="opt" data-act="look" data-k="' + k + '" data-id="' + i + '" aria-pressed="' + (l[k] === i) + '">' + c[1] + '</button>' : '').join('') + '</div>';
     return '<div class="look"><div class="look-pic">' + lookSvg(l) + '</div><div class="look-ctl">' +
       '<div class="lab">Skin</div>' + sw('skin', LOOK.skins) + '<div class="lab">Hair</div>' + op('hair', LOOK.hairs) +
-      '<div class="lab">Outfit</div>' + op('outfit', LOOK.outfits) + '<div class="lab">Colour</div>' + sw('color', LOOK.colors) + '</div></div>';
+      '<div class="lab">Outfit</div>' + op('outfit', LOOK.outfits) + (start ? '' : '<div class="lab">Extras</div>' + op('acc', LOOK.accs)) + '<div class="lab">Colour</div>' + sw('color', LOOK.colors) +
+      (start ? '<p class="muted" style="margin:8px 0 0;font-size:12px">More hairstyles and clothes are in the Boutique app once you start.</p>' : '<button type="button" class="btn ghost" style="margin-top:8px" data-act="phone" data-id="boutique">Shop for more styles</button>') + '</div></div>';
   }
   function nameField(val) { return '<label class="namef"><span class="lab">Your name</span><input type="text" id="pname" maxlength="16" autocomplete="off" placeholder="What do they call you?" value="' + String(val || '').replace(/"/g, '&quot;') + '"></label>'; }
 
   /* panels carried over from the earlier version */
     function renderJobs() {
-    let h = '<h2>Jobs in ' + CITY.name + '</h2>';
-    const cur = S.job && jobById(S.job);
-    if (cur) {
-      h += '<div class="card"><div class="eyebrow">Your job</div><h3>' + cur.name + '</h3><p class="muted">' + cur.blurb + ' You have worked ' + S.tenure + ' days here.</p><div><button class="btn ghost" data-act="quit">Quit this job</button></div></div>';
-    }
-    for (const j of CITY.jobs) {
-      const reqs = jobReqs(S, j); const elig = reqs.every(r => r.ok); const mine = S.job === j.id;
-      const needStart = !ownsStartup(S, j);
+    const cur = S.job && jobById(S.job), tab = UI.jf || 'all';
+    const rows = CITY.jobs.map(function (j) {
+      const reqs = jobReqs(S, j), elig = reqs.every(function (r) { return r.ok; }), mine = S.job === j.id, needStart = !ownsStartup(S, j);
       const where = j.place === 'any' ? 'Anywhere' : CITY.places[j.place].name;
       let block = '';
       if (mine) block = 'You work here';
@@ -2712,21 +3843,30 @@ window.G3 = (function () {
       else if (j.place !== 'any' && S.at !== j.place) block = 'Go to ' + where + ' to apply';
       else if (S.slot + 1 > 3) block = 'Not enough of the day left';
       else if (needStart && j.startup.cost > S.cash) block = 'Need ' + fmt(j.startup.cost);
-      h += '<div class="card"><div class="eyebrow">' + where + '</div><h3>' + j.name + '</h3><p class="muted">' + j.blurb + '</p>' +
-        '<div class="kv"><div><span>Typical pay a day</span>' + money(nominalPay(S, j)) + '</div><div><span>Energy a day</span><span class="num">' + j.energy + '</span></div>' +
-        (j.startup ? '<div><span>' + j.startup.label + '</span><span class="num">' + (needStart ? fmt(j.startup.cost) : 'Owned') + '</span></div>' : '') + '</div>' +
-        (reqs.length ? '<div class="reqs">' + reqs.map(r => '<div class="req ' + (r.ok ? 'ok' : 'no') + '">' + r.text + '</div>').join('') + '</div>' : '<div class="reqs"><div class="req ok">No requirements</div></div>') +
-        '<div><button class="btn" data-act="apply" data-id="' + j.id + '"' + (block ? ' disabled' : '') + '>' + (block || 'Apply (1 slot)') + '</button></div></div>';
-    }
+      return { j: j, reqs: reqs, elig: elig, mine: mine, needStart: needStart, where: where, block: block, here: j.place === 'any' || S.at === j.place };
+    });
+    const shown = rows.filter(function (r) { return tab === 'open' ? r.elig : tab === 'here' ? r.here : true; }).sort(function (a, b) { return (b.mine ? 1 : 0) - (a.mine ? 1 : 0); });
+    const tabs = [['all', 'All (' + rows.length + ')'], ['open', 'Open to me (' + rows.filter(function (r) { return r.elig; }).length + ')'], ['here', 'Here (' + rows.filter(function (r) { return r.here; }).length + ')']];
+    let h = '<h2>Jobs</h2><div class="seg" style="grid-template-columns:repeat(3,1fr)" role="tablist">' + tabs.map(function (x) { return '<button role="tab" data-act="jf" data-id="' + x[0] + '"' + (tab === x[0] ? ' aria-selected="true"' : '') + '>' + x[1] + '</button>'; }).join('') + '</div>';
+    if (!cur) h += '<p class="muted">You have no job yet. Go to the place, then apply. Every job has a career ladder and you move up as you keep working.</p>';
+    if (!shown.length) h += '<p class="muted">Nothing here yet. Try another tab.</p>';
+    h += shown.map(function (r) {
+      const j = r.j, mine = r.mine, left = 60 - ((S.tenure || 0) % 60), lad = jobLadder(j), top = mine && jobRank(S, j) >= Math.min(5, lad.length - 1);
+      let c = '<div class="jb' + (mine ? ' mine' : '') + '"><div class="jb-top"><span class="jb-ic" aria-hidden="true">' + jobIcon(j) + '</span><div class="jb-t"><b>' + esc(j.name) + '</b><span>' + (mine ? esc(jobTitle(S, j)) : 'Starts as ' + esc(jobStartTitle(j))) + '</span></div>' +
+        '<div class="jb-pay"><b>' + fmt(Math.round(nominalPay(S, j))) + '</b><span>per shift</span></div></div><p class="jb-d">' + esc(j.blurb) + '</p><div class="jb-tags"><span>\uD83D\uDD52 2 slots a shift</span><span>\uD83D\uDCCD ' + esc(r.where) + '</span><span>\u26A1 ' + j.energy + ' energy</span>' +
+        (j.startup ? '<span>\uD83E\uDDF0 ' + esc(j.startup.label) + ': ' + (r.needStart ? fmt(j.startup.cost) : 'owned') + '</span>' : '') + '</div>';
+      if (mine) c += '<p class="jb-note">' + (top ? 'You are at the top of this ladder.' : 'Next promotion in ' + left + ' working days: ' + esc(lad[Math.min(lad.length - 1, jobRank(S, j) + 1)]) + '.') + ' You have worked ' + S.tenure + ' days here.</p>';
+      else c += '<div class="jb-reqs">' + (r.reqs.length ? r.reqs.map(function (q) { return '<span class="jr ' + (q.ok ? 'ok' : 'no') + '">' + (q.ok ? '\u2713 ' : '\u2715 ') + esc(q.text) + '</span>'; }).join('') : '<span class="jr ok">\u2713 No requirements</span>') + '</div>';
+      if (mine) c += '<button class="jb-btn quit" data-act="quit">Quit job</button>';
+      else c += '<button class="jb-btn" data-act="apply" data-id="' + j.id + '"' + (r.block ? ' disabled' : '') + '>' + esc(r.block || (cur ? 'Switch to this job' : 'Apply for this job')) + '</button>' + (r.elig && !r.block && cur ? '<p class="jb-note">You start as ' + esc(jobStartTitle(j)) + ', so you begin from the bottom of the ladder.</p>' : '');
+      return c + '</div>';
+    }).join('');
     return h;
   }
 
-  function progRow(label, value, max, text) {
-    return '<div class="prog"><div class="prog-top"><span>' + label + '</span><span class="num">' + text + '</span></div><div class="bar"><i style="width:' + Math.min(100, Math.round(value / max * 100)) + '%"></i></div></div>';
-  }
   function renderLife() {
     const H = CITY.homes[S.home];
-    let h = '<h2>Your life</h2><div class="card"><h3>You</h3>' + nameField(S.name) + lookEditor(S.look) + '</div><div class="card"><h3>Where you stand</h3><div class="kv">' +
+    let h = '<h2>Your life</h2>' + accountCard() + '<div class="card"><h3>You</h3>' + nameField(S.name) + lookEditor(S.look) + '</div><div class="card"><h3>Where you stand</h3><div class="kv">' +
       '<div><span>Home</span><span>' + H.name + '</span></div>' +
       '<div><span>Rent</span><span class="num">' + fmt(rentDue(S)) + ' a month</span></div>' +
       '<div><span>Education</span><span>' + EDU[S.edu] + '</span></div>' +
@@ -2755,6 +3895,11 @@ window.G3 = (function () {
       h += '<div class="card"><div class="eyebrow">Visa approved</div><h3>' + r.name + ' to ' + r.city + '</h3><p class="muted">Book your flight by day ' + j.expireDay + ' or the visa expires. The ticket and first weeks cost ' + fmt(cost) + '.</p>' +
         '<div><button class="btn" data-act="flight"' + (S.cash < cost ? ' disabled' : '') + '>' + (S.cash < cost ? 'Need ' + fmt(cost) : 'Book the flight and go') + '</button></div></div>';
     }
+    const left = j.status === 'approved' ? Math.max(0, j.expireDay - S.day) : (j.status === 'pending' ? Math.max(0, j.decideDay - S.day) : 0);
+    h += '<div class="card"><div class="eyebrow">Your journey</div><div class="kv"><div><span>Days in Abuja</span><span class="num">' + S.day + '</span></div>' +
+      (j.status === 'approved' ? '<div><span>Days left to book the flight</span><span class="num">' + left + '</span></div>' : '') +
+      (j.status === 'pending' ? '<div><span>Days until the visa decision</span><span class="num">' + left + '</span></div>' : '') +
+      (j.status === 'none' ? '<div><span>Visa application</span><span class="num">Not started</span></div>' : '') + '</div></div>';
     h += '<div class="card"><h3>Where you stand</h3><div class="kv">' +
       '<div><span>Best IELTS score</span><span class="num">' + (j.ielts ? j.ielts.toFixed(1) : 'Not yet sat') + '</span></div>' +
       '<div><span>IELTS prep sessions</span><span class="num">' + j.prep + '</span></div>' +
@@ -2785,13 +3930,35 @@ window.G3 = (function () {
   }
 
   function renderLog() {
-    return '<h2>What happened</h2><div class="log">' + S.log.map(l => '<div class="log-i"><span class="num">Day ' + l.d + '</span><span>' + l.t + '</span></div>').join('') + '</div>';
+    return '<div class="log">' + S.log.map(l => '<div class="log-i"><span class="num">Day ' + l.d + '</span><span>' + l.t + '</span></div>').join('') + '</div>';
+  }
+  function renderMessages() {
+    const tab = UI.mt === 'log' ? 'log' : 'inbox', n = unreadCount(S);
+    const seg = '<div class="seg" style="grid-template-columns:1fr 1fr" role="tablist"><button role="tab" data-act="mtab" data-id="inbox"' + (tab === 'inbox' ? ' aria-selected="true"' : '') + '>Inbox' + (n ? ' (' + n + ')' : '') + '</button><button role="tab" data-act="mtab" data-id="log"' + (tab === 'log' ? ' aria-selected="true"' : '') + '>Activity</button></div>';
+    if (tab === 'log') return '<h2>Messages</h2>' + seg + renderLog();
+    const list = S.inbox.slice().reverse();
+    let h = '<h2>Messages</h2>' + seg;
+    if (S.wise >= 2) h += '<p class="muted">Scam radar on: you have spotted ' + S.wise + ' scams, so suspicious messages are now flagged.</p>';
+    else h += '<p class="muted">Some messages are real chances. Others are scams. Watch for pressure, upfront fees and personal account numbers.</p>';
+    if (!list.length) return h + '<p class="muted">No messages yet.</p>';
+    h += list.map(function (m) {
+      const sc = msgIsScam(m);
+      let c = '<div class="card"><div style="display:flex;justify-content:space-between;gap:8px"><b>' + esc(msgFrom(m)) + '</b><span class="muted">Day ' + m.d + '</span></div><p>' + esc(msgText(S, m)) + '</p>';
+      if (m.state === 'new') {
+        if (sc && S.wise >= 2) c += '<div><span class="chip" style="background:var(--warn-bg);color:var(--warn)">Looks like a scam</span></div>';
+        c += '<div style="display:flex;gap:8px;flex-wrap:wrap">' + msgChoices(S, m).map(function (ch, i) {
+          return '<button class="btn ghost" data-act="msg" data-id="' + m.id + '" data-i="' + i + '"' + (ch.block ? ' disabled title="' + esc(ch.block) + '"' : '') + '>' + esc(ch.label) + '</button>';
+        }).join('') + '</div>';
+      } else c += '<p class="muted">' + esc(m.res) + '</p>';
+      return c + '</div>';
+    }).join('');
+    return h;
   }
 
   function renderStart() {
     return '<div class="veil"><div class="sheet"><div class="eyebrow">Abuja Life</div><h2>Where do you start in life?</h2>' +
       '<p class="muted">Nobody picks their starting point. You do here. After that, every choice is yours.</p>' +
-      '<div class="card"><h3>Who are you?</h3>' + nameField(UI.name) + lookEditor(UI.look) + '</div><div class="eyebrow">Pick your starting point</div><div class="bgs">' +
+      '<div class="card"><h3>Who are you?</h3>' + nameField(UI.name) + lookEditor(UI.look, 'start') + '</div><div class="eyebrow">Pick your starting point</div><div class="bgs">' +
       CITY.backgrounds.map(b => row('data-act="start" data-id="' + b.id + '"', b.name, b.line, '<span class="chip money">' + fmt(b.cash) + '</span>', false)).join('') + '</div></div></div>';
   }
   function renderEvent() {
@@ -2822,14 +3989,17 @@ window.G3 = (function () {
     let h = '';
     for (const id in CITY.places) {
       const here = id === S.at, f = here ? 0 : (hasCar(S) && !S.slow ? 0 : fare(S, S.at, id));
-      h += '<button class="pin' + (here ? ' here' : '') + '" data-act="sheet" data-id="' + id + '" data-pin="' + id + '"><span class="pin-n">' + CITY.places[id].name.replace(' Estate', '').replace(' and Nyanya', '') + '</span><span class="pin-s">' + (here ? 'You are here' : (f ? fmt(f) : 'Free')) + '</span></button>';
+      h += '<button class="pin' + (here ? ' here' : '') + '" data-act="sheet" data-id="' + id + '" data-pin="' + id + '"><span class="pin-n">' + CITY.places[id].name.replace(' Estate', '').replace(' and Nyanya', '') + '</span>' + (here ? '<span class="pin-s">' : '<span class="pin-s" hidden>') + (here ? 'You are here' : '') + '</span></button>';
     }
-    pinsEl.innerHTML = h;
+    let lm = '';
+    CITY.landmarks.forEach(function (l) { lm += '<button class="lm" data-act="lm" data-id="' + l.id + '" data-pin="' + l.id + '" aria-label="' + l.name + '"><span class="lm-i">' + l.icon + '</span><span class="lm-n">' + l.name + '</span></button>'; });
+    pinsEl.innerHTML = lm + h;
     positionPins();
   }
   function positionPins() {
     if (UI.tab !== 'map' || !G3.views.map) return;
-    const els = pinsEl.querySelectorAll('.pin');
+    const els = pinsEl.querySelectorAll('.pin, .lm');
+    pinsEl.classList.toggle('far', G3.views.map.dist > 150);
     for (let i = 0; i < els.length; i++) {
       const el = els[i], p = G3.views.map.screenPos(el.dataset.pin);
       el.style.transform = 'translate(' + Math.round(p.x) + 'px,' + Math.round(p.y) + 'px) translate(-50%,-100%)';
@@ -2837,11 +4007,12 @@ window.G3 = (function () {
     }
   }
   function sync3d() {
-    const want = UI.tab === 'home' ? 'home' : UI.tab === 'map' ? 'map' : null;
+    const want = UI.tab === 'home' || UI.tab === 'buy' ? 'home' : UI.tab === 'map' ? 'map' : null;
     stageEl.hidden = !want || !S;
     if (!threeOk) return;
     if (!S) { G3.setView(null); return; }
     G3.setView(want);
+    if (want === 'home' && G3.views.home.setBuy) G3.views.home.setBuy(UI.tab === 'buy');
     if (want) G3.views[want].setState(S);
     updatePins();
   }
@@ -2852,13 +4023,14 @@ window.G3 = (function () {
   }
 
   function render(resync) {
+    if (Auth.conflict || (Auth.session && !S && Auth.pulling) || Auth.recovery || Auth.wait || (needsAuth() && !Auth.session) || Auth.show) { app.innerHTML = renderAuth(); sync3d(); return; }
     if (!S) { app.innerHTML = renderStart(); sync3d(); return; }
     let h = renderHud();
-    if (UI.tab === 'buy') h += '<main class="page">' + renderBuy() + '</main>';
+    if (UI.tab === 'buy') h += (UI.toast && !/walk around/.test(UI.toast) ? renderToast() : '') + renderBuy();
     else if (UI.tab === 'phone') h += '<main class="page">' + renderPhone() + '</main>';
     else {
       h += renderToast();
-      if (!UI.sheet) h += UI.tab === 'home' ? renderDock() : renderMapBar();
+      if (!UI.sheet) h += UI.tab === 'home' ? renderAway() : renderMapBar();
       if (!threeOk) h += '<main class="page nogl">' + renderNoGl() + '</main>';
     }
     if (UI.sheet) h += renderSheet(UI.sheet);
@@ -2886,21 +4058,40 @@ window.G3 = (function () {
     save(); render();
   }
 
+  setInterval(function () {
+    if (!S || UI.busy || document.hidden) return;
+    if (UI.tab === 'phone') { if (UI.phone === 'home') render(false); }
+    else if (UI.tab === 'home' || UI.tab === 'map' || UI.tab === 'buy') sync3d();
+  }, 30000);
+
   document.addEventListener('click', function (e) {
     const el = e.target.closest('[data-act]'); if (!el || el.disabled) return;
     const act = el.dataset.act, id = el.dataset.id;
     if (act === 'look') {
       const k = el.dataset.k, i = parseInt(id, 10), tgt = S ? S.look : UI.look;
-      if (tgt && k in tgt) { tgt[k] = i; Object.assign(tgt, cleanLook(tgt)); if (S) { save(); render(); } else { saveLook(); render(); } }
+      const lst = lookList(k), okWear = !lst || !lst[i] || (S ? ownsLook(S, k, i) : !lst[i][2]);
+      if (tgt && k in tgt && okWear) { tgt[k] = i; Object.assign(tgt, cleanLook(tgt)); if (S) { save(); render(); } else { saveLook(); render(); } }
       return;
     }
     if (act === 'start') { const nm = (document.getElementById('pname') || {}).value; if (typeof nm === 'string') UI.name = nm; saveLook(); S = newGame(id, UI.look, UI.name); UI.tab = 'home'; UI.sheet = null; save(); render();
       let seen = false; try { seen = !!localStorage.getItem('bn-hint-walk'); localStorage.setItem('bn-hint-walk', '1'); } catch (err) {}
       if (threeOk && !seen) showToast('Tap the floor to walk around. Tap the bed, kitchen or bathroom to use them.');
       return; }
+    if (act === 'atab') { const em = document.getElementById('a-email'); if (em) Auth.email = em.value.trim(); Auth.tab = id === 'signup' ? 'signup' : 'login'; Auth.wait = false; Auth.err = ''; Auth.info = ''; render(); return; }
+    if (act === 'aguest') { Auth.guest = true; lsSet(AK.guest, '1'); Auth.show = false; render(); return; }
+    if (act === 'aopen') { Auth.show = true; Auth.tab = 'signup'; Auth.err = ''; Auth.info = ''; render(); return; }
+    if (act === 'aback') { Auth.show = false; Auth.err = ''; render(); return; }
+    if (act === 'aforgot') { forgotPassword(); return; }
+    if (act === 'alogout') { logOut(); return; }
+    if (act === 'cloudpick') {
+      const c = Auth.conflict; if (!c) return;
+      if (id === 'cloud') { adoptCloud(c.row); return; }
+      Auth.conflict = null; lsSet(AK.owner, Auth.session.user.id); lsSet(AK.dirty, '1'); lsDel(AK.sync); cloudPush(false); render(); return;
+    }
     if (!S) return;
     if (UI.busy) { if (act === 'tab' && G3.views.home) G3.views.home.finish(); else return; }
     if (act === 'toast') { UI.toast = ''; render(false); return; }
+    if (act === 'pips') { showToast('Each day gives you 3 actions. Working takes 2, most other things take 1, and rides take none. When the dots run out, sleep in your bed to start a new day.'); render(false); return; }
     if (act === 'walkto') { const st = G3.views.home && G3.views.home.stn && G3.views.home.stn[id]; UI.prompt = null; updatePins(); if (st) G3.views.home.walkTo(st.x, st.z); return; }
     if (act === 'tab') { UI.prompt = null; if (id === 'phone' && UI.tab === 'phone') UI.phone = 'home'; UI.tab = id; UI.sheet = null; UI.confirmNew = false; render(); const pg = document.querySelector('.page'); if (pg) pg.scrollTop = 0; return; }
     if (act === 'theme') {
@@ -2911,6 +4102,7 @@ window.G3 = (function () {
     if (act === 'phone') { UI.phone = id; UI.confirmNew = false; if (id === 'forbes') boardLoad();  render(); const pg = document.querySelector('.page'); if (pg) pg.scrollTop = 0; return; }
     if (act === 'sheet') { UI.sheet = id; render(false); const sh = document.querySelector('.psheet'); if (sh) sh.scrollTop = 0; return; }
     if (act === 'close') { UI.sheet = null; render(false); return; }
+    if (act === 'lm') { const l = CITY.landmarks.find(function (x) { return x.id === id; }); if (l) showToast('<b>' + l.name + '</b>: ' + l.line); render(false); return; }
     if (act === 'findme') { if (G3.views.map) { G3.views.map.dist = 118; G3.views.map.focus(S.at); } return; }
     if (act === 'overview') { if (G3.views.map) G3.views.map.overview(); return; }
     if (act === 'go') {
@@ -2938,13 +4130,23 @@ window.G3 = (function () {
     }
     if (act === 'apply') { const r = applyJob(S, id); if (r.ok) UI.toast = ''; return after(r); }
     if (act === 'quit') return after(quitJob(S));
+    if (act === 'jf') { UI.jf = id; render(false); return; }
+    if (act === 'bcat') { UI.bcat = id; UI.bsel = null; render(false); return; }
+    if (act === 'bsel') { UI.bsel = UI.bsel === id ? null : id; render(false); return; }
+    if (act === 'bhide') { UI.bhide = !UI.bhide; render(false); return; }
     if (act === 'buy') return after(buyItem(S, id));
     if (act === 'buycar') return after(buyCar(S, id));
+    if (act === 'buybike') return after(buyBike(S, id));
+    if (act === 'bq') { UI.bq = id; UI.bi = null; render(false); return; }
+    if (act === 'bqsel') { const n = parseInt(id, 10); UI.bi = UI.bi === n ? null : n; render(false); return; }
+    if (act === 'bqbuy') { const r = boutiqueBuy(S, el.dataset.k, parseInt(id, 10)); if (r.ok) UI.bi = null; return after(r); }
     if (act === 'moveto') { const r = moveHome(S, id); if (r.ok) UI.sheet = null; return after(r); }
     if (act === 'health') return after(doHealth(S, id));
     if (act === 'chow') return after(orderChow(S, id));
     if (act === 'grocery') return after(orderGroceries(S, id));
     if (act === 'report') return after(reportScam(S));
+    if (act === 'mtab') { UI.mt = id; render(false); return; }
+    if (act === 'msg') return after(replyMsg(S, parseInt(id, 10), parseInt(el.dataset.i, 10)));
     if (act === 'fbtab') { UI.fb = id; render(false); return; }
     if (act === 'board-join') {
       if (!S.name) { showToast('Set your name in Me first.'); return; }
@@ -2980,9 +4182,13 @@ window.G3 = (function () {
       render(); return;
     }
     if (act === 'newlife-no') { UI.confirmNew = false; render(); return; }
-    if (act === 'newlife-yes') { S = null; UI.confirmNew = false; UI.tab = 'home'; UI.sheet = null; try { localStorage.removeItem(KEY); } catch (err) {} G3.views.home && (G3.views.home.sig = ''); render(); return; }
+    if (act === 'newlife-yes') { S = null; UI.confirmNew = false; UI.tab = 'home'; UI.sheet = null; try { localStorage.removeItem(KEY); } catch (err) {} cloudWipe(); G3.views.home && (G3.views.home.sig = ''); render(); return; }
   });
+  document.addEventListener('submit', function (e) { if (e.target && e.target.matches && e.target.matches('[data-auth]')) { e.preventDefault(); submitAuth(); } });
+  document.addEventListener('change', function (e) { if (e.target && e.target.id === 'a-show') { const pw = document.getElementById('a-pass'); if (pw) pw.type = e.target.checked ? 'text' : 'password'; } });
   document.addEventListener('input', function (e) {
+    if (e.target && e.target.id === 'a-email') { Auth.email = e.target.value; return; }
+    if (e.target && e.target.id === 'a-pass') { Auth.pass = e.target.value; return; }
     if (!e.target || e.target.id !== 'pname') return;
     const v = e.target.value.slice(0, 16);
     if (S) { S.name = v; save(); } else { UI.name = v; saveLook(); }
@@ -3005,6 +4211,8 @@ window.G3 = (function () {
   try { const th = localStorage.getItem('bn-theme'); if (th === 'dark' || th === 'light') document.documentElement.setAttribute('data-theme', th); } catch (err) {}
   S = load();
   render();
+  if (Auth.session) reconcile();
+  handleAuthHash();
   window.__game = { get S() { return S; }, UI: UI, render: render };
 })();
 
