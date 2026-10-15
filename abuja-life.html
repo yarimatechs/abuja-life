@@ -221,6 +221,36 @@ p { margin: 0; }
 .jb-btn:disabled { background: var(--surface); color: var(--muted); cursor: default; }
 .jb-btn.quit { background: var(--warn-bg); color: var(--warn); }
 .jb-note { margin: 0; font-size: 13px; color: var(--muted); text-align: center; }
+/* trip view */
+.trip { position: fixed; inset: 0; pointer-events: none; z-index: 40; font-family: inherit; }
+.trip > * { pointer-events: auto; }
+.tr-top { position: absolute; left: 10px; right: 10px; top: calc(10px + env(safe-area-inset-top, 0px)); background: rgba(8, 24, 18, 0.92); color: #fff; border-radius: 16px; padding: 10px 14px; display: flex; gap: 12px; align-items: center; box-shadow: 0 6px 18px rgba(0,0,0,0.3); }
+.tr-ic { font-size: 30px; width: 44px; text-align: center; flex: none; }
+.tr-main { font-weight: 800; font-size: 17px; line-height: 1.2; }
+.tr-sub { opacity: 0.8; font-size: 13px; margin-top: 2px; }
+.tr-mini { position: absolute; right: 10px; top: calc(86px + env(safe-area-inset-top, 0px)); width: 124px; height: 124px; border-radius: 50%; border: 3px solid #fff; box-shadow: 0 4px 14px rgba(0,0,0,0.35); background: #dfe9d6; }
+.tr-chips { position: absolute; left: 10px; top: calc(86px + env(safe-area-inset-top, 0px)); display: grid; gap: 6px; justify-items: start; }
+.tr-chip { background: rgba(8, 24, 18, 0.88); color: #fff; border-radius: 12px; padding: 6px 10px; font-weight: 700; font-size: 13px; }
+.tr-chip.warn { background: #b3261e; }
+.tr-mid { position: absolute; left: 0; right: 0; bottom: calc(130px + env(safe-area-inset-bottom, 0px)); display: flex; justify-content: center; gap: 10px; }
+.tr-pill { border: 0; border-radius: 999px; padding: 10px 16px; font: inherit; font-weight: 700; font-size: 14px; background: rgba(255,255,255,0.95); color: #0b1f17; box-shadow: 0 3px 10px rgba(0,0,0,0.25); }
+.tr-ctl { position: absolute; left: 0; right: 0; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); display: flex; justify-content: space-between; align-items: flex-end; padding: 0 16px; }
+.tr-pad { display: flex; gap: 12px; align-items: flex-end; }
+.tr-btn { width: 76px; height: 76px; border-radius: 50%; border: 0; font: inherit; font-size: 26px; font-weight: 800; background: rgba(255,255,255,0.95); color: #0b1f17; touch-action: none; user-select: none; -webkit-user-select: none; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+.tr-btn.gas { background: #0b7a43; color: #fff; width: 96px; height: 96px; font-size: 24px; }
+.tr-btn.brake { background: #b3261e; color: #fff; font-size: 15px; }
+.tr-btn.on { transform: scale(0.93); filter: brightness(0.88); }
+/* going out */
+.pin-p { display: inline-block; margin-left: 4px; font-size: 11px; font-weight: 800; background: #d6247f; color: #fff; border-radius: 999px; padding: 1px 6px; }
+.pp-av { width: 44px; height: 44px; flex: none; border-radius: 50%; background: var(--surface2); display: grid; place-items: center; overflow: hidden; margin-right: 10px; }
+.pp-av svg { width: 100%; height: 100%; }
+.pp-top { display: flex; gap: 12px; align-items: center; }
+.pp-big { width: 84px; height: 118px; flex: none; }
+.pp-big svg { width: 100%; height: 100%; }
+.pp-info { flex: 1; min-width: 0; }
+.vibes { display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0 12px; }
+.vibes .chip-btn { padding: 10px 14px; font-size: 14px; }
+.pp-more { display: flex; flex-wrap: wrap; gap: 8px; }
 /* feedback, safety, welcome */
 .namef textarea { font: inherit; font-size: 16px; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); resize: vertical; min-height: 96px; }
 .namef textarea:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
@@ -407,8 +437,19 @@ const CITY = {
     { id: 'galleria', name: 'Silverbird Galleria', icon: '🎬', x: -36, z: -58, hw: 6, hd: 6, line: 'Cinema, popcorn and a cold drink after work.' },
     { id: 'crafts', name: 'Arts and Crafts Village', icon: '🎨', x: -26, z: 52, hw: 6, hd: 5, line: 'Carvings, beads and fabrics. Bargain hard.' },
     { id: 'ceddi', name: 'Ceddi Plaza', icon: '🏙️', x: 50, z: 38, hw: 5, hd: 5, line: 'The twin towers everyone uses as a landmark.' },
-    { id: 'zuma', name: 'Zuma Rock', icon: '🪨', x: -98, z: -68, hw: 14, hd: 10, line: 'The Gateway to Abuja, standing alone on the highway.' }
+    { id: 'zuma', name: 'Zuma Rock', icon: '🪨', x: -98, z: -68, hw: 14, hd: 10, line: 'The Gateway to Abuja, standing alone on the highway.' },
+    { id: 'club', name: 'Club Zenith', icon: '🎧', x: -16, z: 37, hw: 6, hd: 6, line: 'Loud music, loud people and a queue outside.' }
   ],
+  /* places you can go out to. Other players who are there at the same time can see you and say hello. */
+  hangouts: {
+    themepark: { cost: 8000, fun: 38, mood: 6, energy: 10, clean: 6, verb: 'ride the rides', did: 'You screamed on the rides and ate too much popcorn.' },
+    park: { cost: 0, fun: 16, mood: 4, energy: 3, clean: 2, verb: 'sit and relax', did: 'You sat by the fountain and watched Abuja go by.' },
+    mall: { cost: 3000, fun: 14, mood: 3, energy: 4, clean: 0, verb: 'walk around', did: 'You window-shopped for two hours and bought nothing.' },
+    galleria: { cost: 5000, fun: 28, mood: 5, energy: 4, clean: 0, verb: 'watch a film', did: 'You watched a film and shared popcorn with a stranger.' },
+    stadium: { cost: 3000, fun: 26, mood: 6, energy: 8, clean: 4, verb: 'join the match-day noise', did: 'You joined the match-day noise and lost your voice.' },
+    hotel: { cost: 15000, fun: 20, mood: 5, energy: 3, clean: 0, conn: 0.4, verb: 'have a drink at the lounge', did: 'You had a drink at the Hilton lounge and chatted with strangers.' },
+    club: { cost: 12000, fun: 42, mood: 8, energy: 15, clean: 8, conn: 0.3, verb: 'dance', did: 'You danced until your feet complained.' }
+  },
   roads: [['wuse', 'secretariat'], ['secretariat', 'garki'], ['garki', 'asokoro'], ['wuse', 'maitama'], ['wuse', 'utako'], ['wuse', 'jabi'], ['utako', 'gwarinpa'], ['gwarinpa', 'kubwa'], ['jabi', 'maitama'], ['maitama', 'abujacars']],
   scamMsgs: {
     agent: { from: 'Visa Plug Abuja', frac: 0.3, min: 20000, max: 150000, pay: 'Pay the fee',
@@ -1084,7 +1125,7 @@ function work(s) {
   apply(s, { cash: p, energy: -j.energy, mood: j.mood === undefined ? -2 : j.mood, xp: j.xp, conn: j.conn });
   apply(s, { fun: -4, clean: j.energy >= 22 ? -8 : -3 });
   const rank0 = jobRank(s, j);
-  s.slot += 2; s.tenure += 1; s.stats.workDays += 1;
+  s.slot += 2; s.tenure += 1; s.stats.workDays += 1; s.hang = null;
   let m = pick(j.lines) + ' You earned ' + fmt(p) + '.' + extra;
   if (jobRank(s, j) > rank0) { apply(s, { mood: 6, conn: 0.2 }); m += ' Promotion! You are now ' + jobTitle(s, j) + '.'; }
   if (j.corper && s.tenure >= 60) {
@@ -1116,7 +1157,7 @@ function doAction(s, id) {
   const why = actionBlock(s, a);
   if (why) return { ok: false, msg: why };
   const c = a.cost ? a.cost(s) : 0;
-  s.cash -= c; s.energy = clamp(s.energy - (a.energy || 0), 0, 100);
+  s.cash -= c; s.hang = null; s.energy = clamp(s.energy - (a.energy || 0), 0, 100);
   s.slot += a.slots === undefined ? 1 : a.slots;
   if (a.once) s.done[a.id] = s.day;
   const m = a.run(s);
@@ -1130,7 +1171,7 @@ function travel(s, to, mode) {
   if (!o) return { ok: false, msg: 'Not possible.' };
   if (o.block) return { ok: false, msg: o.mode === 'car' ? 'You do not own a car yet.' : 'You cannot afford the fare of ' + fmt(o.cost) + '.' };
   const name = CITY.places[to].name;
-  s.cash -= o.cost; s.at = to;
+  s.cash -= o.cost; s.at = to; s.hang = null;
   let m;
   if (mode === 'trek') {
     const before = s.energy, spent = o.energy;
@@ -1425,6 +1466,27 @@ function buyItem(s, id) {
   return { ok: true, msg: m };
 }
 
+/* ---------- going out: hangouts ---------- */
+function hangoutBlock(s, id) {
+  const h = CITY.hangouts[id];
+  if (s.over) return 'Game over';
+  if (!h) return 'Not available';
+  if (s.hang === id) return 'You are already here';
+  if (s.slot + 1 > 3) return 'Not enough of the day left';
+  if (s.energy < h.energy) return 'Too tired';
+  if (pr(s, h.cost) > s.cash) return 'Need ' + fmt(pr(s, h.cost));
+  return null;
+}
+function visitHangout(s, id) {
+  const why = hangoutBlock(s, id);
+  if (why) return { ok: false, msg: why };
+  const h = CITY.hangouts[id], c = pr(s, h.cost);
+  s.cash -= c; s.stats.spent += c; s.slot += 1; s.hang = id;
+  apply(s, { fun: h.fun, mood: h.mood, energy: -h.energy, clean: -h.clean, conn: h.conn || 0 });
+  const m = h.did + (c ? ' It cost ' + fmt(c) + '.' : '');
+  log(s, m);
+  return { ok: true, msg: m };
+}
 /* ---------- Japa: IELTS, visa routes, agents, endings ---------- */
 function ieltsSitting(s) {
   const raw = 3.5 + s.japa.prep * 0.12 + Math.min(1, s.edu * 0.25) + (rnd() - 0.5) * 1.2;
@@ -1594,7 +1656,7 @@ function endDay(s) {
   apply(s, { food: -N.decay.food, fun: -N.decay.fun, clean: -N.decay.clean });
   const net = s.cash - s.dayStartCash;
   log(s, 'Day ' + d + ' closed. Living costs ' + fmt(live) + '.' + rentLine + ' Net for the day: ' + fmt(net) + '.' + (notes.length ? ' ' + notes.join(' ') : ''));
-  s.day += 1; s.at = homePlace(s); s.slot = s.mood < 15 ? 1 : 0;
+  s.day += 1; s.at = homePlace(s); s.hang = null; s.slot = s.mood < 15 ? 1 : 0;
   if (s.mood < 15) log(s, 'You woke up with no strength. The morning is gone.');
   dailyMessages(s);
   if (s.sick > 0) { s.sick -= 1; apply(s, { energy: -12, mood: -3 }); log(s, s.sick ? 'Still feverish. Your body aches.' : 'The fever finally passed.'); }
@@ -2849,7 +2911,15 @@ window.G3 = (function () {
     });
     for (let i = 0; i < 8; i++) { const a = rnd() * P * 2, r = 12 + rnd() * 6; sph(g, 1 + rnd(), 0x4f8a45, Math.cos(a) * r, 0.7, Math.sin(a) * r * 0.7 + 4); }
   }
-  const LMK = { stadium: stadium, airport: airport, hospital: hospital, hotel: hotel, church: church, themepark: themepark, park: cityPark, galleria: galleria, crafts: craftsVillage, ceddi: ceddi, zuma: zumaRock, cbd: cbd, eagle: eagleSquare, mall: mall, university: university };
+  function clubZenith(p, x, z) {
+    const g = new T.Group(); g.position.set(x, 0, z); p.add(g);
+    box(g, 9, 5, 7, 0x1d1730, 0, 0, 0); box(g, 9.4, 0.4, 7.4, 0xff3fa4, 0, 5, 0); box(g, 9.4, 0.3, 7.4, 0x38d6ff, 0, 5.5, 0);
+    const tex = G.canvasTex(512, 128, function (c, w, h) { c.fillStyle = '#0d0820'; c.fillRect(0, 0, w, h); c.fillStyle = '#ff5ec8'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.font = '800 56px system-ui, sans-serif'; c.fillText('ZENITH', w / 2, h / 2 + 2); });
+    const sg = new T.Mesh(new T.PlaneGeometry(7, 1.75), new T.MeshBasicMaterial({ map: tex })); sg.position.set(0, 3.6, 3.55); g.add(sg);
+    box(g, 1.6, 2.4, 0.3, 0x3a2a60, 0, 0, 3.6); sph(g, 0.9, 0xdfe6ff, 0, 7, 0);
+    box(g, 11, 0.1, 5, 0x2a2540, 0, 0, 6);
+  }
+  const LMK = { club: clubZenith, stadium: stadium, airport: airport, hospital: hospital, hotel: hotel, church: church, themepark: themepark, park: cityPark, galleria: galleria, crafts: craftsVillage, ceddi: ceddi, zuma: zumaRock, cbd: cbd, eagle: eagleSquare, mall: mall, university: university };
 
   function inRect(x, z, cx, cz, hw, hd, m) { return Math.abs(x - cx) < hw + m && Math.abs(z - cz) < hd + m; }
   function nearRoad(x, z, m) {
@@ -2989,23 +3059,26 @@ window.G3 = (function () {
 
   function place(id) { const m = CITY.mapPos[id]; return { x: m.x + 3, z: m.z + 11 }; }
   function frame() {
+    if (V.trip) { tripCamera(V.trip, 0.016); return; }
     const c = camera, d = V.dist, e = V.el;
     c.position.set(V.target.x, V.target.y + Math.sin(e) * d, V.target.z + Math.cos(e) * d);
     c.lookAt(V.target.x, V.target.y, V.target.z - 4); c.updateProjectionMatrix();
   }
   V.resize = function (w, h) { V.aspect = w / h; camera.aspect = w / h; frame(); };
   V.drag = function (dx, dy) {
+    if (V.trip) return;
     const size = G.size(), wpp = (2 * V.dist * Math.tan(camera.fov * P / 360)) / Math.max(1, size.h);
     V.target.x = Math.max(-110, Math.min(70, V.target.x - dx * wpp)); V.target.z = Math.max(-70, Math.min(60, V.target.z - dy * wpp / Math.sin(V.el)));
     V.follow = false; frame();
   };
-  V.pinch = function (r) { V.dist = Math.max(40, Math.min(230, V.dist / r)); frame(); };
+  V.pinch = function (r) { if (V.trip) return; V.dist = Math.max(40, Math.min(230, V.dist / r)); frame(); };
   V.overview = function () { V.dist = 215; V.goal = new T.Vector3(-26, 0, 8); };
   V.focus = function (id, instant) {
     const m = CITY.mapPos[id]; V.goal = new T.Vector3(m.x, 0, m.z + 4);
     if (instant) { V.target.copy(V.goal); frame(); }
   };
   V.tap = function (x, y) {
+    if (V.trip) return;
     const size = G.size(), rc = G.renderer.domElement.getBoundingClientRect();
     const ndc = new T.Vector2(((x - rc.left) / rc.width) * 2 - 1, -((y - rc.top) / rc.height) * 2 + 1);
     const rcst = new T.Raycaster(); rcst.setFromCamera(ndc, camera);
@@ -3019,6 +3092,162 @@ window.G3 = (function () {
     const size = G.size();
     return { x: (tmp.x * 0.5 + 0.5) * size.w, y: (-tmp.y * 0.5 + 0.5) * size.h, ok: tmp.z < 1 && Math.abs(tmp.x) < 1.25 && Math.abs(tmp.y) < 1.25 };
   };
+  /* ---------- trip mode: a top-down navigation view. You ride along in a cab or okada, or drive your own car or bike. ---------- */
+  function bikeMesh(col) {
+    const g = new T.Group();
+    box(g, 0.5, 0.5, 2.3, col, 0, 0.45, 0); box(g, 0.7, 0.14, 0.8, 0x1c1c1c, 0, 0.95, -0.3); box(g, 1.1, 0.1, 0.12, 0x333333, 0, 1.15, 0.85);
+    [1.0, -1.0].forEach(function (z) { const w = cyl(g, 0.42, 0.42, 0.2, 0x1c1c1c, 0, 0.42, z, 12); w.rotation.z = P / 2; w.position.y = 0.42; });
+    box(g, 0.5, 0.8, 0.4, 0xd9a21b, 0, 1.0, -0.3); sph(g, 0.24, 0x5a3a28, 0, 1.95, -0.25);
+    g.scale.setScalar(0.95); return g;
+  }
+  function roadGraph() {
+    const adj = {};
+    CITY.roads.forEach(function (r) {
+      const pts = V.paths[r[0] + '-' + r[1]]; if (!pts) return;
+      (adj[r[0]] = adj[r[0]] || []).push({ to: r[1], pts: pts });
+      (adj[r[1]] = adj[r[1]] || []).push({ to: r[0], pts: pts.slice().reverse() });
+    });
+    return adj;
+  }
+  /* shortest way along the roads from one district to another, as one list of [x, z] points */
+  function routeFor(from, to) {
+    const adj = roadGraph(), dist = {}, prev = {}, done = {};
+    dist[from] = 0;
+    for (;;) {
+      let u = null; for (const k in dist) if (!done[k] && (u === null || dist[k] < dist[u])) u = k;
+      if (u === null || u === to) break; done[u] = 1;
+      (adj[u] || []).forEach(function (e) { const nd = dist[u] + pathLen(e.pts); if (dist[e.to] === undefined || nd < dist[e.to]) { dist[e.to] = nd; prev[e.to] = { from: u, pts: e.pts }; } });
+    }
+    const m0 = CITY.mapPos[from], m1 = CITY.mapPos[to];
+    if (dist[to] === undefined) return [[m0.x, m0.z], [m1.x, m0.z], [m1.x, m1.z]];
+    const legs = []; for (let k = to; k !== from; k = prev[k].from) legs.unshift(prev[k].pts);
+    const out = [];
+    legs.forEach(function (pts) { pts.forEach(function (q) { const l = out[out.length - 1]; if (!l || Math.hypot(l[0] - q[0], l[1] - q[1]) > 0.05) out.push([q[0], q[1]]); }); });
+    return out;
+  }
+  function cumLen(R) { const c = [0]; for (let i = 1; i < R.length; i++) c.push(c[i - 1] + Math.hypot(R[i][0] - R[i - 1][0], R[i][1] - R[i - 1][1])); return c; }
+  function routeAtS(t, sv) {
+    const R = t.route, c = t.cum; sv = Math.max(0, Math.min(t.len, sv));
+    for (let i = 0; i < R.length - 1; i++) if (sv <= c[i + 1] || i === R.length - 2) {
+      const seg = c[i + 1] - c[i] || 1, u = Math.min(1, (sv - c[i]) / seg);
+      return { x: R[i][0] + (R[i + 1][0] - R[i][0]) * u, z: R[i][1] + (R[i + 1][1] - R[i][1]) * u, dx: (R[i + 1][0] - R[i][0]) / seg, dz: (R[i + 1][1] - R[i][1]) / seg, i: i };
+    }
+  }
+  /* nearest point on the blue route: how far along it you are, and how far off it */
+  function onRoute(t, x, z) {
+    const R = t.route, c = t.cum; let best = { d: 1e9, s: 0, i: 0 };
+    for (let i = 0; i < R.length - 1; i++) {
+      const ax = R[i][0], az = R[i][1], bx = R[i + 1][0], bz = R[i + 1][1], vx = bx - ax, vz = bz - az, l2 = vx * vx + vz * vz || 1;
+      const u = Math.max(0, Math.min(1, ((x - ax) * vx + (z - az) * vz) / l2)), px = ax + vx * u, pz = az + vz * u, d = Math.hypot(x - px, z - pz);
+      if (d < best.d) best = { d: d, s: c[i] + Math.sqrt(l2) * u, i: i };
+    }
+    return best;
+  }
+  /* distance from the nearest road, and whether you are inside a district */
+  function roadDist(x, z) {
+    let d = 1e9;
+    for (const k in V.paths) {
+      const R = V.paths[k];
+      for (let i = 0; i < R.length - 1; i++) {
+        const ax = R[i][0], az = R[i][1], vx = R[i + 1][0] - ax, vz = R[i + 1][1] - az, l2 = vx * vx + vz * vz || 1;
+        const u = Math.max(0, Math.min(1, ((x - ax) * vx + (z - az) * vz) / l2)); d = Math.min(d, Math.hypot(x - (ax + vx * u), z - (az + vz * u)));
+      }
+    }
+    return d;
+  }
+  function wrapA(a) { while (a > P) a -= P * 2; while (a < -P) a += P * 2; return a; }
+  function nextTurn(t, sv) {
+    const R = t.route, c = t.cum;
+    for (let i = 1; i < R.length - 1; i++) {
+      if (c[i] <= sv + 0.5) continue;
+      const ax = R[i][0] - R[i - 1][0], az = R[i][1] - R[i - 1][1], bx = R[i + 1][0] - R[i][0], bz = R[i + 1][1] - R[i][1], la = Math.hypot(ax, az) || 1, lb = Math.hypot(bx, bz) || 1;
+      const dot = (ax * bx + az * bz) / (la * lb);
+      if (dot < 0.8) { const right = (bx / lb) * (-az / la) + (bz / lb) * (ax / la) > 0; return { dir: right ? 'right' : 'left', dist: c[i] - sv }; }
+    }
+    return null;
+  }
+  V.input = { left: false, right: false, gas: false, brake: false };
+  V.startTrip = function (o) {
+    if (!V.built) build();
+    V.endTrip(null, true);
+    const route = routeFor(o.from, o.to), cum = cumLen(route), len = cum[cum.length - 1];
+    const col = o.color || 0xe8b100, bike = o.vehicle === 'bike' || o.vehicle === 'okada';
+    const veh = bike ? bikeMesh(col) : carMesh(col);
+    if (o.vehicle === 'cab') box(veh, 0.8, 0.22, 0.3, 0xffffff, 0, 1.6, -0.1);
+    veh.scale.multiplyScalar(1.5);
+    const halo = new T.Mesh(new T.CylinderGeometry(2.3, 2.3, 0.1, 24), new T.MeshBasicMaterial({ color: 0x2f7bff, transparent: true, opacity: 0.4 })); halo.position.y = 0.18; veh.add(halo); halo.scale.setScalar(1 / 1.5 / (bike ? 0.95 : 0.85));
+    const root = new T.Group(); V.root.add(root); root.add(veh);
+    const rib = new T.Group(); V.root.add(rib);
+    const bm = new T.MeshBasicMaterial({ color: 0x2f7bff });
+    for (let i = 0; i < route.length - 1; i++) {
+      const ax = route[i][0], az = route[i][1], bx = route[i + 1][0], bz = route[i + 1][1], l = Math.hypot(bx - ax, bz - az); if (l < 0.05) continue;
+      const m = new T.Mesh(new T.BoxGeometry(0.8, 0.1, l + 0.8), bm); m.position.set((ax + bx) / 2, 0.2, (az + bz) / 2); m.rotation.y = Math.atan2(bx - ax, bz - az); rib.add(m);
+    }
+    const d1 = route[route.length - 1], pin = new T.Group(); pin.position.set(d1[0], 0, d1[1]); rib.add(pin);
+    const ring = new T.Mesh(new T.CylinderGeometry(5.5, 5.5, 0.12, 28), new T.MeshBasicMaterial({ color: 0xff3b5c, transparent: true, opacity: 0.35 })); ring.position.y = 0.3; pin.add(ring);
+    const flag = new T.Mesh(new T.ConeGeometry(1.1, 3.2, 12), new T.MeshBasicMaterial({ color: 0xff3b5c })); flag.rotation.x = P; flag.position.y = 5; pin.add(flag);
+    const p0 = routeAtS({ route: route, cum: cum, len: len }, 0);
+    V.marker.visible = false;
+    V.trip = { o: o, route: route, cum: cum, len: len, mode: o.drive ? 'drive' : 'ride', s: 0, v: 0, x: p0.x, z: p0.z, h: Math.atan2(p0.dx, p0.dz), camH: Math.atan2(p0.dx, p0.dz), veh: veh, root: root, rib: rib, ring: ring, bike: bike,
+      saved: { dist: V.dist, el: V.el, tx: V.target.x, tz: V.target.z }, time: 0, done: false, info: null, bump: 0 };
+    V.goal = null; V.anim = null; V.input.left = V.input.right = V.input.gas = V.input.brake = false;
+    tripStep(0.001);
+  };
+  V.endTrip = function (at, quiet) {
+    const t = V.trip; if (!t) return; V.trip = null;
+    t.root.parent && t.root.parent.remove(t.root); t.rib.parent && t.rib.parent.remove(t.rib); G.dispose(t.root); G.dispose(t.rib);
+    V.marker.visible = true; V.dist = 118; V.el = 0.98;
+    if (at && CITY.mapPos[at]) { const pp = place(at); V.marker.position.set(pp.x, 0, pp.z); V.at = at; V.target.set(CITY.mapPos[at].x, 0, CITY.mapPos[at].z + 4); }
+    if (!quiet) frame();
+  };
+  V.autopilot = function () { const t = V.trip; if (!t || t.mode !== 'drive') return; const q = onRoute(t, t.x, t.z); t.mode = 'ride'; t.s = q.s; t.auto = true; };
+  V.skipTrip = function () { const t = V.trip; if (t && t.mode === 'ride') t.s = t.len; };
+  function tripCamera(t, dt) {
+    t.camH += wrapA(t.h - t.camH) * Math.min(1, dt * 4.5);
+    const fx = Math.sin(t.camH), fz = Math.cos(t.camH), dist = 46 + Math.min(24, t.v * 1.0), el = 1.2, lead = 3 + t.v * 0.3;
+    const tx = t.x + fx * lead, tz = t.z + fz * lead;
+    camera.position.set(tx - fx * Math.cos(el) * dist, Math.sin(el) * dist, tz - fz * Math.cos(el) * dist);
+    camera.up.set(0, 1, 0); camera.lookAt(tx, 0, tz); camera.updateProjectionMatrix();
+  }
+  function tripStep(dt) {
+    const t = V.trip; if (!t || t.done) return;
+    const o = t.o, slow = !!o.slow; t.time += dt;
+    if (t.mode === 'ride') {
+      const vmax = (o.vehicle === 'cab' ? 15 : 17) * (slow ? (o.vehicle === 'okada' ? 0.85 : 0.55) : 1), left = t.len - t.s;
+      const want = Math.max(3.5, Math.min(vmax, t.s * 1.6 + 4, left * 1.5 + 2.5));
+      t.v += (want - t.v) * Math.min(1, dt * 3); t.s = Math.min(t.len, t.s + t.v * dt);
+      const q = routeAtS(t, t.s), q2 = routeAtS(t, Math.min(t.len, t.s + 3));
+      t.x = q.x; t.z = q.z; const th = Math.atan2(q2.dx, q2.dz); t.h += wrapA(th - t.h) * Math.min(1, dt * 9);
+      if (t.s >= t.len - 0.01) { finishTrip(t); }
+    } else {
+      const I = V.input, car = o.vehicle !== 'bike', base = o.top || (car ? 16 : 15);
+      const rd = roadDist(t.x, t.z), nearDistrict = Object.keys(CITY.mapPos).some(function (k) { const m = CITY.mapPos[k]; return Math.abs(t.x - m.x) < 11 && Math.abs(t.z - m.z) < 11; });
+      const off = rd > 2.3 && !nearDistrict, rough = rd > 2.3 && nearDistrict;
+      let cap = base * (slow ? (car ? 0.55 : 0.85) : 1) * (off ? 0.22 : rough ? 0.5 : 1);
+      /* other cars slow you down when you bump into them */
+      t.bump = Math.max(0, t.bump - dt);
+      for (let i = 0; i < V.cars.length; i++) { const cp = V.cars[i].position; if (Math.abs(cp.x - t.x) < 2.2 && Math.abs(cp.z - t.z) < 2.2) { if (!t.bump) { t.v *= 0.35; t.bump = 0.8; } } }
+      if (t.bump) cap *= 0.6;
+      const acc = I.gas ? (car ? 11 : 13) : 0, brk = I.brake ? 26 : 0;
+      t.v += (acc - brk - (I.gas ? 0 : 3.5) - t.v * 0.12) * dt; if (t.v > cap) t.v += (cap - t.v) * Math.min(1, dt * 5);
+      if (t.v < 0) t.v = 0;
+      const steer = (I.left ? 1 : 0) - (I.right ? 1 : 0);
+      t.h += steer * (car ? 1.9 : 2.3) * Math.min(1, 0.25 + t.v / 7) * dt * (t.v > 0.2 ? 1 : 0.15);
+      t.x += Math.sin(t.h) * t.v * dt; t.z += Math.cos(t.h) * t.v * dt;
+      t.x = Math.max(-118, Math.min(78, t.x)); t.z = Math.max(-76, Math.min(66, t.z));
+      t.off = off; t.rough = rough;
+      const dest = CITY.mapPos[o.to]; if (Math.hypot(t.x - dest.x, t.z - dest.z) < 6.5) finishTrip(t);
+    }
+    t.veh.position.set(t.x, 0.1, t.z); t.veh.rotation.y = t.h;
+    if (t.bike) t.veh.rotation.z = t.mode === 'drive' ? ((V.input.left ? -1 : 0) + (V.input.right ? 1 : 0)) * 0.12 * Math.min(1, t.v / 8) : 0;
+    t.ring.scale.setScalar(1 + Math.sin(t.time * 4) * 0.08);
+    const q = onRoute(t, t.x, t.z), turn = nextTurn(t, q.s);
+    t.info = { x: t.x, z: t.z, h: t.h, v: t.v, s: q.s, len: t.len, remain: Math.max(0, t.len - q.s), off: q.d > 4 && t.mode === 'drive', offRoad: !!t.off, rough: !!t.rough, turn: turn, mode: t.mode, slow: slow, done: t.done };
+    tripCamera(t, dt);
+    if (V.onTrip) V.onTrip(t.info, t);
+  }
+  function finishTrip(t) { if (t.done) return; t.done = true; if (V.onTripDone) V.onTripDone(t.o); }
+  V.tripStep = tripStep;
   /* the player token follows the roads from one district to the next */
   V.travel = function (from, to) {
     const a = CITY.mapPos[from], b = CITY.mapPos[to]; if (!a || !b) return;
@@ -3040,6 +3269,7 @@ window.G3 = (function () {
     G.once();
   };
   V.tick = function (dt, t) {
+    if (V.trip) { tripStep(dt); (V.planes || []).forEach(function (a) { planeTick(a, dt); }); V.cars.forEach(function (c) { const d = c.userData; d.u += dt * d.sp * d.dir; if (d.u > 1) { d.u = 1; d.dir = -1; } if (d.u < 0) { d.u = 0; d.dir = 1; } const p = pathAt(d.pts, d.u), len = Math.hypot(p.dx, p.dz) || 1; c.position.set(p.x + (-p.dz / len) * d.lane, 0.1, p.z + (p.dx / len) * d.lane); c.rotation.y = Math.atan2(p.dx * d.dir, p.dz * d.dir); }); return; }
     if (V.goal) { V.target.lerp(V.goal, Math.min(1, dt * 3.2)); if (V.target.distanceTo(V.goal) < 0.05) V.goal = null; frame(); }
     const mk = V.marker, u = mk.userData;
     u.ring.scale.setScalar(1 + Math.sin(t * 3) * 0.08);
@@ -3224,6 +3454,7 @@ window.G3 = (function () {
     return '';
   }
   function renderSheet(id) {
+    if (CITY.hangouts[id]) return renderHangSheet(id);
     const pl = CITY.places[id], here = id === S.at;
     let h = '<div class="sheet-wrap"><div class="psheet" role="dialog" aria-label="' + pl.name + '"><div class="grab"></div>' +
       '<div class="ps-head"><div><div class="eyebrow">' + pl.tag + '</div><h2>' + pl.name + '</h2></div><button class="xbtn" data-act="close" aria-label="Close">Close</button></div><p class="muted">' + pl.line + '</p>';
@@ -3260,7 +3491,7 @@ window.G3 = (function () {
         h += '</div>';
       }
     }
-    return h + '</div></div>';
+    return h + peopleCard(id) + '</div></div>';
   }
 
   /* ---------- shop ---------- */
@@ -3306,7 +3537,7 @@ window.G3 = (function () {
   /* ---------- phone: jobs, japa, life, log ---------- */
   /* ---------- online leaderboard (Supabase over plain REST: no library, only the public anon key) ---------- */
   const BOARD = { url: 'https://tvbnoqwyekbqrlxxnztq.supabase.co', key: 'sb_publishable_db5quqce8u5iWU7qENLltg_U4OWrfYG' };   /* public client key: safe to ship */
-  const APP_VERSION = 'v1.1 · 15 Oct 2026';
+  const APP_VERSION = 'v1.3 · 15 Oct 2026';
   const ERRS = [];
   window.addEventListener('error', function (e) { ERRS.push(String((e && e.message) || 'error').slice(0, 140) + ' @' + ((e && e.lineno) || 0)); if (ERRS.length > 5) ERRS.shift(); });
   window.addEventListener('unhandledrejection', function (e) { ERRS.push('promise: ' + String((e && e.reason && e.reason.message) || (e && e.reason) || '').slice(0, 140)); if (ERRS.length > 5) ERRS.shift(); });
@@ -3811,12 +4042,13 @@ window.G3 = (function () {
     h += '<form class="chat-bar" data-chatform novalidate><input type="text" id="chat-input" maxlength="500" autocomplete="off" placeholder="Message @' + esc(c.name) + '…" value="' + esc(Chat.draft) + '"><button class="btn" type="submit" aria-label="Send message">Send</button></form></div>';
     return h;
   }
-  function sendText(body) {
-    body = String(body || '').trim().slice(0, 500); const to = UI.chat && UI.chat.id; if (!body || !to || !Chat.me) return;
+  function sendTextTo(to, body) {
+    body = String(body || '').trim().slice(0, 500); if (!body || !to || !Chat.me) return null;
     const m = { id: 0, pending: true, cid: newCid(), from_id: Chat.uid, to_id: to, kind: 'text', body: body, amount: null, created_at: new Date().toISOString() };
-    Chat.msgs.push(m); Chat.draft = ''; paintChat(true);
-    post(m, 2).then(function () { chatPoll(); }, function (e) { m.failed = true; paintChat(); showToast(e.message); });
+    Chat.msgs.push(m); if (UI.chat) paintChat(true);
+    return post(m, 2).then(function () { chatPoll(); }, function (e) { m.failed = true; if (UI.chat) paintChat(); showToast(esc(e.message)); });
   }
+  function sendText(body) { Chat.draft = ''; sendTextTo(UI.chat && UI.chat.id, body); }
   /* sending retries with the same message id, so a lost reply can never send it twice */
   function post(m, tries) {
     return chatApi('/rest/v1/dms', { method: 'POST', prefer: 'return=minimal', body: { cid: m.cid, from_id: m.from_id, to_id: m.to_id, kind: m.kind, body: m.kind === 'text' ? m.body : null, amount: m.amount } }).catch(function (e) {
@@ -3848,7 +4080,98 @@ window.G3 = (function () {
     if (!Chat.me) return;
     const fast = UI.chat || (UI.tab === 'phone' && UI.phone === 'chat');
     if (Date.now() - Chat.last >= (fast ? 3800 : 24000)) chatPoll();
+    presBeat(); if (UI.tab === 'map' || UI.sheet || UI.person) presLoad();
   }, 4000);
+
+  /* ---------- going out: seeing other players and saying hello ---------- */
+  const Pres = { rows: [], at: 0, loading: false, sent: '', sentAt: 0, backoff: 0, err: '', lastVibe: 0, vibeTo: {} };
+  function visOn() { try { return localStorage.getItem('bn-vis') !== '0'; } catch (e) { return true; } }
+  function myPlace() { return S ? (S.hang || S.at) : ''; }
+  function placeLabel(k) { const p = CITY.places[k] || CITY.landmarks.find(function (l) { return l.id === k; }); return p ? p.name : 'somewhere in Abuja'; }
+  function presBeat(force) {
+    if (!chatOn() || !Chat.me || !S) return;
+    const now = Date.now();
+    if (!visOn()) {
+      if (Pres.sent) { Pres.sent = ''; chatApi('/rest/v1/presence?user_id=eq.' + enc(Chat.uid), { method: 'DELETE', prefer: 'return=minimal' }).catch(function () {}); }
+      return;
+    }
+    const pl = myPlace();
+    if (now < Pres.backoff) return;
+    if (!force && pl === Pres.sent && now - Pres.sentAt < 120000) return;
+    Pres.sent = pl; Pres.sentAt = now;
+    chatApi('/rest/v1/presence?on_conflict=user_id', { method: 'POST', prefer: 'resolution=merge-duplicates,return=minimal', body: { user_id: Chat.uid, place: pl, look: S.look || null } }).catch(function (e) { Pres.sent = ''; Pres.backoff = Date.now() + 30000; Pres.err = e.message; });
+  }
+  function presLoad(force) {
+    if (!chatOn() || !Chat.me || Pres.loading) return;
+    if (!force && Date.now() - Pres.at < 15000) return;
+    Pres.loading = true;
+    chatApi('/rest/v1/presence?select=user_id,place,look&user_id=neq.' + enc(Chat.uid) + '&limit=300').then(function (rows) {
+      Pres.rows = Array.isArray(rows) ? rows : []; Pres.at = Date.now(); Pres.err = '';
+      const need = []; Pres.rows.forEach(function (r) { if (!Chat.names[r.user_id] && need.indexOf(r.user_id) < 0) need.push(r.user_id); });
+      return need.length ? chatApi('/rest/v1/profiles?select=user_id,username&user_id=in.(' + need.map(enc).join(',') + ')').then(function (pr) { (pr || []).forEach(function (x) { Chat.names[x.user_id] = x.username; }); }) : null;
+    }).catch(function (e) { Pres.err = e.message; Pres.at = Date.now(); }).then(function () { Pres.loading = false; presPaint(); });
+  }
+  function presPaint() {
+    if (!S) return;
+    if (UI.tab === 'map' && !UI.sheet && !UI.chat) updatePins();
+    const el = document.getElementById('people'); if (el && UI.sheet) el.innerHTML = peopleInner(UI.sheet);
+  }
+  function outfitName(l) { return LOOK.outfits[cleanLook(l).outfit][1]; }
+  function hairName(l) { return LOOK.hairs[cleanLook(l).hair][1]; }
+  function peopleInner(key) {
+    if (!Auth.session) return '<p class="muted">Create an account to see and meet other players here.</p><button class="btn ghost" data-act="aopen" type="button">Create account or log in</button>';
+    if (!Chat.me) return '<p class="muted">' + (Chat.meLoaded ? 'Pick a username in the Chat app so other players can see you and you can see them.' : 'Looking around…') + '</p>';
+    const hide = !visOn() ? '<p class="muted">You are hidden from other players. Turn on “Show me at places” in the Me app to be seen.</p>' : '';
+    if (!Pres.at) return hide + '<p class="muted">Looking around…</p>';
+    const list = Pres.rows.filter(function (r) { return r.place === key && !Chat.blocked[r.user_id] && Chat.names[r.user_id]; });
+    if (!list.length) return hide + '<p class="muted">' + (Pres.err ? 'Could not look around (' + esc(Pres.err) + ').' : 'Nobody else is here right now. Ask a friend to come and meet you here.') + '</p>';
+    return hide + '<div class="list">' + list.map(function (r) {
+      return '<button class="row" data-act="person" data-id="' + esc(r.user_id) + '" data-pl="' + esc(key) + '" type="button"><span class="pp-av">' + lookSvg(r.look, 'head') + '</span><span class="row-main"><span class="row-title">@' + esc(Chat.names[r.user_id]) + '</span><span class="row-desc">' + esc(outfitName(r.look)) + ' · ' + esc(hairName(r.look)) + '</span></span><span class="row-chips"><span class="chip">Say hi</span></span></button>';
+    }).join('') + '</div>';
+  }
+  function peopleCard(key) { return '<div class="card" style="margin-top:12px"><h3>Players here</h3><div id="people">' + peopleInner(key) + '</div></div>'; }
+  function renderHangSheet(id) {
+    const lm = CITY.landmarks.find(function (l) { return l.id === id; }), hg = CITY.hangouts[id], here = S.hang === id, why = hangoutBlock(S, id), c = pr(S, hg.cost);
+    return '<div class="sheet-wrap"><div class="psheet" role="dialog" aria-label="' + esc(lm.name) + '"><div class="grab"></div><div class="ps-head"><div><div class="eyebrow">Go out</div><h2>' + esc(lm.name) + '</h2></div><button class="xbtn" data-act="close" aria-label="Close">Close</button></div><p class="muted">' + esc(lm.line) + '</p>' +
+      (here ? '<div class="banner">You are here. Other players here can see you.</div>' : '<div class="list">' + row('data-act="hangvisit" data-id="' + id + '"', 'Go and ' + hg.verb, why ? why : 'Gain fun and mood. Other players there can see you.', (c ? chipMoney(c) : '<span class="chip">Free</span>') + chipSlot(1) + chipEnergy(hg.energy), !!why, 'primary') + '</div>') +
+      peopleCard(id) + '</div></div>';
+  }
+  const JOKES = ['I asked NEPA for light. They said “wait small”. That was 2019. 💡😂', 'Relationship status: waiting for fuel price to come down. Still single. ⛽😂', 'Me: I will sleep early tonight. Also me at 3am: one more Chowdeck jollof. 🍛😂',
+    'Japa tip: first pass IELTS, then pass the vibe check at the embassy. ✈️😂', 'Why is Abuja so calm? Everybody is quietly waiting for a ministry contract. 🏛️😂', 'My phone battery and my savings have one thing in common: both drop to 1% when I need them most. 🔋😂',
+    'My okada man just offered me a “scenic route”. It was the same road. 🛵😂', 'I told my account balance I would always be there for it. It said “don’t make promises you cannot keep”. 😭'];
+  const FLIRTS = ['Are you NEPA? Because you just brought light into my whole day. 💡😊', 'Do you have a visa? Because I would japa for you. ✈️😏', 'Is your name Wi-Fi? I am feeling a strong connection. 📶😊', 'If love were Abuja traffic, I would happily be stuck with you. 🚗💕',
+    'You look like my next good decision. 😏', 'Are you jollof? Because I would defend you in any argument. 🍛😄', 'I came here for the vibes, but you are better. ✨'];
+  const VIBES = [['hi', '👋🏾 How far?'], ['sup', '😄 What’s up?'], ['hang', '🤝 Wanna hang out?'], ['outfit', '👗 I like your outfit'], ['hair', '💇🏾 Love your hair'], ['joke', '😂 Crack a joke'], ['flirt', '😏 Flirt']];
+  function pickOne(a) { return a[Math.floor(Math.random() * a.length)]; }
+  function vibeText(kind, r) {
+    const l = cleanLook(r.look);
+    if (kind === 'hi') return pickOne(['How far? 👋🏾', 'How far na? 👋🏾', 'Hey, how far?']);
+    if (kind === 'sup') return pickOne(['What’s up? 😄', 'Wetin dey happen? 😄', 'How you dey? 😄']);
+    if (kind === 'hang') return 'Wanna hang out? I am at ' + placeLabel(r.place) + ' right now. 🤝';
+    if (kind === 'outfit') return 'I like your ' + outfitName(l).toLowerCase() + '! 🔥';
+    if (kind === 'hair') return LOOK.hairs[l.hair][0] === 'bald' ? 'Bald and bold. Respect. 😎' : 'Your ' + hairName(l).toLowerCase() + ' is looking good! 🔥';
+    if (kind === 'joke') return pickOne(JOKES);
+    return pickOne(FLIRTS);
+  }
+  function renderPerson() {
+    const pp = UI.person, r = Pres.rows.find(function (x) { return x.user_id === pp.id; }) || { user_id: pp.id, place: pp.place, look: null }, nm = esc(Chat.names[pp.id] || 'player');
+    return '<div class="veil"><div class="sheet person" role="dialog" aria-modal="true" aria-label="Player @' + nm + '"><div class="pp-top"><div class="pp-big">' + lookSvg(r.look) + '</div><div class="pp-info"><div class="eyebrow">At ' + esc(placeLabel(r.place)) + '</div><h2>@' + nm + '</h2><p class="muted">Wearing ' + esc(outfitName(r.look).toLowerCase()) + ', ' + esc(hairName(r.look).toLowerCase()) + '</p></div><button class="xbtn" data-act="pclose" aria-label="Close">Close</button></div>' +
+      (UI.pmsg ? '<p class="auth-err" role="status">' + esc(UI.pmsg) + '</p>' : '') + '<div class="eyebrow">Say something</div><div class="vibes">' + VIBES.map(function (v) { return '<button type="button" class="chip-btn" data-act="vibe" data-id="' + v[0] + '">' + v[1] + '</button>'; }).join('') + '</div>' +
+      '<div class="pp-more"><button class="cact" data-act="pchat" type="button">💬 Open chat</button><button class="cact money" data-act="pmoney" type="button">💸 Send money</button><button class="cact" data-act="psafe" data-id="report" type="button">🚩 Report</button><button class="cact" data-act="psafe" data-id="block" type="button">🚫 Block</button></div></div></div>';
+  }
+  function openPersonChat(opts) {
+    const pp = UI.person; if (!pp) return;
+    UI.chat = { id: pp.id, name: Chat.names[pp.id] || 'player' }; UI.person = null; UI.sheet = null; UI.chatMoney = !!opts.money; UI.chatSafe = opts.safe || null; if (opts.safe === 'report') UI.rsn = 'abuse'; Chat.draft = '';
+    render(false); paintChat(true);
+  }
+  function sendVibe(kind) {
+    const pp = UI.person; if (!pp || !Chat.me) return;
+    const now = Date.now(), r = Pres.rows.find(function (x) { return x.user_id === pp.id; }) || { place: pp.place, look: null };
+    if (now - Pres.lastVibe < 6000 || now - (Pres.vibeTo[pp.id] || 0) < 30000) { UI.pmsg = 'Give them a moment before you send another.'; render(false); return; }
+    Pres.lastVibe = now; Pres.vibeTo[pp.id] = now;
+    const nm = Chat.names[pp.id] || 'player', t = vibeText(kind, r); UI.person = null;
+    sendTextTo(pp.id, t); showToast('Sent to <b>@' + esc(nm) + '</b>: ' + esc(t)); render(false);
+  }
 
   /* ---------- feedback, invite, welcome ---------- */
   const FB = { kind: 'bug', text: '', busy: false, sent: false, err: '' };
@@ -3908,6 +4231,7 @@ window.G3 = (function () {
     if (Auth.session) {
       return '<div class="card"><h3>Account</h3><div class="kv"><div><span>Signed in as</span><span class="num" style="word-break:break-all">' + esc(Auth.session.user.email) + '</span></div><div><span>Username</span><span>' + (Chat.me ? '@' + esc(Chat.me.username) : '<button class="auth-link" data-act="phone" data-id="chat" type="button">Pick one in Chat</button>') + '</span></div><div><span>Online save</span><span id="cloud-stat">' + statusText() + '</span></div></div>' +
         '<div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap"><button class="btn ghost" data-act="alogout" type="button">Log out</button><button class="btn ghost" data-act="share" type="button">📲 Invite a friend</button></div>' +
+        '<div style="margin-top:8px"><button class="chip-btn' + (visOn() ? ' on' : '') + '" data-act="vistoggle" type="button">' + (visOn() ? '✓ ' : '') + 'Show me at places</button><p class="muted" style="font-size:12px;margin:4px 0 0">When this is on, players at the same place can see your character and say hello.</p></div>' +
         (UI.confirmDel ? '<div class="card" style="margin-top:10px"><p>Delete your account? This removes your login, your online save, your username and your chats. It cannot be undone.</p><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" data-act="delacct-yes" type="button">Yes, delete everything</button><button class="btn ghost" data-act="delacct-no" type="button">Cancel</button></div></div>' : '<div style="margin-top:6px"><button class="auth-link" data-act="delacct" type="button">Delete my account</button></div>') + '</div>';
     }
     return '<div class="card"><h3>Account</h3><p class="muted">You are playing as a guest, so your game only lives on this phone. Create an account to save it online and play on any phone.</p><button class="btn" data-act="aopen" type="button">Create account or log in</button> <button class="btn ghost" data-act="share" type="button">📲 Invite a friend</button></div>';
@@ -4109,9 +4433,10 @@ window.G3 = (function () {
   function renderHelp() {
     return '<h2>Help and guide</h2><div class="card"><h3>The day</h3><p class="muted">Each day gives you 3 actions (the dots at the top). Working takes 2, most other things like eating out, studying, applying or a test drive take 1, and rides in a cab, okada or your own car take none. When the dots run out, go home and sleep to start a new day. The time on your phone follows the real clock, but your day only moves when you use your actions.</p></div>' +
       '<div class="card"><h3>Your needs</h3><p class="muted">Keep food, fun and clean above 25 or you pay for it overnight. Eat, bathe and unwind at home or out.</p></div>' +
-      '<div class="card"><h3>Getting around</h3><p class="muted">Cab is priced by distance. Okada is cheaper but dusty. Trekking is free but slow and tiring. A car or a bike is free or cheap to run, and you buy one at AbujaCars on the map. Cars are free except in go-slow; a bike only costs a little fuel and slips through traffic.</p></div>' +
+      '<div class="card"><h3>Getting around</h3><p class="muted">Cabs and okadas show a top-down map with a blue route and a minimap while you ride. When you own a car or bike you drive it yourself: hold GO to speed up, steer with the arrows, STOP to brake. Follow the blue line, or tap Auto-drive. Cab is priced by distance. Okada is cheaper but dusty. Trekking is free but slow and tiring. A car or a bike is free or cheap to run, and you buy one at AbujaCars on the map. Cars are free except in go-slow; a bike only costs a little fuel and slips through traffic.</p></div>' +
       '<div class="card"><h3>Your phone</h3><p class="muted">Check Messages for real chances and scams, order food on Chowdeck, groceries from Shops, medication from Health, find a new home in Houses, change your look in the Boutique, check your rank on Forbes, and report scams to the Police.</p></div>' +
       '<div class="card"><h3>The goal</h3><p class="muted">Save money, pass IELTS, choose a visa route, avoid fake agents, then japa. Or stay and build a life here. Both are real endings.</p></div>' +
+      '<div class="card"><h3>Going out</h3><p class="muted">Tap Magic Land, Club Zenith, the park, the mall or the Hilton on the map to go out. Players who are there at the same time show up. Tap one to say how far, compliment them, crack a joke or flirt. Block or report anyone who is rude.</p></div>' +
       '<div class="card"><h3>Friends and feedback</h3><p class="muted">Chat lets you find a friend by username and send money. Something broken or boring? Tell the maker in the Feedback app.</p><button class="btn ghost" data-act="phone" data-id="feedback" type="button">Open Feedback</button> <button class="btn ghost" data-act="share" type="button">📲 Invite a friend</button></div>';
   }
   const PHONE_SCREENS = { jobs: () => renderJobs(), log: () => renderMessages(), japa: () => renderJapa(), life: () => renderLife(), bank: () => renderBank(), courses: () => renderCourses(),
@@ -4331,18 +4656,102 @@ window.G3 = (function () {
 
 
 
+  /* ---------- trips: ride along, or drive your own ---------- */
+  const TRIP_ICON = { left: '⬅️', right: '➡️', straight: '⬆️', arrive: '🏁', off: '⚠️' };
+  function fmtD(u) { const m = Math.max(0, u) * 10; return m < 1000 ? Math.max(10, Math.round(m / 10) * 10) + ' m' : (m / 1000).toFixed(1) + ' km'; }
+  function renderTrip() {
+    const T = UI.trip, drive = T.drive;
+    return '<div class="trip" role="region" aria-label="Trip"><div class="tr-top"><span class="tr-ic" id="tr-ic">⬆️</span><div><div class="tr-main" id="tr-main">Heading to ' + esc(CITY.places[T.to].name) + '</div><div class="tr-sub" id="tr-sub">' + esc(T.label) + '</div></div></div>' +
+      '<canvas class="tr-mini" id="tr-map" width="260" height="260" aria-label="Minimap"></canvas>' +
+      '<div class="tr-chips"><span class="tr-chip" id="tr-spd">0 km/h</span><span class="tr-chip" id="tr-rem">…</span><span class="tr-chip warn" id="tr-warn" hidden></span></div>' +
+      (drive ? '<div class="tr-mid"><button class="tr-pill" data-act="tr-auto" type="button">🤖 Auto-drive</button><button class="tr-pill" data-act="tr-park" type="button">🅿️ Park here</button></div>' +
+        '<div class="tr-ctl"><div class="tr-pad"><button class="tr-btn" data-hold="left" type="button" aria-label="Steer left">◀</button><button class="tr-btn" data-hold="right" type="button" aria-label="Steer right">▶</button></div>' +
+        '<div class="tr-pad"><button class="tr-btn brake" data-hold="brake" type="button" aria-label="Brake">STOP</button><button class="tr-btn gas" data-hold="gas" type="button" aria-label="Accelerate">GO</button></div></div>'
+        : '<div class="tr-mid"><button class="tr-pill" data-act="tr-skip" type="button">Skip ›</button></div>') + '</div>';
+  }
+  function drawMini(i) {
+    const cv = document.getElementById('tr-map'); if (!cv) return; const c = cv.getContext('2d'), W = cv.width, H = cv.height, R = 62, k = W / 2 / R;
+    c.clearRect(0, 0, W, H); c.save(); c.beginPath(); c.arc(W / 2, H / 2, W / 2 - 2, 0, Math.PI * 2); c.clip(); c.fillStyle = '#dfe9d6'; c.fillRect(0, 0, W, H);
+    const fx = Math.sin(i.h), fz = Math.cos(i.h), rx = -Math.cos(i.h), rz = Math.sin(i.h);
+    const pt = function (x, z) { const dx = x - i.x, dz = z - i.z; return [W / 2 + (dx * rx + dz * rz) * k, H / 2 - (dx * fx + dz * fz) * k]; };
+    const line = function (pts, w, col) { c.beginPath(); pts.forEach(function (q, n) { const p = pt(q[0], q[1]); n ? c.lineTo(p[0], p[1]) : c.moveTo(p[0], p[1]); }); c.lineWidth = w; c.strokeStyle = col; c.lineJoin = 'round'; c.lineCap = 'round'; c.stroke(); };
+    const V = G3.views.map, paths = V.paths || {};
+    for (const key in paths) { line(paths[key], 11, '#ffffff'); }
+    for (const key in paths) { line(paths[key], 7, '#b9bfc7'); }
+    const t = V.trip; if (t) { line(t.route, 11, '#ffffff'); line(t.route, 7, '#2f7bff'); }
+    c.font = '700 20px system-ui,sans-serif'; c.textAlign = 'center'; c.fillStyle = '#4b5563';
+    for (const id in CITY.mapPos) { const m = CITY.mapPos[id], p = pt(m.x, m.z); c.beginPath(); c.arc(p[0], p[1], 9, 0, 7); c.fillStyle = id === (UI.trip && UI.trip.to) ? '#ff3b5c' : '#6b7280'; c.fill(); }
+    c.restore();
+    c.save(); c.translate(W / 2, H / 2); c.fillStyle = '#ffffff'; c.beginPath(); c.moveTo(0, -17); c.lineTo(13, 14); c.lineTo(0, 7); c.lineTo(-13, 14); c.closePath(); c.fill();
+    c.fillStyle = '#0b5fff'; c.beginPath(); c.moveTo(0, -13); c.lineTo(9, 10); c.lineTo(0, 5); c.lineTo(-9, 10); c.closePath(); c.fill(); c.restore();
+  }
+  function tripUi(i) {
+    const T = UI.trip; if (!T) return;
+    const set = function (id, t) { const el = document.getElementById(id); if (el && el.textContent !== t) el.textContent = t; };
+    const dest = CITY.places[T.to].name; let ic = TRIP_ICON.straight, main = 'Head to ' + dest, sub;
+    if (i.off) { ic = TRIP_ICON.off; main = 'Off route'; sub = 'Get back on the blue line'; }
+    else if (i.remain < 14) { ic = TRIP_ICON.arrive; main = 'Arriving at ' + dest; sub = fmtD(i.remain); }
+    else if (i.turn && i.turn.dist < 90) { ic = TRIP_ICON[i.turn.dir]; main = (i.turn.dist < 14 ? 'Turn ' : 'Turn ') + i.turn.dir + (i.turn.dist < 14 ? ' now' : ' in ' + fmtD(i.turn.dist)); sub = 'Then continue to ' + dest; }
+    else { sub = 'Continue for ' + fmtD(i.turn ? i.turn.dist : i.remain); }
+    set('tr-ic', ic); set('tr-main', main); set('tr-sub', sub); set('tr-spd', Math.round(i.v * 3.6) + ' km/h'); set('tr-rem', fmtD(i.remain) + ' left');
+    const w = document.getElementById('tr-warn'), wt = i.offRoad ? 'Off the road! Slow down' : i.slow ? '🚦 Go-slow traffic' : '';
+    if (w) { w.hidden = !wt; if (wt && w.textContent !== wt) w.textContent = wt; }
+    const now = performance.now(); if (now - (T.drawn || 0) > 33) { T.drawn = now; drawMini(i); }
+  }
+  function beginTrip(from, to, mode) {
+    const V = G3.views.map, o = tripOptions(S, from, to).find(function (x) { return x.mode === mode; });
+    if (!o || o.block) { showToast(o && o.block ? (o.mode === 'car' ? 'You do not own a car yet.' : 'You cannot afford the fare of ' + fmt(o.cost) + '.') : 'Not possible.'); render(false); return; }
+    const ownCar = mode === 'car', ownBike = mode === 'okada' && !!S.owned.bike, drive = ownCar || ownBike;
+    const car = S.owned.car && CITY.cars[S.owned.carId || 'corolla'], bike = S.owned.bike && CITY.bikes[S.owned.bikeId];
+    const vehicle = mode === 'cab' ? 'cab' : ownCar ? 'car' : ownBike ? 'bike' : 'okada';
+    const color = vehicle === 'car' ? (car ? car.col : 0xb8bcc4) : vehicle === 'bike' ? (bike ? bike.col : 0x2b4f86) : vehicle === 'cab' ? 0xe8b100 : 0xd9502a;
+    const label = vehicle === 'cab' ? 'Cab · ' + fmt(o.cost) : vehicle === 'okada' ? 'Okada · ' + fmt(o.cost) : (ownCar ? (car ? car.name : 'Your car') : (bike ? bike.name : 'Your bike')) + (o.cost ? ' · fuel ' + fmt(o.cost) : ' · you drive');
+    let msg = '';
+    if (!drive) { const r = travel(S, to, mode); if (!r.ok) { showToast(r.msg); render(false); return; } msg = r.msg; save(); }
+    UI.sheet = null; UI.prompt = null; UI.toast = ''; pinsEl.innerHTML = '';
+    UI.trip = { from: from, to: to, mode: mode, drive: drive, label: label, msg: msg, drawn: 0 };
+    app.innerHTML = renderTrip();
+    V.onTrip = tripUi; V.onTripDone = function () { setTimeout(finishTrip, 150); };
+    V.startTrip({ from: from, to: to, drive: drive, vehicle: vehicle, color: color, slow: !!S.slow, top: vehicle === 'bike' && bike && bike.run > 0.3 ? 18 : 0 });
+  }
+  function finishTrip() {
+    const T = UI.trip; if (!T) return; const V = G3.views.map;
+    let msg = T.msg;
+    if (T.drive) { const r = travel(S, T.to, T.mode); msg = r.msg; save(); }
+    UI.trip = null; V.onTrip = null; V.onTripDone = null; V.endTrip(T.to);
+    if (msg) showToast(msg); render();
+  }
+  function cancelTrip() {
+    const T = UI.trip; if (!T) return; const V = G3.views.map;
+    UI.trip = null; V.onTrip = null; V.onTripDone = null; V.endTrip(T.from);
+    showToast('You parked and stayed in ' + CITY.places[T.from].name + '. Nothing was charged.'); render();
+  }
+  /* hold-to-steer buttons and arrow keys */
+  (function () {
+    const set = function (k, v) { if (G3.views.map && G3.views.map.input) G3.views.map.input[k] = v; };
+    document.addEventListener('pointerdown', function (e) { const b = e.target.closest && e.target.closest('[data-hold]'); if (!b) return; e.preventDefault(); try { b.setPointerCapture(e.pointerId); } catch (x) {} b.classList.add('on'); set(b.dataset.hold, true); });
+    const up = function (e) { const b = e.target.closest && e.target.closest('[data-hold]'); if (!b) return; b.classList.remove('on'); set(b.dataset.hold, false); };
+    document.addEventListener('pointerup', up); document.addEventListener('pointercancel', up); document.addEventListener('lostpointercapture', up);
+    document.addEventListener('contextmenu', function (e) { if (e.target.closest && e.target.closest('.trip')) e.preventDefault(); });
+    const KM = { ArrowLeft: 'left', ArrowRight: 'right', ArrowUp: 'gas', ArrowDown: 'brake', a: 'left', d: 'right', w: 'gas', s: 'brake' };
+    document.addEventListener('keydown', function (e) { if (UI.trip && KM[e.key]) { set(KM[e.key], true); e.preventDefault(); } });
+    document.addEventListener('keyup', function (e) { if (KM[e.key]) set(KM[e.key], false); });
+  })();
+
   /* ---------- 3D wiring ---------- */
+  function pinPeople(id) { const n = Pres.rows.filter(function (r) { return r.place === id && !Chat.blocked[r.user_id]; }).length; return n ? ' <span class="pin-p">👥 ' + n + '</span>' : ''; }
   function updatePins() {
+    if (UI.trip) return;
     if (!S) { pinsEl.innerHTML = ''; return; }
     if (UI.tab === 'home' && threeOk) { pinsEl.innerHTML = renderPrompt(); positionPrompt(); return; }
     if (UI.tab !== 'map' || !threeOk) { pinsEl.innerHTML = ''; return; }
     let h = '';
     for (const id in CITY.places) {
       const here = id === S.at, f = here ? 0 : (hasCar(S) && !S.slow ? 0 : fare(S, S.at, id));
-      h += '<button class="pin' + (here ? ' here' : '') + '" data-act="sheet" data-id="' + id + '" data-pin="' + id + '"><span class="pin-n">' + CITY.places[id].name.replace(' Estate', '').replace(' and Nyanya', '') + '</span>' + (here ? '<span class="pin-s">' : '<span class="pin-s" hidden>') + (here ? 'You are here' : '') + '</span></button>';
+      h += '<button class="pin' + (here ? ' here' : '') + '" data-act="sheet" data-id="' + id + '" data-pin="' + id + '"><span class="pin-n">' + CITY.places[id].name.replace(' Estate', '').replace(' and Nyanya', '') + pinPeople(id) + '</span>' + (here ? '<span class="pin-s">' : '<span class="pin-s" hidden>') + (here ? 'You are here' : '') + '</span></button>';
     }
     let lm = '';
-    CITY.landmarks.forEach(function (l) { lm += '<button class="lm" data-act="lm" data-id="' + l.id + '" data-pin="' + l.id + '" aria-label="' + l.name + '"><span class="lm-i">' + l.icon + '</span><span class="lm-n">' + l.name + '</span></button>'; });
+    CITY.landmarks.forEach(function (l) { lm += '<button class="lm" data-act="lm" data-id="' + l.id + '" data-pin="' + l.id + '" aria-label="' + l.name + '"><span class="lm-i">' + l.icon + '</span><span class="lm-n">' + l.name + pinPeople(l.id) + '</span></button>'; });
     pinsEl.innerHTML = lm + h;
     positionPins();
   }
@@ -4373,6 +4782,7 @@ window.G3 = (function () {
   }
 
   function render(resync) {
+    if (UI.trip) { if (!document.getElementById('tr-map')) app.innerHTML = renderTrip(); return; }
     if (Auth.conflict || (Auth.session && !S && Auth.pulling) || Auth.recovery || Auth.wait || (needsAuth() && !Auth.session) || Auth.show) { app.innerHTML = renderAuth(); sync3d(); return; }
     if (!S) { app.innerHTML = renderStart(); sync3d(); return; }
     let h = renderHud();
@@ -4386,6 +4796,7 @@ window.G3 = (function () {
     if (UI.sheet) h += renderSheet(UI.sheet);
     h += renderNav();
     if (UI.chat) h += renderChatView();
+    if (UI.person) h += renderPerson();
     if (S.over) h += renderOver(); else if (S.event) h += renderEvent(); else if (UI.welcome) h += renderWelcome();
     app.innerHTML = h;
     if (resync !== false) sync3d();
@@ -4467,12 +4878,24 @@ window.G3 = (function () {
       render(); return;
     }
     if (act === 'phone') { UI.phone = id; UI.confirmNew = false; if (id === 'forbes') boardLoad();  render(); const pg = document.querySelector('.page'); if (pg) pg.scrollTop = 0; return; }
-    if (act === 'sheet') { UI.sheet = id; render(false); const sh = document.querySelector('.psheet'); if (sh) sh.scrollTop = 0; return; }
+    if (act === 'sheet') { UI.sheet = id; presLoad(); render(false); const sh = document.querySelector('.psheet'); if (sh) sh.scrollTop = 0; return; }
     if (act === 'close') { UI.sheet = null; render(false); return; }
-    if (act === 'lm') { const l = CITY.landmarks.find(function (x) { return x.id === id; }); if (l) showToast('<b>' + l.name + '</b>: ' + l.line); render(false); return; }
+    if (act === 'hangvisit') { const r = visitHangout(S, id); if (r.ok) { presBeat(true); setTimeout(function () { presLoad(true); }, 700); } return after(r); }
+    if (act === 'person') { UI.person = { id: id, place: el.dataset.pl }; UI.pmsg = ''; render(false); return; }
+    if (act === 'pclose') { UI.person = null; UI.pmsg = ''; render(false); return; }
+    if (act === 'vibe') { sendVibe(id); return; }
+    if (act === 'pchat') { openPersonChat({}); return; }
+    if (act === 'pmoney') { openPersonChat({ money: true }); return; }
+    if (act === 'psafe') { openPersonChat({ safe: id }); return; }
+    if (act === 'vistoggle') { try { localStorage.setItem('bn-vis', visOn() ? '0' : '1'); } catch (err) {} presBeat(true); render(false); return; }
+    if (act === 'lm') { if (CITY.hangouts[id]) { UI.sheet = id; presLoad(); render(false); return; } const l = CITY.landmarks.find(function (x) { return x.id === id; }); if (l) showToast('<b>' + l.name + '</b>: ' + l.line); render(false); return; }
     if (act === 'findme') { if (G3.views.map) { G3.views.map.dist = 118; G3.views.map.focus(S.at); } return; }
     if (act === 'overview') { if (G3.views.map) G3.views.map.overview(); return; }
+    if (act === 'tr-auto') { G3.views.map.autopilot(); const bt = document.querySelector('.tr-ctl'); if (bt) bt.hidden = true; el.hidden = true; return; }
+    if (act === 'tr-skip') { G3.views.map.skipTrip(); return; }
+    if (act === 'tr-park') { cancelTrip(); return; }
     if (act === 'go') {
+      if (threeOk && UI.tab === 'map' && G3.views.map && G3.views.map.startTrip && (el.dataset.mode || 'cab') !== 'trek' && CITY.mapPos[S.at] && CITY.mapPos[id]) return beginTrip(S.at, id, el.dataset.mode || 'cab');
       const to = id, from = S.at, r = travel(S, to, el.dataset.mode || 'cab');
       if (r.ok) { UI.sheet = null; if (threeOk && UI.tab === 'map' && G3.views.map) G3.views.map.travel(from, to); }
       return after(r);
