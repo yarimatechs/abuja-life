@@ -1,6 +1,14 @@
 <!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
 <meta charset="utf-8">
 <title>Abuja Life</title>
+<meta name="description" content="Abuja Life: hustle, survive and try to japa. A Nigerian life sim set in Abuja.">
+<meta property="og:title" content="Abuja Life">
+<meta property="og:description" content="Hustle in Abuja, dodge scams, and try to japa. Can you make it out?">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#0b7a43">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Abuja Life">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
@@ -213,6 +221,13 @@ p { margin: 0; }
 .jb-btn:disabled { background: var(--surface); color: var(--muted); cursor: default; }
 .jb-btn.quit { background: var(--warn-bg); color: var(--warn); }
 .jb-note { margin: 0; font-size: 13px; color: var(--muted); text-align: center; }
+/* feedback, safety, welcome */
+.namef textarea { font: inherit; font-size: 16px; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); resize: vertical; min-height: 96px; }
+.namef textarea:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.chip-btn.on { background: var(--accent); color: var(--accent-ink); }
+.safety { display: grid; gap: 8px; padding: 12px 14px; border-top: 1px solid var(--line); }
+.wl { display: flex; gap: 10px; align-items: flex-start; margin: 8px 0; line-height: 1.4; }
+.wl-i { font-size: 20px; line-height: 1.2; }
 </style>
 <style>
 .stat-chips { display: flex; flex-wrap: wrap; gap: 6px; min-width: 0; }
@@ -488,15 +503,15 @@ const CITY = {
   },
   comfortItems: ['fan', 'tv', 'sofa', 'rug', 'plant', 'inverter'],
   japa: {
-    ieltsFee: 60000, agentFee: 120000, flightCost: 250000, flightWindow: 45, stayNeed: 800000, prepNeeded: 5,
+    ieltsFee: 80000, agentFee: 250000, flightCost: 400000, flightWindow: 45, stayNeed: 3000000, prepNeeded: 5,
     formalJobs: ['bank', 'teacher', 'pharmacy', 'civil', 'bdc'],
     routes: {
       study: { name: 'Study abroad', country: 'the UK', city: 'Manchester', role: 'Master’s student', blurb: 'A master’s degree at a UK university. You need a degree, an IELTS score and money in the bank.',
-        fee: 60000, funds: 600000, minIelts: 6, days: 21, base: 55 },
+        fee: 150000, funds: 1800000, minIelts: 6, days: 21, base: 55 },
       work: { name: 'Skilled worker visa', country: 'the UK', city: 'Leicester', role: 'Skilled worker', blurb: 'An employer sponsors you for a skilled job. You need a year of work behind you and a trade employers want.',
-        fee: 80000, funds: 400000, minIelts: 5.5, days: 28, base: 50 },
+        fee: 200000, funds: 1400000, minIelts: 5.5, days: 28, base: 50 },
       pr: { name: 'Canada Express Entry', country: 'Canada', city: 'Calgary', role: 'Permanent resident', blurb: 'Points for education, English and work. The pay-off is permanent residence, so the bar is higher.',
-        fee: 100000, funds: 900000, minIelts: 6.5, days: 35, base: 38 }
+        fee: 250000, funds: 3200000, minIelts: 6.5, days: 35, base: 38 }
     },
     reasons: ['The officer questioned your bank statement.', 'Your documents did not match.', 'The officer said "insufficient ties to your home country".', 'The quota was filled before your file was read.', 'The reason was not given. It rarely is.']
   },
@@ -3291,6 +3306,10 @@ window.G3 = (function () {
   /* ---------- phone: jobs, japa, life, log ---------- */
   /* ---------- online leaderboard (Supabase over plain REST: no library, only the public anon key) ---------- */
   const BOARD = { url: 'https://tvbnoqwyekbqrlxxnztq.supabase.co', key: 'sb_publishable_db5quqce8u5iWU7qENLltg_U4OWrfYG' };   /* public client key: safe to ship */
+  const APP_VERSION = 'v1.1 · 15 Oct 2026';
+  const ERRS = [];
+  window.addEventListener('error', function (e) { ERRS.push(String((e && e.message) || 'error').slice(0, 140) + ' @' + ((e && e.lineno) || 0)); if (ERRS.length > 5) ERRS.shift(); });
+  window.addEventListener('unhandledrejection', function (e) { ERRS.push('promise: ' + String((e && e.reason && e.reason.message) || (e && e.reason) || '').slice(0, 140)); if (ERRS.length > 5) ERRS.shift(); });
   const Board = { rows: null, at: 0, loading: false, err: '', last: null, sub: false };
   function boardOn() { return !!(BOARD.url && BOARD.key); }
   function esc(x) { return String(x).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
@@ -3585,10 +3604,10 @@ window.G3 = (function () {
   function errLine() { return Auth.err ? '<p class="auth-err" role="alert">' + esc(Auth.err) + '</p>' : ''; }
 
   /* ---------- chat: find players by username, message them, send them money ---------- */
-  const Chat = { uid: '', me: null, meLoaded: false, loadingMe: false, msgs: [], maxId: 0, names: {}, polling: false, last: 0, err: '', q: '', res: null, searching: false, stm: 0, nameErr: '', draft: '', amt: '' };
+  const Chat = { uid: '', me: null, meLoaded: false, loadingMe: false, msgs: [], maxId: 0, names: {}, polling: false, last: 0, err: '', q: '', res: null, searching: false, stm: 0, nameErr: '', draft: '', amt: '', blocked: {}, blocksOk: false, rnote: '' };
   const enc = encodeURIComponent;
   const RESERVED = ['admin', 'support', 'moderator', 'system', 'abujalife', 'abuja_life', 'staff', 'official'];
-  function chatReset() { Chat.uid = ''; Chat.me = null; Chat.meLoaded = false; Chat.loadingMe = false; Chat.msgs = []; Chat.maxId = 0; Chat.names = {}; Chat.res = null; Chat.q = ''; Chat.err = ''; Chat.polling = false; Chat.draft = ''; Chat.amt = ''; Chat.nameErr = ''; }
+  function chatReset() { Chat.uid = ''; Chat.me = null; Chat.meLoaded = false; Chat.loadingMe = false; Chat.msgs = []; Chat.maxId = 0; Chat.names = {}; Chat.res = null; Chat.q = ''; Chat.err = ''; Chat.polling = false; Chat.draft = ''; Chat.amt = ''; Chat.nameErr = ''; Chat.blocked = {}; Chat.blocksOk = false; Chat.rnote = ''; }
   function chatOn() { return !!(Auth.session && S && !Auth.pulling && !Auth.conflict && !Auth.recovery); }
   function chatApi(path, o) { return freshToken().then(function (tok) { return authFetch(path, Object.assign({}, o || {}, { token: tok })); }); }
   function newCid() {
@@ -3607,16 +3626,46 @@ window.G3 = (function () {
     }, function (e) { Chat.err = e.message; }).then(function () {
       Chat.loadingMe = false;
       if (UI.tab === 'phone' && (UI.phone === 'chat' || UI.phone === 'life') && !UI.chat) render(false);
-      if (Chat.me) chatPoll();
+      if (Chat.me) { chatPoll(); loadBlocks(); }
     });
+  }
+  const BADNAME = /(fuck|shit|bitch|nigg|cunt|whore|pussy|hitler|nazi|slut)/i;
+  function safeErr(e) { return e && (e.status === 404 || e.code === '42P01' || e.code === 'PGRST205' || e.code === 'PGRST202') ? 'This needs the latest database update (supabase_safety.sql).' : (e && e.message) || 'Something went wrong.'; }
+  function loadBlocks() {
+    return chatApi('/rest/v1/blocks?select=blocked&blocker=eq.' + enc(Chat.uid)).then(function (rows) {
+      Chat.blocked = {}; (Array.isArray(rows) ? rows : []).forEach(function (r) { Chat.blocked[r.blocked] = 1; }); Chat.blocksOk = true;
+      const need = Object.keys(Chat.blocked).filter(function (k) { return !Chat.names[k]; });
+      if (!need.length) return;
+      return chatApi('/rest/v1/profiles?select=user_id,username&user_id=in.(' + need.map(enc).join(',') + ')').then(function (pr) { (pr || []).forEach(function (x) { Chat.names[x.user_id] = x.username; }); });
+    }).catch(function () {}).then(function () { if (UI.tab === 'phone' && UI.phone === 'chat' && !UI.chat) render(false); });
+  }
+  function doBlock(id) {
+    if (!id || !Chat.me) return;
+    chatApi('/rest/v1/blocks', { method: 'POST', prefer: 'return=minimal', body: { blocker: Chat.uid, blocked: id } }).catch(function (e) { if (e.status === 409) return null; throw e; }).then(function () {
+      Chat.blocked[id] = 1; UI.chatSafe = null; UI.chat = null; UI.chatMoney = false; showToast('Blocked @' + esc(Chat.names[id] || 'player') + '. They can no longer message you or send you money.'); render();
+    }, function (e) { showToast(esc(safeErr(e))); });
+  }
+  function doUnblock(id) {
+    chatApi('/rest/v1/blocks?blocker=eq.' + enc(Chat.uid) + '&blocked=eq.' + enc(id), { method: 'DELETE', prefer: 'return=minimal' }).then(function () {
+      delete Chat.blocked[id]; showToast('Unblocked @' + esc(Chat.names[id] || 'player') + '.'); render(false);
+    }, function (e) { showToast(esc(safeErr(e))); });
+  }
+  function doReport() {
+    const c = UI.chat; if (!c || !Chat.me) return;
+    const o = c.id, me = Chat.uid;
+    const ctx = Chat.msgs.filter(function (m) { return (m.from_id === o && m.to_id === me) || (m.from_id === me && m.to_id === o); }).slice(-10).map(function (m) { return { from: m.from_id === me ? 'reporter' : 'reported', kind: m.kind, body: m.body, amount: m.amount, at: m.created_at }; });
+    chatApi('/rest/v1/reports', { method: 'POST', prefer: 'return=minimal', body: { reporter: me, reported: o, reason: UI.rsn || 'abuse', note: (Chat.rnote || '').trim().slice(0, 500) || null, context: ctx } }).then(function () {
+      Chat.rnote = ''; UI.chatSafe = 'after'; render(false); paintChat(true);
+    }, function (e) { showToast(esc(safeErr(e))); });
   }
   function createProfile(name) {
     name = String(name || '').trim(); Chat.nameErr = '';
     if (!/^[A-Za-z0-9_]{3,16}$/.test(name)) { Chat.nameErr = 'Use 3 to 16 letters, numbers or underscores. No spaces.'; render(false); return; }
+    if (BADNAME.test(name)) { Chat.nameErr = 'That name is not allowed. Pick another.'; render(false); return; }
     if (RESERVED.indexOf(name.toLowerCase()) >= 0) { Chat.nameErr = 'That name is reserved. Pick another.'; render(false); return; }
     chatApi('/rest/v1/profiles', { method: 'POST', prefer: 'return=representation', body: { user_id: Auth.session.user.id, username: name } }).then(function (rows) {
       Chat.me = Array.isArray(rows) ? rows[0] : rows; Chat.names[Chat.uid] = name; Chat.meLoaded = true; render(false); chatPoll();
-    }, function (e) { Chat.nameErr = e.status === 409 || e.code === '23505' ? 'Someone already has that username. Try another.' : e.message; render(false); });
+    }, function (e) { Chat.nameErr = e.status === 409 || e.code === '23505' ? 'Someone already has that username. Try another.' : e.code === '23514' ? 'That name is not allowed. Pick another.' : e.message; render(false); });
   }
   function doSearch() {
     const q = Chat.q.replace(/[^A-Za-z0-9_]/g, ''); clearTimeout(Chat.stm);
@@ -3625,7 +3674,7 @@ window.G3 = (function () {
     Chat.stm = setTimeout(function () {
       chatApi('/rest/v1/profiles?select=user_id,username&username=ilike.*' + enc(q) + '*&user_id=neq.' + enc(Chat.uid) + '&order=username.asc&limit=8').then(function (rows) {
         if (q !== Chat.q.replace(/[^A-Za-z0-9_]/g, '')) return;
-        Chat.res = Array.isArray(rows) ? rows : []; Chat.res.forEach(function (r) { Chat.names[r.user_id] = r.username; }); Chat.searching = false; Chat.err = ''; paintSearch();
+        Chat.res = (Array.isArray(rows) ? rows : []).filter(function (r) { return !Chat.blocked[r.user_id]; }); Chat.res.forEach(function (r) { Chat.names[r.user_id] = r.username; }); Chat.searching = false; Chat.err = ''; paintSearch();
       }, function (e) { Chat.searching = false; Chat.err = e.message; paintSearch(); });
     }, 280);
   }
@@ -3658,7 +3707,7 @@ window.G3 = (function () {
         added.forEach(function (r) {
           if (r.id > top) top = r.id;
           if (r.id <= S.chatSeen || r.to_id !== me) return;
-          if (r.kind === 'money' && r.amount > 0) { gain += r.amount; from.push(who(r.from_id)); } else if (!first) texts.push(r);
+          if (r.kind === 'money' && r.amount > 0) { gain += r.amount; from.push(who(r.from_id)); } else if (!first && !Chat.blocked[r.from_id]) texts.push(r);
         });
         if (top > S.chatSeen) {
           S.chatSeen = top;
@@ -3679,7 +3728,7 @@ window.G3 = (function () {
   function chatConvs() {
     const me = Chat.uid, by = {};
     Chat.msgs.forEach(function (m) { const o = m.from_id === me ? m.to_id : m.from_id; (by[o] = by[o] || { id: o, msgs: [] }).msgs.push(m); });
-    const list = Object.keys(by).map(function (k) { const c = by[k]; c.last = c.msgs[c.msgs.length - 1]; c.unread = c.msgs.filter(function (m) { return m.from_id !== me && m.id > ((S.chatRead || {})[k] || 0); }).length; return c; });
+    const list = Object.keys(by).filter(function (k) { return !Chat.blocked[k]; }).map(function (k) { const c = by[k]; c.last = c.msgs[c.msgs.length - 1]; c.unread = c.msgs.filter(function (m) { return m.from_id !== me && m.id > ((S.chatRead || {})[k] || 0); }).length; return c; });
     list.sort(function (a, b) { return (b.last.id || 9e15) - (a.last.id || 9e15); });
     return list;
   }
@@ -3732,13 +3781,27 @@ window.G3 = (function () {
     chatPoll();
     return h + '<p class="muted">You are <b>@' + esc(Chat.me.username) + '</b>. Tell your friends to search for you.</p>' +
       '<label class="namef"><span class="lab">Find a player</span><input type="search" id="c-search" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="Search by username" value="' + esc(Chat.q) + '"></label><div id="c-results">' + searchHtml() + '</div>' +
-      '<h3>Chats</h3><div class="list" id="c-list">' + chatListHtml() + '</div>';
+      '<button class="btn ghost" data-act="share" type="button" style="margin-top:10px">📲 Invite a friend to Abuja Life</button>' +
+      '<h3>Chats</h3><div class="list" id="c-list">' + chatListHtml() + '</div>' + blockedHtml();
+  }
+  const REASONS = [['abuse', 'Rude or abusive'], ['spam', 'Spam or scam'], ['username', 'Bad username'], ['other', 'Something else']];
+  function safetyPanel(c) {
+    const nm = esc(c.name), x = '<button class="chat-x" data-act="chatsafe" data-id="' + esc(UI.chatSafe) + '" type="button" aria-label="Close">✕</button>';
+    if (UI.chatSafe === 'block') return '<div class="chat-money safety"><div class="cm-row"><b>Block @' + nm + '?</b>' + x + '</div><p class="muted">They will not be able to message you or send you money. Their chat leaves your list. You can unblock them any time from Chat.</p><button class="btn" data-act="blockyes" type="button">Yes, block @' + nm + '</button></div>';
+    if (UI.chatSafe === 'after') return '<div class="chat-money safety"><div class="cm-row"><b>Report sent</b>' + x + '</div><p class="muted">Thank you. The maker will look at it. Do you also want to block @' + nm + '?</p><button class="btn" data-act="blockyes" type="button">Block @' + nm + '</button></div>';
+    return '<div class="chat-money safety"><div class="cm-row"><b>Report @' + nm + '</b>' + x + '</div><div class="cm-chips">' + REASONS.map(function (r) { return '<button type="button" class="chip-btn' + ((UI.rsn || 'abuse') === r[0] ? ' on' : '') + '" data-act="rsn" data-id="' + r[0] + '">' + r[1] + '</button>'; }).join('') + '</div>' +
+      '<label class="namef"><span class="lab">Anything to add? (optional)</span><input type="text" id="r-note" maxlength="300" autocomplete="off" value="' + esc(Chat.rnote) + '"></label><button class="btn" data-act="reportsend" type="button">Send report</button></div>';
+  }
+  function blockedHtml() {
+    const ids = Object.keys(Chat.blocked); if (!ids.length) return '';
+    return '<h3>Blocked</h3><div class="list">' + ids.map(function (k) { return '<div class="row" style="cursor:default"><span class="row-main"><span class="row-title">@' + esc(Chat.names[k] || 'player') + '</span></span><span class="row-chips"><button class="chip-btn" data-act="unblock" data-id="' + esc(k) + '" type="button">Unblock</button></span></div>'; }).join('') + '</div>';
   }
   function renderChatView() {
     const c = UI.chat, mon = UI.chatMoney;
     let h = '<div class="chatv" role="dialog" aria-modal="true" aria-label="Chat with ' + esc(c.name) + '"><div class="chat-head"><button class="chat-back" data-act="chatclose" type="button" aria-label="Back">‹</button><h2>@' + esc(c.name) + '</h2></div>' +
-      '<div class="chat-actions"><button class="cact money" data-act="chatsend" type="button">💸 Send money</button></div>' +
+      '<div class="chat-actions"><button class="cact money" data-act="chatsend" type="button">💸 Send money</button><button class="cact" data-act="chatsafe" data-id="report" type="button">🚩 Report</button><button class="cact" data-act="chatsafe" data-id="block" type="button">🚫 Block</button></div>' +
       '<div class="chat-msgs" id="chat-msgs">' + chatMsgsHtml() + '</div>';
+    if (UI.chatSafe) h += safetyPanel(c);
     if (mon) {
       h += '<form class="chat-money" data-chatmoney novalidate><div class="cm-row"><b>Send money to @' + esc(c.name) + '</b><button class="chat-x" data-act="chatsend" type="button" aria-label="Close">✕</button></div>' +
         '<label class="namef"><span class="lab">Amount (you have ' + fmt(S.cash) + ')</span><input type="text" id="c-amt" inputmode="numeric" autocomplete="off" placeholder="₦0" value="' + esc(Chat.amt) + '"></label>' +
@@ -3787,12 +3850,67 @@ window.G3 = (function () {
     if (Date.now() - Chat.last >= (fast ? 3800 : 24000)) chatPoll();
   }, 4000);
 
+  /* ---------- feedback, invite, welcome ---------- */
+  const FB = { kind: 'bug', text: '', busy: false, sent: false, err: '' };
+  const FB_KINDS = [['bug', '🐞 Bug'], ['idea', '💡 Idea'], ['balance', '⚖️ Too hard or easy'], ['other', '💬 Other']];
+  function fbInfo() {
+    return { v: APP_VERSION, day: S && S.day, cash: S && Math.round(S.cash), nw: S && Math.round(netWorth(S)), job: S && S.job, japa: S && S.japa && S.japa.status, tab: UI.tab, app: UI.phone,
+      ua: String(navigator.userAgent || '').slice(0, 160), w: window.innerWidth, h: window.innerHeight, gl: !!threeOk, errs: ERRS.slice() };
+  }
+  function fbText() { return 'Abuja Life feedback (' + FB.kind + ', ' + APP_VERSION + (S ? ', day ' + S.day : '') + '):\n' + FB.text.trim(); }
+  function renderFeedback() {
+    let h = '<h2>Feedback</h2><p class="muted">Found a bug? Something too hard, too easy or boring? Tell the maker here. Be as plain as you like.</p>';
+    if (FB.sent) h += '<div class="card"><h3>Thank you 🙏🏾</h3><p class="muted">Got it. You can send another any time.</p><button class="btn" data-act="fbagain" type="button">Send another</button></div>';
+    else {
+      h += '<div class="card"><div class="cm-chips">' + FB_KINDS.map(function (k) { return '<button type="button" class="chip-btn' + (FB.kind === k[0] ? ' on' : '') + '" data-act="fbkind" data-id="' + k[0] + '">' + k[1] + '</button>'; }).join('') + '</div>' +
+        '<label class="namef" style="margin-top:10px"><span class="lab">What happened, or what do you think?</span><textarea id="fb-text" rows="5" maxlength="1500" placeholder="Example: I could not buy a car after going to AbujaCars.">' + esc(FB.text) + '</textarea></label>' +
+        (FB.err ? '<p class="auth-err" role="alert">' + esc(FB.err) + '</p>' : '') +
+        '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px"><button class="btn" data-act="fbsend" type="button"' + (FB.busy ? ' disabled' : '') + '>' + (FB.busy ? 'Sending…' : 'Send feedback') + '</button>' +
+        (FB.fail ? '<button class="btn ghost" data-act="fbcopy" type="button">Copy it</button><button class="btn ghost" data-act="fbwa" type="button">WhatsApp</button>' : '') + '</div></div>';
+    }
+    return h + '<p class="muted" style="font-size:12px">Game ' + esc(APP_VERSION) + '. Your day, cash and device type are sent with it, to help find the problem.</p>';
+  }
+  function sendFeedback() {
+    const t = FB.text.trim();
+    if (t.length < 3) { FB.err = 'Type a few words first.'; render(false); return; }
+    if (FB.busy) return; FB.busy = true; FB.err = ''; FB.fail = false; render(false);
+    const o = { method: 'POST', prefer: 'return=minimal', body: { user_id: Auth.session ? Auth.session.user.id : null, username: Chat.me ? Chat.me.username : null, kind: FB.kind, message: t.slice(0, 2000), info: fbInfo() } };
+    (Auth.session ? chatApi('/rest/v1/feedback', o) : authFetch('/rest/v1/feedback', o)).then(function () { FB.sent = true; FB.text = ''; FB.fail = false; }, function (e) {
+      FB.err = 'Could not send (' + safeErr(e) + ') Use Copy or WhatsApp to send it instead.'; FB.fail = true;
+    }).then(function () { FB.busy = false; if (UI.tab === 'phone' && UI.phone === 'feedback') render(false); });
+  }
+  function shareGame() {
+    const url = location.href.split('#')[0].split('?')[0], nm = Chat.me ? ' Find me in Chat: @' + Chat.me.username + '.' : '';
+    const text = 'I am playing Abuja Life, a game about hustling in Abuja and trying to japa. Can you make it out?' + nm;
+    if (navigator.share) { navigator.share({ title: 'Abuja Life', text: text, url: url }).catch(function () {}); return; }
+    const full = text + ' ' + url;
+    try { navigator.clipboard.writeText(full).then(function () { showToast('Invite copied. Paste it in WhatsApp.'); render(false); }, function () { showToast(esc(full)); render(false); }); } catch (err) { showToast(esc(full)); render(false); }
+  }
+  function renderWelcome() {
+    const li = function (i, t) { return '<div class="wl"><span class="wl-i">' + i + '</span><span>' + t + '</span></div>'; };
+    return '<div class="veil"><div class="sheet" role="dialog" aria-modal="true" aria-label="Welcome"><div class="eyebrow">Welcome to Abuja Life</div><h2>Can you make it out?</h2>' +
+      li('🎯', '<b>The goal:</b> save money, pass IELTS, get a visa and japa. Or stay and build a life here. Both are real endings.') +
+      li('☀️', '<b>Each day has 3 actions</b> (the dots at the top). Working takes 2. When they run out, go to sleep to start a new day.') +
+      li('📱', '<b>Your phone runs your life:</b> Jobs, Bank, Chowdeck, Ride, Houses, Cars and more. Watch the food, fun and clean bars.') +
+      li('🗺️', '<b>Tap a place on the map</b> to go there. Beware of scam messages. Some offers are real.') +
+      li('💭', '<b>Chat</b> lets you find a friend by username and send money. <b>Feedback</b> tells the maker what is broken or boring.') +
+      '<button class="btn" data-act="welcome-ok" type="button" style="margin-top:10px">Let’s go</button></div></div>';
+  }
+  function deleteAccount() {
+    if (!Auth.session) return;
+    chatApi('/rest/v1/rpc/delete_my_account', { method: 'POST', body: {} }).then(function () {
+      clearTimeout(Auth.timer); wipeLocal(); [AK.sess, AK.guest].forEach(lsDel);
+      Auth.session = null; Auth.guest = false; Auth.tab = 'signup'; Auth.status = ''; Auth.savedAt = 0; chatReset(); UI.chat = null; UI.confirmDel = false; S = null; UI.tab = 'home'; UI.sheet = null; UI.phone = 'home'; UI.toast = '';
+      if (G3.views && G3.views.home) G3.views.home.sig = ''; render(); showToast('Your account was deleted.');
+    }, function (e) { UI.confirmDel = false; showToast('Could not delete: ' + esc(safeErr(e))); render(false); });
+  }
   function accountCard() {
     if (Auth.session) {
       return '<div class="card"><h3>Account</h3><div class="kv"><div><span>Signed in as</span><span class="num" style="word-break:break-all">' + esc(Auth.session.user.email) + '</span></div><div><span>Username</span><span>' + (Chat.me ? '@' + esc(Chat.me.username) : '<button class="auth-link" data-act="phone" data-id="chat" type="button">Pick one in Chat</button>') + '</span></div><div><span>Online save</span><span id="cloud-stat">' + statusText() + '</span></div></div>' +
-        '<div style="margin-top:8px"><button class="btn ghost" data-act="alogout" type="button">Log out</button></div></div>';
+        '<div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap"><button class="btn ghost" data-act="alogout" type="button">Log out</button><button class="btn ghost" data-act="share" type="button">📲 Invite a friend</button></div>' +
+        (UI.confirmDel ? '<div class="card" style="margin-top:10px"><p>Delete your account? This removes your login, your online save, your username and your chats. It cannot be undone.</p><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" data-act="delacct-yes" type="button">Yes, delete everything</button><button class="btn ghost" data-act="delacct-no" type="button">Cancel</button></div></div>' : '<div style="margin-top:6px"><button class="auth-link" data-act="delacct" type="button">Delete my account</button></div>') + '</div>';
     }
-    return '<div class="card"><h3>Account</h3><p class="muted">You are playing as a guest, so your game only lives on this phone. Create an account to save it online and play on any phone.</p><button class="btn" data-act="aopen" type="button">Create account or log in</button></div>';
+    return '<div class="card"><h3>Account</h3><p class="muted">You are playing as a guest, so your game only lives on this phone. Create an account to save it online and play on any phone.</p><button class="btn" data-act="aopen" type="button">Create account or log in</button> <button class="btn ghost" data-act="share" type="button">📲 Invite a friend</button></div>';
   }
 
   /* the in-game calendar: Day 1 is a Monday */
@@ -3821,6 +3939,7 @@ window.G3 = (function () {
     ['health', 'Health', '💊', 'linear-gradient(145deg,#fb7185,#be123c)'],
     ['forbes', 'Forbes', '👑', 'linear-gradient(145deg,#14532d,#052e16)'],
     ['police', 'Police', '🚓', 'linear-gradient(145deg,#3b82f6,#1e3a8a)'],
+    ['feedback', 'Feedback', '📝', 'linear-gradient(145deg,#c4b5fd,#7c3aed)'],
     ['help', 'Help & guide', '💡', 'linear-gradient(145deg,#fde68a,#f59e0b)']
   ];
   function appBadge(id) {
@@ -3992,10 +4111,11 @@ window.G3 = (function () {
       '<div class="card"><h3>Your needs</h3><p class="muted">Keep food, fun and clean above 25 or you pay for it overnight. Eat, bathe and unwind at home or out.</p></div>' +
       '<div class="card"><h3>Getting around</h3><p class="muted">Cab is priced by distance. Okada is cheaper but dusty. Trekking is free but slow and tiring. A car or a bike is free or cheap to run, and you buy one at AbujaCars on the map. Cars are free except in go-slow; a bike only costs a little fuel and slips through traffic.</p></div>' +
       '<div class="card"><h3>Your phone</h3><p class="muted">Check Messages for real chances and scams, order food on Chowdeck, groceries from Shops, medication from Health, find a new home in Houses, change your look in the Boutique, check your rank on Forbes, and report scams to the Police.</p></div>' +
-      '<div class="card"><h3>The goal</h3><p class="muted">Save money, pass IELTS, choose a visa route, avoid fake agents, then japa. Or stay and build a life here. Both are real endings.</p></div>';
+      '<div class="card"><h3>The goal</h3><p class="muted">Save money, pass IELTS, choose a visa route, avoid fake agents, then japa. Or stay and build a life here. Both are real endings.</p></div>' +
+      '<div class="card"><h3>Friends and feedback</h3><p class="muted">Chat lets you find a friend by username and send money. Something broken or boring? Tell the maker in the Feedback app.</p><button class="btn ghost" data-act="phone" data-id="feedback" type="button">Open Feedback</button> <button class="btn ghost" data-act="share" type="button">📲 Invite a friend</button></div>';
   }
   const PHONE_SCREENS = { jobs: () => renderJobs(), log: () => renderMessages(), japa: () => renderJapa(), life: () => renderLife(), bank: () => renderBank(), courses: () => renderCourses(),
-    help: () => renderHelp(), houses: () => renderHouses(), cars: () => renderCars(), chat: () => renderChatApp(), boutique: () => renderBoutique(), health: () => renderHealth(), chow: () => renderChow(), shops: () => renderShops(),
+    help: () => renderHelp(), feedback: () => renderFeedback(), houses: () => renderHouses(), cars: () => renderCars(), chat: () => renderChatApp(), boutique: () => renderBoutique(), health: () => renderHealth(), chow: () => renderChow(), shops: () => renderShops(),
     forbes: () => renderForbes(), police: () => renderPolice(), ride: () => renderRide() };
   function renderPhone() {
     const f = PHONE_SCREENS[UI.phone];
@@ -4266,7 +4386,7 @@ window.G3 = (function () {
     if (UI.sheet) h += renderSheet(UI.sheet);
     h += renderNav();
     if (UI.chat) h += renderChatView();
-    if (S.over) h += renderOver(); else if (S.event) h += renderEvent();
+    if (S.over) h += renderOver(); else if (S.event) h += renderEvent(); else if (UI.welcome) h += renderWelcome();
     app.innerHTML = h;
     if (resync !== false) sync3d();
   }
@@ -4306,7 +4426,8 @@ window.G3 = (function () {
     }
     if (act === 'start') { const nm = (document.getElementById('pname') || {}).value; if (typeof nm === 'string') UI.name = nm; saveLook(); S = newGame(id, UI.look, UI.name); UI.tab = 'home'; UI.sheet = null; save(); render();
       let seen = false; try { seen = !!localStorage.getItem('bn-hint-walk'); localStorage.setItem('bn-hint-walk', '1'); } catch (err) {}
-      if (threeOk && !seen) showToast('Tap the floor to walk around. Tap the bed, kitchen or bathroom to use them.');
+      try { if (!localStorage.getItem('bn-welcome')) { UI.welcome = true; render(false); } } catch (err) {}
+      if (threeOk && !seen && !UI.welcome) showToast('Tap the floor to walk around. Tap the bed, kitchen or bathroom to use them.');
       return; }
     if (act === 'atab') { const em = document.getElementById('a-email'); if (em) Auth.email = em.value.trim(); Auth.tab = id === 'signup' ? 'signup' : 'login'; Auth.wait = false; Auth.err = ''; Auth.info = ''; render(); return; }
     if (act === 'aguest') { Auth.guest = true; lsSet(AK.guest, '1'); Auth.show = false; render(); return; }
@@ -4314,6 +4435,21 @@ window.G3 = (function () {
     if (act === 'aback') { Auth.show = false; Auth.err = ''; render(); return; }
     if (act === 'aforgot') { forgotPassword(); return; }
     if (act === 'alogout') { logOut(); return; }
+    if (act === 'welcome-ok') { UI.welcome = false; try { localStorage.setItem('bn-welcome', '1'); } catch (err) {} render(false); return; }
+    if (act === 'share') { shareGame(); return; }
+    if (act === 'fbkind') { const ft = document.getElementById('fb-text'); if (ft) FB.text = ft.value; FB.kind = id; render(false); return; }
+    if (act === 'fbsend') { const ft = document.getElementById('fb-text'); if (ft) FB.text = ft.value; sendFeedback(); return; }
+    if (act === 'fbagain') { FB.sent = false; FB.err = ''; FB.fail = false; render(false); return; }
+    if (act === 'fbcopy') { const tx = fbText(); try { navigator.clipboard.writeText(tx).then(function () { showToast('Copied. Send it to the maker on WhatsApp.'); render(false); }, function () { showToast('Could not copy. Select the text and copy it yourself.'); }); } catch (err) { showToast('Could not copy.'); } return; }
+    if (act === 'fbwa') { try { window.open('https://wa.me/?text=' + encodeURIComponent(fbText()), '_blank'); } catch (err) {} return; }
+    if (act === 'chatsafe') { UI.chatSafe = UI.chatSafe === id ? null : id; UI.chatMoney = false; if (id === 'report' && !UI.rsn) UI.rsn = 'abuse'; render(false); paintChat(true); return; }
+    if (act === 'rsn') { const rn = document.getElementById('r-note'); if (rn) Chat.rnote = rn.value; UI.rsn = id; render(false); paintChat(); return; }
+    if (act === 'blockyes') { doBlock(UI.chat && UI.chat.id); return; }
+    if (act === 'reportsend') { const rn = document.getElementById('r-note'); if (rn) Chat.rnote = rn.value; doReport(); return; }
+    if (act === 'unblock') { doUnblock(id); return; }
+    if (act === 'delacct') { UI.confirmDel = true; render(false); return; }
+    if (act === 'delacct-no') { UI.confirmDel = false; render(false); return; }
+    if (act === 'delacct-yes') { deleteAccount(); return; }
     if (act === 'cloudpick') {
       const c = Auth.conflict; if (!c) return;
       if (id === 'cloud') { adoptCloud(c.row); return; }
@@ -4407,8 +4543,8 @@ window.G3 = (function () {
       try { navigator.clipboard.writeText(txt).then(() => { UI.copied = true; render(false); }, fail); } catch (err) { fail(); }
       return;
     }
-    if (act === 'chatopen') { UI.chat = { id: id, name: el.dataset.n || (Chat.names[id] || 'player') }; Chat.names[id] = UI.chat.name; UI.chatMoney = false; Chat.draft = ''; render(false); paintChat(true); const ci = document.getElementById('chat-input'); if (ci) ci.focus(); return; }
-    if (act === 'chatclose') { UI.chat = null; UI.chatMoney = false; render(); return; }
+    if (act === 'chatopen') { UI.chat = { id: id, name: el.dataset.n || (Chat.names[id] || 'player') }; Chat.names[id] = UI.chat.name; UI.chatMoney = false; UI.chatSafe = null; Chat.draft = ''; render(false); paintChat(true); const ci = document.getElementById('chat-input'); if (ci) ci.focus(); return; }
+    if (act === 'chatclose') { UI.chat = null; UI.chatMoney = false; UI.chatSafe = null; render(); return; }
     if (act === 'chatsend') { UI.chatMoney = !UI.chatMoney; render(false); paintChat(true); const ca = document.getElementById('c-amt'); if (ca) ca.focus(); return; }
     if (act === 'camt') { const ca = document.getElementById('c-amt'); if (ca) { ca.value = parseInt(id, 10).toLocaleString('en-US'); Chat.amt = ca.value; } return; }
     if (act === 'newlife') { UI.confirmNew = true; render(); return; }
@@ -4432,6 +4568,8 @@ window.G3 = (function () {
     if (e.target && e.target.id === 'a-pass') { Auth.pass = e.target.value; return; }
     if (e.target && e.target.id === 'c-search') { Chat.q = e.target.value; doSearch(); return; }
     if (e.target && e.target.id === 'chat-input') { Chat.draft = e.target.value; return; }
+    if (e.target && e.target.id === 'fb-text') { FB.text = e.target.value; return; }
+    if (e.target && e.target.id === 'r-note') { Chat.rnote = e.target.value; return; }
     if (e.target && e.target.id === 'c-amt') { const d = e.target.value.replace(/[^0-9]/g, ''); e.target.value = d ? parseInt(d, 10).toLocaleString('en-US') : ''; Chat.amt = e.target.value; const er = document.getElementById('c-amt-err'); if (er) er.hidden = true; return; }
     if (!e.target || e.target.id !== 'pname') return;
     const v = e.target.value.slice(0, 16);
@@ -4454,6 +4592,7 @@ window.G3 = (function () {
   }
   try { const th = localStorage.getItem('bn-theme'); if (th === 'dark' || th === 'light') document.documentElement.setAttribute('data-theme', th); } catch (err) {}
   S = load();
+  try { if (S && !S.over && !localStorage.getItem('bn-welcome')) UI.welcome = true; } catch (err) {}
   render();
   if (Auth.session) reconcile();
   handleAuthHash();
