@@ -155,6 +155,12 @@ p { margin: 0; }
 
 .goal.warn { background: var(--warn); color: #fff; }
 .quick { display: flex; gap: 6px; }
+.rot-pill { position: fixed; right: 12px; bottom: calc(var(--nav-h) + env(safe-area-inset-bottom, 0px) + 14px); z-index: 5; display: flex; align-items: center; gap: 2px; padding: 5px; border-radius: 999px; background: var(--accent); color: #fff; box-shadow: 0 6px 18px rgba(0, 0, 0, .3); }
+.rot-pill.up { bottom: auto; top: calc(160px + env(safe-area-inset-top, 0px)); }
+.rot-b { display: grid; place-items: center; width: 44px; height: 44px; border: 0; border-radius: 50%; background: rgba(255, 255, 255, .16); color: #fff; cursor: pointer; }
+.rot-b:active { transform: scale(.92); background: rgba(255, 255, 255, .32); }
+.rot-b:focus-visible { outline: 3px solid #fff; outline-offset: 2px; }
+.rot-l { font: 800 10px/1.15 var(--f-body); letter-spacing: .04em; text-align: center; text-transform: uppercase; padding: 0 4px; }
 .qb { flex: 1 1 0; min-width: 0; display: grid; gap: 1px; justify-items: center; padding: 7px 4px; border-radius: 10px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); }
 .qb b { font-size: 13px; }
 .qb span { font-family: var(--f-mono); font-size: 10.5px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
@@ -1733,60 +1739,222 @@ window.G3 = (function () {
     const L = look || { skin: 4, hair: 0, outfit: 0, color: 0, acc: 0 };
     const skin = hexNum(LOOK.skins[L.skin] || LOOK.skins[4]), shirt = hexNum(LOOK.colors[L.color] || LOOK.colors[0]);
     const hair = LOOK.hairs[L.hair] ? LOOK.hairs[L.hair][0] : 'low', outfit = LOOK.outfits[L.outfit] ? LOOK.outfits[L.outfit][0] : 'tee', acc = LOOK.accs[L.acc] ? LOOK.accs[L.acc][0] : 'none';
-    const legs = [], arms = [], black = 0x15110f, suitc = 0x23262c, white = 0xf2efe6, gold = 0xd9a21b;
-    const trouser = outfit === 'suit' ? suitc : 0x2b2f3a, skirty = outfit === 'dress' || outfit === 'ankara';
-    const tc = outfit === 'suit' ? suitc : outfit === 'jersey' ? 0x0b7a43 : outfit === 'jacket' ? 0x3b5b86 : shirt;
-    const sleeve = outfit === 'jersey' ? white : tc, dk = new T.Color(shirt).multiplyScalar(0.68).getHex();
-    [-0.11, 0.11].forEach(function (x) {
-      const p = new T.Group(); p.position.set(x, 0.52, 0);
-      G.box(p, 0.17, 0.52, 0.19, skirty || outfit === 'jersey' ? skin : trouser, 0, -0.52, 0);
-      if (outfit === 'jersey') G.box(p, 0.185, 0.36, 0.205, white, 0, -0.36, 0);
-      g.add(p); legs.push(p);
+    const black = 0x15110f, suitc = 0x23262c, white = 0xf2efe6, gold = 0xd9a21b, denim = 0x3b5b86, bobc = 0x3a2218;
+    const skirty = outfit === 'dress' || outfit === 'ankara', shorts = outfit === 'jersey';
+    const fem = skirty || hair === 'gele' || hair === 'bob';
+    const trouser = outfit === 'suit' ? suitc : outfit === 'jacket' ? 0x2f3b52 : 0x2b2f3a;
+    const tc = outfit === 'suit' ? suitc : outfit === 'jersey' ? 0x0b7a43 : outfit === 'jacket' ? denim : shirt;
+    const dk = new T.Color(shirt).multiplyScalar(0.68).getHex();
+    const skinD = new T.Color(skin).multiplyScalar(0.9).getHex();
+    const lipC = new T.Color(skin).lerp(new T.Color(0x6e2424), fem ? 0.5 : 0.34).getHex();
+    const sleeves = outfit === 'dress' ? 'none' : (outfit === 'tee' || outfit === 'jersey' || outfit === 'ankara') ? 'short' : 'long';
+    const sleeveC = outfit === 'jersey' ? white : outfit === 'suit' ? suitc : outfit === 'jacket' ? denim : shirt;
+    const shoeC = outfit === 'suit' ? 0x15110f : (outfit === 'agbada' || outfit === 'kaftan') ? 0x7a5230 : skirty ? gold : white;
+    const soleC = outfit === 'suit' ? 0x0a0807 : 0x3a3633;
+
+    /* small builders: every part is a plain mesh so it can be swapped or posed freely */
+    const part = function (p, geo, c, x, y, z, sx, sy, sz) {
+      const m = new T.Mesh(geo, G.mat(c)); m.position.set(x || 0, y || 0, z || 0);
+      if (sx !== undefined) m.scale.set(sx, sy, sz);
+      m.castShadow = true; m.receiveShadow = true; p.add(m); return m;
+    };
+    const ball = function (p, c, x, y, z, sx, sy, sz) { return part(p, new T.SphereGeometry(1, 16, 12), c, x, y, z, sx, sy, sz); };
+    const blk = function (p, c, x, y, z, w, h, d) { return part(p, new T.BoxGeometry(w, h, d), c, x, y, z); };
+    /* a tube hanging down from y: rt = radius at the top, rb = radius at the bottom */
+    const tube = function (p, c, rt, rb, len, x, y, z, seg) { return part(p, new T.CylinderGeometry(rt, rb, len, seg || 14), c, x || 0, (y || 0) - len / 2, z || 0); };
+    const ring = function (p, c, r, tr, x, y, z, rx) { const m = part(p, new T.TorusGeometry(r, tr, 6, 22), c, x, y, z); m.rotation.x = rx === undefined ? Math.PI / 2 : rx; return m; };
+
+    const legs = [], shins = [], arms = [], elbows = [], eyes = [];
+
+    /* legs: thigh, knee, shin, shoe */
+    [-1, 1].forEach(function (sd) {
+      const lg = new T.Group(); lg.position.set(sd * 0.09, 0.74, 0); g.add(lg); legs.push(lg);
+      const bare = skirty || shorts, lc = bare ? skin : trouser;
+      tube(lg, lc, 0.08, 0.063, 0.38, 0, 0, 0);
+      if (shorts) tube(lg, white, 0.09, 0.088, 0.22, 0, 0, 0);
+      const sh = new T.Group(); sh.position.set(0, -0.37, 0); lg.add(sh); shins.push(sh);
+      ball(sh, lc, 0, 0, 0, 0.064, 0.064, 0.064);
+      tube(sh, lc, 0.063, 0.046, 0.31, 0, 0, 0);
+      blk(sh, shoeC, 0, -0.325, 0.045, 0.104, 0.07, 0.2);
+      ball(sh, shoeC, 0, -0.325, 0.145, 0.052, 0.036, 0.06);
+      blk(sh, soleC, 0, -0.362, 0.05, 0.108, 0.016, 0.26);
+      if (outfit === 'tee' || outfit === 'hoodie' || outfit === 'jacket') blk(sh, white, 0, -0.318, 0.075, 0.09, 0.012, 0.09);
     });
-    G.box(g, 0.48, 0.62, 0.27, tc, 0, 0.52, 0);
-    if (outfit === 'kaftan') G.box(g, 0.54, 0.5, 0.31, shirt, 0, 0.14, 0);
-    if (outfit === 'dress') G.cyl(g, 0.2, 0.36, 0.5, shirt, 0, 0.18, 0, 14);
-    if (outfit === 'ankara') { G.cyl(g, 0.2, 0.36, 0.5, shirt, 0, 0.18, 0, 14); G.cyl(g, 0.34, 0.34, 0.04, gold, 0, 0.26, 0, 14); G.cyl(g, 0.275, 0.275, 0.04, gold, 0, 0.46, 0, 14); G.box(g, 0.5, 0.05, 0.29, gold, 0, 0.55, 0); }
-    if (outfit === 'hoodie') { const hd = G.sph(g, 0.16, shirt, 0, 1.17, -0.14); hd.scale.set(1.15, 0.8, 0.75); G.box(g, 0.3, 0.12, 0.02, dk, 0, 0.62, 0.14); G.box(g, 0.02, 0.2, 0.02, white, -0.05, 0.9, 0.14); G.box(g, 0.02, 0.2, 0.02, white, 0.05, 0.9, 0.14); }
-    if (outfit === 'jersey') { G.box(g, 0.06, 0.62, 0.285, white, -0.1, 0.52, 0); G.box(g, 0.06, 0.62, 0.285, white, 0.1, 0.52, 0); G.box(g, 0.2, 0.05, 0.285, white, 0, 1.1, 0); }
-    if (outfit === 'jacket') { G.box(g, 0.14, 0.6, 0.285, shirt, 0, 0.52, 0); G.box(g, 0.5, 0.05, 0.285, 0x2c4568, 0, 0.52, 0); }
-    if (outfit === 'suit') { G.box(g, 0.14, 0.42, 0.285, 0xf4f4f0, 0, 0.72, 0); G.box(g, 0.045, 0.36, 0.292, shirt, 0, 0.64, 0); }
-    if (outfit === 'agbada') { G.box(g, 0.76, 0.8, 0.36, shirt, 0, 0.08, 0); G.box(g, 0.1, 0.8, 0.37, gold, 0, 0.08, 0); G.box(g, 0.78, 0.06, 0.37, gold, 0, 0.08, 0); }
-    const ax = outfit === 'agbada' ? 0.44 : 0.31, aw = outfit === 'agbada' ? 0.2 : 0.12;
-    [-ax, ax].forEach(function (x) {
-      const p = new T.Group(); p.position.set(x, 1.1, 0); G.box(p, aw, 0.5, 0.14, outfit === 'agbada' ? shirt : sleeve, 0, -0.5, 0); G.sph(p, 0.075, skin, 0, -0.52, 0); g.add(p); arms.push(p);
+
+    /* upper body hangs from a group at hip height so it can breathe and sway */
+    const up = new T.Group(); up.position.y = 0.74; g.add(up);
+    const hips = part(up, new T.CylinderGeometry(0.175, 0.17, 0.16, 18), shorts ? white : skirty ? tc : trouser, 0, -0.08, 0, 1, 1, 0.66);
+    const fh = fem ? 0.16 : 0.2;
+    const torso = part(up, new T.CylinderGeometry(fem ? 0.2 : 0.222, fh, 0.52, 20), tc, 0, 0.22, 0, 1, 1, 0.64);
+    const shoulderX = fem ? 0.232 : 0.28;
+
+    /* clothing on the body */
+    if (outfit === 'tee') ring(up, dk, 0.074, 0.014, 0, 0.475, 0.012);
+    if (outfit === 'kaftan') {
+      part(up, new T.CylinderGeometry(0.23, 0.29, 0.86, 22), shirt, 0, 0.03, 0, 1, 1, 0.66);
+      blk(up, gold, 0, 0.12, 0.19, 0.05, 0.5, 0.012); ring(up, gold, 0.076, 0.012, 0, 0.475, 0.012);
+      blk(up, dk, 0, 0.02, 0.196, 0.13, 0.04, 0.012);
+    }
+    if (skirty) {
+      part(up, new T.CylinderGeometry(0.175, 0.37, 0.56, 24), tc, 0, -0.26, 0, 1, 1, 0.85);
+      ring(up, outfit === 'ankara' ? gold : dk, 0.17, 0.014, 0, -0.01, 0, Math.PI / 2).scale.set(1, 0.66, 1);
+    }
+    if (outfit === 'ankara') {
+      [[-0.14, -0.22, 0.27, gold], [0.12, -0.3, 0.3, white], [0.0, -0.38, 0.33, gold], [-0.2, -0.44, 0.27, white], [0.22, -0.42, 0.24, gold], [0.06, -0.14, 0.2, white], [-0.08, -0.5, 0.3, gold], [0.17, -0.52, 0.17, white]].forEach(function (d) { ball(up, d[3], d[0], d[1], d[2], 0.028, 0.028, 0.012); });
+      tube(up, gold, 0.372, 0.378, 0.04, 0, -0.52, 0, 24).scale.z = 0.85;
+      blk(up, gold, 0.1, -0.02, 0.19, 0.06, 0.05, 0.02); blk(up, gold, -0.1, -0.02, 0.19, 0.06, 0.05, 0.02);
+    }
+    if (outfit === 'hoodie') {
+      const hd0 = ball(up, shirt, 0, 0.5, -0.1, 0.15, 0.1, 0.12);
+      blk(up, dk, 0, 0.1, 0.136, 0.26, 0.11, 0.03); blk(up, white, -0.045, 0.34, 0.136, 0.014, 0.17, 0.012); blk(up, white, 0.045, 0.34, 0.136, 0.014, 0.17, 0.012);
+      ring(up, dk, 0.075, 0.016, 0, 0.48, 0.0);
+    }
+    if (outfit === 'jersey') {
+      blk(up, white, -0.1, 0.22, 0.123, 0.06, 0.52, 0.012); blk(up, white, 0.1, 0.22, 0.123, 0.06, 0.52, 0.012);
+      ring(up, white, 0.076, 0.016, 0, 0.475, 0.012);
+      blk(up, gold, 0, 0.32, 0.133, 0.07, 0.07, 0.012);
+    }
+    if (outfit === 'jacket') {
+      blk(up, shirt, 0, 0.22, 0.128, 0.13, 0.5, 0.014);
+      blk(up, 0x2c4568, -0.02, 0.22, 0.14, 0.012, 0.5, 0.01);
+      blk(up, 0x2c4568, 0, 0.0, 0.14, 0.4, 0.014, 0.01);
+      const c1 = blk(up, denim, -0.075, 0.46, 0.1, 0.09, 0.05, 0.05); c1.rotation.z = 0.3; const c2 = blk(up, denim, 0.075, 0.46, 0.1, 0.09, 0.05, 0.05); c2.rotation.z = -0.3;
+    }
+    if (outfit === 'suit') {
+      blk(up, 0xf4f4f0, 0, 0.34, 0.131, 0.1, 0.3, 0.014);
+      const lp1 = blk(up, 0x1a1c21, -0.06, 0.34, 0.14, 0.05, 0.3, 0.014); lp1.rotation.z = -0.22; const lp2 = blk(up, 0x1a1c21, 0.06, 0.34, 0.14, 0.05, 0.3, 0.014); lp2.rotation.z = 0.22;
+      blk(up, shirt, 0, 0.3, 0.143, 0.032, 0.26, 0.012); blk(up, shirt, 0, 0.44, 0.143, 0.05, 0.035, 0.014);
+      ring(up, 0xf4f4f0, 0.072, 0.014, 0, 0.475, 0.0);
+    }
+    if (outfit === 'agbada') {
+      part(up, new T.CylinderGeometry(0.3, 0.42, 1.0, 26), shirt, 0, -0.04, 0, 1, 1, 0.88);
+      blk(up, gold, 0, -0.04, 0.322, 0.09, 1.0, 0.012).rotation.x = -0.106; tube(up, gold, 0.42, 0.424, 0.05, 0, -0.5, 0, 26).scale.z = 0.88;
+      ring(up, gold, 0.092, 0.016, 0, 0.5, 0.0);
+    }
+
+    /* neck and head */
+    tube(up, skinD, 0.054, 0.058, 0.13, 0, 0.56, 0, 12);
+    const hd = new T.Group(); hd.position.y = 0.66; up.add(hd);
+
+    /* arms: shoulder, upper arm, elbow, forearm, hand */
+    [-1, 1].forEach(function (sd) {
+      const ax = outfit === 'agbada' ? 0.34 : shoulderX;
+      const ar = new T.Group(); ar.position.set(sd * ax, 0.42, 0); ar.rotation.z = sd * 0.05; up.add(ar); arms.push(ar);
+      const wide = outfit === 'agbada';
+      const upC = sleeves === 'none' ? skin : sleeveC, loC = sleeves === 'long' ? sleeveC : skin;
+      ball(ar, upC, 0, -0.005, 0, 0.068, 0.068, 0.068);
+      if (wide) { tube(ar, shirt, 0.09, 0.115, 0.27, 0, 0, 0, 16); }
+      else tube(ar, upC, 0.06, 0.052, 0.27, 0, 0, 0);
+      if (outfit === 'ankara') ball(ar, shirt, 0, -0.04, 0, 0.088, 0.08, 0.088);
+      const el = new T.Group(); el.position.set(0, -0.27, 0); ar.add(el); elbows.push(el);
+      if (wide) { tube(el, shirt, 0.115, 0.15, 0.26, 0, 0, 0, 16); tube(el, gold, 0.15, 0.152, 0.03, 0, -0.23, 0, 16); }
+      else { ball(el, loC, 0, 0, 0, 0.052, 0.052, 0.052); tube(el, loC, 0.052, 0.04, 0.25, 0, 0, 0); }
+      if (sleeves === 'long' && !wide) tube(el, outfit === 'suit' ? 0xf4f4f0 : loC, 0.042, 0.042, 0.03, 0, -0.235, 0, 12);
+      const hand = new T.Group(); hand.position.set(0, -0.285, 0.0); el.add(hand);
+      ball(hand, skin, 0, 0, 0.004, 0.04, 0.056, 0.026);
+      ball(hand, skin, sd * -0.034, 0.012, 0.014, 0.014, 0.03, 0.014).rotation.z = sd * 0.35;
     });
-    G.sph(g, 0.21, skin, 0, 1.34, 0);
-    const cap = function (rr, c) { const h = G.sph(g, rr || 0.215, c === undefined ? black : c, 0, 1.4, -0.015); h.scale.set(1, 0.6, 1); return h; };
-    if (hair === 'low') cap();
-    else if (hair === 'afro') { const h = G.sph(g, 0.29, black, 0, 1.46, -0.02); h.scale.set(1, 0.9, 1); }
+
+    /* head: skull, jaw, ears, face */
+    ball(hd, skin, 0, 0, 0, 0.15, 0.175, 0.165);
+    ball(hd, skin, 0, -0.075, 0.015, 0.122, 0.098, 0.128);
+    [-1, 1].forEach(function (sd) {
+      ball(hd, skinD, sd * 0.147, -0.005, -0.012, 0.022, 0.044, 0.032);
+      const eg = new T.Group(); eg.position.set(sd * 0.062, 0.016, 0.141); hd.add(eg); eyes.push(eg);
+      ball(eg, 0xf4f1ea, 0, 0, 0, 0.027, 0.021, 0.018);
+      ball(eg, 0x1a0f0a, sd * -0.002, 0, 0.011, 0.0145, 0.0145, 0.01);
+      ball(eg, 0xffffff, sd * 0.004, 0.006, 0.019, 0.004, 0.004, 0.003);
+      const br = blk(hd, hair === 'bald' ? skinD : black, sd * 0.065, fem ? 0.066 : 0.059, 0.148, fem ? 0.066 : 0.07, fem ? 0.009 : 0.014, 0.016); br.rotation.z = sd * (fem ? 0.2 : 0.1);
+      if (fem) blk(hd, black, sd * 0.065, 0.04, 0.152, 0.054, 0.007, 0.01);
+    });
+    ball(hd, skin, 0, -0.03, 0.158, 0.026, 0.034, 0.032);
+    ball(hd, skin, -0.021, -0.049, 0.152, 0.015, 0.012, 0.014); ball(hd, skin, 0.021, -0.049, 0.152, 0.015, 0.012, 0.014);
+    const sm = part(hd, new T.TorusGeometry(0.034, 0.0045, 6, 14, Math.PI), 0x3d1a18, 0, -0.07, 0.139, 1, 0.4, 1); sm.rotation.z = Math.PI;
+    ball(hd, lipC, 0, -0.088, 0.139, fem ? 0.026 : 0.02, 0.006, 0.008);
+
+    /* hair: it is all built relative to the head */
+    const shell = function (c, y, z, sx, sy, sz) { return ball(hd, c === undefined ? black : c, 0, y === undefined ? 0.09 : y, z === undefined ? -0.03 : z, sx || 0.162, sy || 0.108, sz || 0.185); };
+    const nape = function (c) { return ball(hd, c === undefined ? black : c, 0, -0.045, -0.085, 0.125, 0.1, 0.12); };
+    const strand = function (c, x, z, len, r, y0) { const m = tube(hd, c, r, r * 0.8, len, x, y0 === undefined ? 0.04 : y0, z, 7); return m; };
+    if (hair === 'low') { shell(); nape(); }
+    else if (hair === 'afro') ball(hd, black, 0, 0.13, -0.1, 0.25, 0.22, 0.25);
     else if (hair === 'braids') {
-      const h = G.sph(g, 0.22, black, 0, 1.4, -0.015); h.scale.set(1, 0.62, 1);
-      [-0.14, -0.05, 0.05, 0.14].forEach(function (x) { G.box(g, 0.05, 0.5, 0.05, black, x, 0.95, -0.2); });
+      shell(); nape();
+      [-0.105, -0.035, 0.035, 0.105].forEach(function (x) { strand(black, x, -0.15, 0.58, 0.02, 0.0); ball(hd, gold, x, -0.595, -0.15, 0.018, 0.018, 0.018); });
+      [-1, 1].forEach(function (sd) { strand(black, sd * 0.168, -0.01, 0.4, 0.019, 0.03); ball(hd, gold, sd * 0.168, -0.375, -0.01, 0.018, 0.018, 0.018); });
     } else if (hair === 'gele') {
-      G.sph(g, 0.215, black, 0, 1.4, -0.01).scale.set(1, 0.5, 1);
-      const w = G.sph(g, 0.24, shirt === 0xf2efe6 ? 0xd9a21b : (shirt === 0xd9a21b ? 0xb5382f : 0xd9a21b), 0, 1.5, 0); w.scale.set(1.15, 0.85, 1);
-      G.box(g, 0.3, 0.2, 0.12, 0xb5382f, 0.14, 1.52, 0);
-    } else if (hair === 'fade') { cap(); G.box(g, 0.27, 0.1, 0.27, black, 0, 1.46, -0.01); }
-    else if (hair === 'cornrow') { cap(); [-0.12, -0.06, 0, 0.06, 0.12].forEach(function (x) { G.box(g, 0.024, 0.03, 0.36, 0x4a3b33, x, 1.5 - Math.abs(x) * 0.55, -0.02); }); }
-    else if (hair === 'bun') { cap(); G.sph(g, 0.095, black, 0, 1.6, -0.02); }
-    else if (hair === 'puff') { cap(); G.sph(g, 0.105, black, -0.16, 1.55, -0.03); G.sph(g, 0.105, black, 0.16, 1.55, -0.03); }
-    else if (hair === 'twist') { cap(); for (let t = 0; t < 9; t++) { const a = t / 9 * Math.PI * 2; G.sph(g, 0.07, black, Math.cos(a) * 0.14, 1.53 + (t % 2) * 0.03, Math.sin(a) * 0.12 - 0.02); } G.sph(g, 0.08, black, 0, 1.6, -0.02); }
-    else if (hair === 'dread') { cap(); [[-0.2, -0.05], [-0.17, -0.14], [-0.08, -0.19], [0, -0.2], [0.08, -0.19], [0.17, -0.14], [0.2, -0.05]].forEach(function (q, n) { G.box(g, 0.04, 0.3 + (n % 3) * 0.04, 0.04, black, q[0], 1.1 - (n % 3) * 0.04, q[1]); }); }
-    else if (hair === 'bob') { cap(0.228, 0x3a2218); G.box(g, 0.47, 0.3, 0.1, 0x3a2218, 0, 1.1, -0.17); G.box(g, 0.06, 0.28, 0.22, 0x3a2218, -0.215, 1.12, -0.04); G.box(g, 0.06, 0.28, 0.22, 0x3a2218, 0.215, 1.12, -0.04); }
-    if (acc === 'glasses') { G.box(g, 0.13, 0.07, 0.03, 0x101418, -0.085, 1.32, 0.2); G.box(g, 0.13, 0.07, 0.03, 0x101418, 0.085, 1.32, 0.2); G.box(g, 0.05, 0.015, 0.03, 0x101418, 0, 1.36, 0.205); G.box(g, 0.012, 0.012, 0.2, 0x101418, -0.18, 1.36, 0.1); G.box(g, 0.012, 0.012, 0.2, 0x101418, 0.18, 1.36, 0.1); }
-    else if (acc === 'cap') { const cr = G.sph(g, 0.235, shirt, 0, 1.4, -0.01); cr.scale.set(1, 0.62, 1); G.box(g, 0.25, 0.02, 0.16, dk, 0, 1.44, 0.2); }
-    else if (acc === 'chain') { const ring = new T.Mesh(new T.TorusGeometry(0.13, 0.014, 6, 20), G.mat(gold, { emissive: 0x3a2a05 })); ring.position.set(0, 1.0, 0.14); g.add(ring); G.box(g, 0.05, 0.05, 0.02, gold, 0, 0.84, 0.145); }
-    g.userData = { legs: legs, arms: arms, phase: 0 };
+      const wc = shirt === 0xf2efe6 ? gold : (shirt === gold ? 0xb5382f : gold);
+      shell(); nape();
+      ball(hd, wc, 0, 0.19, -0.025, 0.2, 0.11, 0.21);
+      ball(hd, 0xb5382f, 0.105, 0.265, 0.0, 0.085, 0.08, 0.06).rotation.z = -0.6;
+      ball(hd, wc, -0.06, 0.29, -0.03, 0.12, 0.07, 0.1).rotation.z = 0.35;
+      ball(hd, 0xb5382f, -0.11, 0.2, 0.05, 0.05, 0.05, 0.05);
+    } else if (hair === 'fade') {
+      shell(black, 0.1, -0.025, 0.155, 0.095, 0.178); nape(0x261e1b);
+      blk(hd, black, 0, 0.19, -0.03, 0.2, 0.08, 0.215);
+    } else if (hair === 'cornrow') {
+      shell(); nape();
+      [-0.115, -0.07, -0.025, 0.025, 0.07, 0.115].forEach(function (x) { const m = ball(hd, 0x4a3b33, x, 0.1 + (1 - Math.abs(x) * 3) * 0.075, -0.03, 0.009, 0.01, 0.195); m.rotation.x = -0.02; });
+    } else if (hair === 'bun') { shell(); nape(); ball(hd, black, 0, 0.245, -0.055, 0.075, 0.075, 0.075); ring(hd, 0x2a2220, 0.062, 0.01, 0, 0.19, -0.05, 0.4); }
+    else if (hair === 'puff') { shell(); nape(); ball(hd, black, -0.125, 0.205, -0.04, 0.085, 0.085, 0.085); ball(hd, black, 0.125, 0.205, -0.04, 0.085, 0.085, 0.085); }
+    else if (hair === 'twist') {
+      shell(); nape();
+      for (let t = 0; t < 10; t++) { const a = t / 10 * Math.PI * 2; ball(hd, black, Math.cos(a) * 0.115, 0.215 + (t % 2) * 0.02, Math.sin(a) * 0.12 - 0.04, 0.052, 0.07, 0.052); }
+      ball(hd, black, 0, 0.255, -0.04, 0.06, 0.07, 0.06);
+    } else if (hair === 'dread') {
+      shell(); nape();
+      [[-0.168, 0.0, 0.3], [-0.15, -0.08, 0.34], [-0.1, -0.14, 0.38], [-0.04, -0.17, 0.36], [0.04, -0.17, 0.38], [0.1, -0.14, 0.34], [0.15, -0.08, 0.36], [0.168, 0.0, 0.3]].forEach(function (q) { strand(black, q[0], q[1], q[2], 0.017, 0.04); });
+    } else if (hair === 'bob') {
+      shell(bobc, 0.085, -0.025, 0.166, 0.115, 0.19);
+      ball(hd, bobc, 0, 0.12, 0.075, 0.138, 0.055, 0.095).rotation.x = -0.15;
+      blk(hd, bobc, 0, -0.07, -0.168, 0.34, 0.29, 0.06);
+      [-1, 1].forEach(function (sd) { blk(hd, bobc, sd * 0.163, -0.06, -0.035, 0.05, 0.27, 0.2); });
+    }
+
+    /* accessories */
+    if (acc === 'glasses') {
+      [-1, 1].forEach(function (sd) { blk(hd, 0x101418, sd * 0.065, 0.014, 0.162, 0.088, 0.052, 0.014); blk(hd, 0x101418, sd * 0.151, 0.02, 0.07, 0.012, 0.012, 0.2); });
+      blk(hd, 0x101418, 0, 0.026, 0.162, 0.036, 0.012, 0.014);
+    } else if (acc === 'cap') {
+      const k = hair === 'afro' ? 1.42 : (hair === 'gele' || hair === 'puff' || hair === 'bun' || hair === 'twist') ? 1.22 : 1;
+      ball(hd, shirt, 0, 0.1, -0.015, 0.172 * k, 0.118 * k, 0.19 * k);
+      const br2 = blk(hd, dk, 0, 0.082, 0.205, 0.2, 0.014, 0.13); br2.rotation.x = 0.12;
+      ball(hd, dk, 0, 0.21 * k, -0.015, 0.016, 0.016, 0.016);
+    } else if (acc === 'chain') {
+      ring(up, gold, 0.158, 0.012, 0, 0.43, 0.0, 1.1); ball(up, gold, 0, 0.275, 0.14, 0.03, 0.038, 0.014);
+    }
+
+    g.userData = { legs: legs, shins: shins, arms: arms, elbows: elbows, eyes: eyes, up: up, torso: torso, hd: hd, phase: 0, t: Math.random() * 6, blink: 0, nextBlink: 1.5 + Math.random() * 2, moving: false };
     g.scale.setScalar(1.15);
+    G.walkPose(g, false, 0);
     return g;
   };
+  /* limbs: swing with the stride, knees and elbows bend, the body bobs and twists a little */
   G.walkPose = function (g, moving, dt) {
-    const u = g.userData;
+    const u = g.userData; dt = dt || 0;
+    u.moving = !!moving;
     if (moving) u.phase += dt * 9;
-    const a = moving ? Math.sin(u.phase) * 0.7 : 0;
+    const ph = u.phase, a = moving ? Math.sin(ph) * 0.62 : 0;
     u.legs[0].rotation.x = a; u.legs[1].rotation.x = -a;
-    u.arms[0].rotation.x = -a * 0.8; u.arms[1].rotation.x = a * 0.8;
+    u.shins[0].rotation.x = moving ? Math.max(0, -Math.cos(ph)) * 0.95 : 0.02;
+    u.shins[1].rotation.x = moving ? Math.max(0, Math.cos(ph)) * 0.95 : 0.02;
+    u.arms[0].rotation.x = -a * 0.85; u.arms[1].rotation.x = a * 0.85;
+    u.elbows[0].rotation.x = -(0.16 + (moving ? Math.max(0, a) * 0.8 : 0));
+    u.elbows[1].rotation.x = -(0.16 + (moving ? Math.max(0, -a) * 0.8 : 0));
+    u.up.rotation.y = moving ? Math.sin(ph) * 0.1 : 0;
+    u.up.position.y = 0.74 + (moving ? Math.abs(Math.cos(ph)) * 0.022 : 0);
+    u.hd.rotation.y = moving ? -Math.sin(ph) * 0.05 : u.hd.rotation.y;
+  };
+  /* life when standing still: breathing, blinking, a glance around */
+  G.faceTick = function (g, dt) {
+    const u = g.userData; if (!u || !u.hd) return;
+    u.t += dt;
+    const br = Math.sin(u.t * 2.1);
+    u.torso.scale.y = 1 + br * 0.012; u.up.scale.set(1 + br * 0.004, 1, 1 + br * 0.006);
+    if (u.t > u.nextBlink) { u.blink = 0.12; u.nextBlink = u.t + 1.8 + Math.random() * 3.6; }
+    const closed = u.blink > 0; if (closed) u.blink -= dt;
+    u.eyes.forEach(function (e) { e.scale.y = closed ? 0.12 : 1; });
+    if (!u.moving) { u.hd.rotation.y = Math.sin(u.t * 0.55) * 0.3 * Math.sin(u.t * 0.23); u.hd.rotation.x = Math.sin(u.t * 0.4) * 0.03; }
   };
 
   /* ---------- time of day, weather, power ---------- */
@@ -2184,7 +2352,7 @@ window.G3 = (function () {
   const camera = new T.OrthographicCamera(-10, 10, 10, -10, -100, 200);
   const lights = G.makeLights(scene, true);
   scene.fog = null;
-  const V = { scene: scene, camera: camera, az: 0.78, el: 0.66, zoom: 1.0, sig: '', def: null, ctx: null, root: new T.Group(), avatar: null, st: null, rain: null, target: new T.Vector3(0, 0.2, 1.2), aspect: 0.6 };
+  const V = { scene: scene, camera: camera, az: 0.78, azBase: 0.78, azOff: 0, azGoal: 0.78, walls: [], el: 0.66, zoom: 1.0, sig: '', def: null, ctx: null, root: new T.Group(), avatar: null, st: null, rain: null, target: new T.Vector3(0, 0.2, 1.2), aspect: 0.6 };
   scene.add(V.root);
   G.views.home = V;
 
@@ -2218,6 +2386,9 @@ window.G3 = (function () {
     const cs = 0.3, x0 = -def.W / 2 + 0.4, x1 = def.fence.w / 2 - 0.7, z0 = -def.D / 2 + 0.4, z1 = def.fence.d / 2 - 0.7;
     const nx = Math.floor((x1 - x0) / cs) + 1, nz = Math.floor((z1 - z0) / cs) + 1, bl = new Uint8Array(nx * nz), rects = [];
     placed.forEach(function (p) { const b = p[1].userData.box; if (b) rects.push([b.min.x - 0.2, b.max.x + 0.2, b.min.z - 0.2, b.max.z + 0.2]); });
+    { const W2 = def.W / 2, D2 = def.D / 2;
+      rects.push([W2 - 0.3, W2 + 0.6, -D2 - 1, D2 + 1]);
+      rects.push([-W2 - 1, -0.5, D2 - 0.3, D2 + 0.6]); rects.push([0.5, W2 + 1, D2 - 0.3, D2 + 0.6]); }
     def.parts.forEach(function (q) { rects.push([Math.min(q[0], q[2]) - 0.17, Math.max(q[0], q[2]) + 0.17, Math.min(q[1], q[3]) - 0.17, Math.max(q[1], q[3]) + 0.17]); });
     for (let j = 0; j < nz; j++) for (let i = 0; i < nx; i++) {
       const x = x0 + i * cs, z = z0 + j * cs;
@@ -2314,7 +2485,7 @@ window.G3 = (function () {
     } else if (st.pose) {
       V.A.mode = 'pose'; const av = V.avatar, A = V.A;
       if (st.pose === 'lie') { lieDown(); V.props.zzz.visible = !!st.zzz; }
-      else if (st.pose === 'sit') { av.position.set(st.at[0], st.at[1] - 0.6, st.at[2]); av.rotation.set(0, st.face, 0); av.userData.legs.forEach(function (l) { l.rotation.x = -P / 2; }); av.userData.arms.forEach(function (a) { a.rotation.x = -0.5; }); }
+      else if (st.pose === 'sit') { av.position.set(st.at[0], st.at[1] - 0.6, st.at[2]); av.rotation.set(0, st.face, 0); av.userData.legs.forEach(function (l) { l.rotation.x = -P / 2; }); av.userData.shins.forEach(function (l) { l.rotation.x = P / 2 - 0.1; }); av.userData.arms.forEach(function (a) { a.rotation.x = -0.5; }); av.userData.elbows.forEach(function (e) { e.rotation.x = -0.5; }); }
       else { av.rotation.set(0, st.face, 0); av.position.set(A.x, 0.14, A.z); }
       if (st.pose === 'eat') V.props.plate.visible = true;
     }
@@ -2369,19 +2540,46 @@ window.G3 = (function () {
     // house shell
     const W = def.W, D = def.D;
     const fl = new T.Mesh(new T.BoxGeometry(W, 0.14, D), new T.MeshLambertMaterial({ map: floorTexture(def) })); fl.position.set(0, 0.07, 0); fl.receiveShadow = true; root.add(fl);
-    box(root, 0.22, 3.1, D + 0.22, def.wall, -W / 2 - 0.11, 0, 0); box(root, W + 0.22, 3.1, 0.22, def.wall, 0, 0, -D / 2 - 0.11);
-    box(root, 0.26, 0.2, D + 0.26, def.trim, -W / 2 - 0.12, 3.1, 0); box(root, W + 0.26, 0.2, 0.26, def.trim, 0, 3.1, -D / 2 - 0.12);
-    box(root, 0.12, 0.4, D, def.trim, W / 2 + 0.06, 0, 0); box(root, W, 0.4, 0.12, def.trim, 0, 0, D / 2 + 0.06);
+    /* four full-height walls with a door in the front one. The two that face the camera turn to glass so you can see in; turn the house and they swap. */
+    V.walls = [];
+    const mkWall = function (nx, nz) { const w = { g: new T.Group(), caps: [], nx: nx, nz: nz, o: 1, mats: [], meshes: [] }; root.add(w.g); V.walls.push(w); return w; };
+    const capOn = function (w, bw, bd, x, z) { w.caps.push(box(root, bw, 0.2, bd, def.trim, x, 3.1, z)); };
+    const wl = mkWall(-1, 0), wb = mkWall(0, -1), wr = mkWall(1, 0), wf = mkWall(0, 1);
+    box(wl.g, 0.22, 3.1, D + 0.22, def.wall, -W / 2 - 0.11, 0, 0); capOn(wl, 0.26, D + 0.26, -W / 2 - 0.12, 0);
+    box(wb.g, W + 0.22, 3.1, 0.22, def.wall, 0, 0, -D / 2 - 0.11); capOn(wb, W + 0.26, 0.26, 0, -D / 2 - 0.12);
+    box(wr.g, 0.22, 3.1, D + 0.22, def.wall, W / 2 + 0.11, 0, 0); capOn(wr, 0.26, D + 0.26, W / 2 + 0.12, 0);
+    { const dw = 0.75, len = W / 2 + 0.11 - dw, fz = D / 2 + 0.11;
+      [-1, 1].forEach(function (sd) {
+        box(wf.g, len, 3.1, 0.22, def.wall, sd * (dw + len / 2), 0, fz); capOn(wf, len + 0.04, 0.26, sd * (dw + len / 2), D / 2 + 0.12);
+        box(wf.g, 0.1, 2.3, 0.32, def.trim, sd * dw, 0, fz);
+      });
+      box(wf.g, dw * 2, 0.8, 0.22, def.wall, 0, 2.3, fz); capOn(wf, dw * 2 + 0.2, 0.26, 0, D / 2 + 0.12);
+      box(wf.g, dw * 2 + 0.2, 0.08, 0.32, def.trim, 0, 2.3, fz); box(root, dw * 2 - 0.1, 0.05, 0.5, 0x9a8f82, 0, 0.0, D / 2 + 0.34); }
     def.parts.forEach(function (q) { wallSeg(root, q[0], q[1], q[2], q[3], 1.5, 0.14, def.wall); const cap = Math.abs(q[0] - q[2]) < 1e-6; box(root, cap ? 0.18 : Math.abs(q[2] - q[0]), 0.08, cap ? Math.abs(q[3] - q[1]) : 0.18, def.trim, (q[0] + q[2]) / 2, 1.5, (q[1] + q[3]) / 2); });
     // windows on the back wall
     def.windows.forEach(function (w) {
       if (!w[1]) return;
       const x = w[0], ww = w[1], y = 1.0;
-      G.glow(ctx.glass, 0x9ed4f0, ww, 1.2, 0.05, root, x, y, -D / 2 + 0.03, 0x000000);
-      box(root, ww + 0.16, 0.08, 0.1, 0xf2efe6, x, y - 0.08, -D / 2 + 0.05); box(root, ww + 0.16, 0.08, 0.1, 0xf2efe6, x, y + 1.2, -D / 2 + 0.05);
-      box(root, 0.08, 1.3, 0.1, 0xf2efe6, x - ww / 2, y - 0.04, -D / 2 + 0.05); box(root, 0.08, 1.3, 0.1, 0xf2efe6, x + ww / 2, y - 0.04, -D / 2 + 0.05); box(root, 0.05, 1.2, 0.1, 0xf2efe6, x, y, -D / 2 + 0.05);
+      G.glow(ctx.glass, 0x9ed4f0, ww, 1.2, 0.05, wb.g, x, y, -D / 2 + 0.03, 0x000000);
+      box(wb.g, ww + 0.16, 0.08, 0.1, 0xf2efe6, x, y - 0.08, -D / 2 + 0.05); box(wb.g, ww + 0.16, 0.08, 0.1, 0xf2efe6, x, y + 1.2, -D / 2 + 0.05);
+      box(wb.g, 0.08, 1.3, 0.1, 0xf2efe6, x - ww / 2, y - 0.04, -D / 2 + 0.05); box(wb.g, 0.08, 1.3, 0.1, 0xf2efe6, x + ww / 2, y - 0.04, -D / 2 + 0.05); box(wb.g, 0.05, 1.2, 0.1, 0xf2efe6, x, y, -D / 2 + 0.05);
     });
-    if (def.windows.length && def.windows[0][1]) box(root, 0.5, 0.35, 0.05, 0x0b7a43, W / 2 - 1.0, 2.2, -D / 2 + 0.03), box(root, 0.5, 0.35, 0.05, 0xffffff, W / 2 - 1.5, 2.2, -D / 2 + 0.03);
+    if (def.windows.length && def.windows[0][1]) box(wb.g, 0.5, 0.35, 0.05, 0x0b7a43, W / 2 - 1.0, 2.2, -D / 2 + 0.03), box(wb.g, 0.5, 0.35, 0.05, 0xffffff, W / 2 - 1.5, 2.2, -D / 2 + 0.03);
+    /* the solid base and the corner posts stay put, so every wall always reads as a wall, even when its glass is clear */
+    { const sh = 0.42, st = 0.3, dw = 0.75, flen = W / 2 + 0.15 - dw;
+      box(root, st, sh, D + 0.3, def.trim, -W / 2 - 0.125, 0, 0); box(root, W + 0.3, sh, st, def.trim, 0, 0, -D / 2 - 0.125); box(root, st, sh, D + 0.3, def.trim, W / 2 + 0.125, 0, 0);
+      [-1, 1].forEach(function (sd) { box(root, flen, sh, st, def.trim, sd * (dw + flen / 2), 0, D / 2 + 0.125); });
+      [-1, 1].forEach(function (sx) { [-1, 1].forEach(function (sz) { box(root, 0.18, 3.2, 0.18, def.trim, sx * (W / 2 + 0.11), 0, sz * (D / 2 + 0.11)); }); }); }
+    /* every wall gets its own materials so it can fade without touching anything else of the same colour */
+    { const glassM = ctx.glass.map(function (g) { return g.m; });
+      V.walls.forEach(function (w) {
+        const cl = new Map();
+        w.g.traverse(function (o) {
+          if (!o.isMesh) return; let m = o.material;
+          if (glassM.indexOf(m) < 0) { if (!cl.has(m)) cl.set(m, m.clone()); m = cl.get(m); o.material = m; }
+          if (w.mats.indexOf(m) < 0) w.mats.push(m); w.meshes.push(o);
+        });
+      }); }
     // furniture, placed by a table
     const placed = [];
     const put = function (kind, x, z, r, o) {
@@ -2417,7 +2615,7 @@ window.G3 = (function () {
     // person
     V.job = null;
     placed.forEach(function (p) { if (SOLID[p[0]]) { p[1].updateMatrixWorld(true); const b = new T.Box3().setFromObject(p[1]); p[1].userData.box = b; } });
-    V.nav = makeNav(def, placed);
+    V.nav = makeNav(def, placed); updateWalls(true);
     V.stn = {};
     ['bed', 'kitchen', 'bath', 'relax'].forEach(function (k) { const a = def.st[k], q = V.nav.free(a[0], a[1]); V.stn[k] = { x: q[0], z: q[1], face: a[2] }; });
     { const d = def.desk, seat = d ? [d[0], d[1] + 0.85] : [2.7, -1.45], a = V.nav.free(seat[0], seat[1] + 0.75); V.stn.desk = { x: a[0], z: a[1], face: P }; V.deskSeat = { x: seat[0], z: seat[1] }; }
@@ -2451,7 +2649,19 @@ window.G3 = (function () {
   }
   V.setBuy = function (on) { on = !!on; if (V.buy !== on) { V.buy = on; frame(); G.once(); } };
   V.resize = function (w, h) { V.aspect = w / h; frame(); };
-  V.drag = function (dx) { V.az = Math.max(0.5, Math.min(1.1, V.az - dx * 0.004)); frame(); };
+  V.drag = function (dx) { V.azOff = Math.max(-0.28, Math.min(0.32, V.azOff - dx * 0.004)); V.az = V.azBase + V.azOff; frame(); };
+  /* turn the whole view a quarter turn; the walls in front of the camera drop as it comes round */
+  V.rotate = function (dir) { V.azGoal += (dir || 1) * P / 2; G.once(); };
+  function updateWalls(force) {
+    const cx = Math.sin(V.az), cz = Math.cos(V.az);
+    V.walls.forEach(function (w) {
+      const dot = w.nx * cx + w.nz * cz, k = Math.max(0, Math.min(1, (dot + 0.15) / 0.6)), op = 1 - 0.8 * (k * k * (3 - 2 * k));
+      if (!force && Math.abs(op - w.o) < 0.004) return;
+      w.o = op; const clear = op < 0.995, solid = op > 0.55;
+      w.mats.forEach(function (m) { m.opacity = op; m.transparent = clear; m.depthWrite = !clear || solid; });
+      w.meshes.forEach(function (o) { o.castShadow = solid; });
+    });
+  }
   V.pinch = function (r) { V.zoom = Math.max(0.8, Math.min(2.4, V.zoom * r)); frame(); };
 
   /* run a list of steps ({walk:[x,z]} or {pose, ms, ...}); done() fires when the last one ends */
@@ -2543,8 +2753,13 @@ window.G3 = (function () {
 
   V.tick = function (dt, t) {
     const ctx = V.ctx; if (!ctx) return;
+    if (V.azBase !== V.azGoal) {
+      const d = V.azGoal - V.azBase; V.azBase = Math.abs(d) < 0.003 ? V.azGoal : V.azBase + d * Math.min(1, dt * 8);
+      V.az = V.azBase + V.azOff; frame();
+    }
+    updateWalls();
     ctx.fans.forEach(function (b) { b.rotation.z += dt * (V.env && V.env.power || (V.st && V.st.items.fan) ? 9 : 0); });
-    if (V.avatar && V.avatar.visible) agent(dt, t);
+    if (V.avatar && V.avatar.visible) { G.faceTick(V.avatar, dt); agent(dt, t); }
     // smoke puffs: generator when NEPA is out, grill always
     (ctx.puffs || []).forEach(function (m) {
       const u = m.userData, on = u.k === 1 || (V.st && V.st.nepa); m.visible = !!on; if (!on) return;
@@ -3537,7 +3752,7 @@ window.G3 = (function () {
   /* ---------- phone: jobs, japa, life, log ---------- */
   /* ---------- online leaderboard (Supabase over plain REST: no library, only the public anon key) ---------- */
   const BOARD = { url: 'https://tvbnoqwyekbqrlxxnztq.supabase.co', key: 'sb_publishable_db5quqce8u5iWU7qENLltg_U4OWrfYG' };   /* public client key: safe to ship */
-  const APP_VERSION = 'v1.3 · 15 Oct 2026';
+  const APP_VERSION = 'v1.5 · 16 Oct 2026';
   const ERRS = [];
   window.addEventListener('error', function (e) { ERRS.push(String((e && e.message) || 'error').slice(0, 140) + ' @' + ((e && e.lineno) || 0)); if (ERRS.length > 5) ERRS.shift(); });
   window.addEventListener('unhandledrejection', function (e) { ERRS.push('promise: ' + String((e && e.reason && e.reason.message) || (e && e.reason) || '').slice(0, 140)); if (ERRS.length > 5) ERRS.shift(); });
@@ -4433,6 +4648,7 @@ window.G3 = (function () {
   function renderHelp() {
     return '<h2>Help and guide</h2><div class="card"><h3>The day</h3><p class="muted">Each day gives you 3 actions (the dots at the top). Working takes 2, most other things like eating out, studying, applying or a test drive take 1, and rides in a cab, okada or your own car take none. When the dots run out, go home and sleep to start a new day. The time on your phone follows the real clock, but your day only moves when you use your actions.</p></div>' +
       '<div class="card"><h3>Your needs</h3><p class="muted">Keep food, fun and clean above 25 or you pay for it overnight. Eat, bathe and unwind at home or out.</p></div>' +
+      '<div class="card"><h3>Your house</h3><p class="muted">The two walls facing you turn to glass so you can see in. Tap the green Turn house buttons to spin the house and see every side. Tap the floor to walk around. Your person can only leave through the front door.</p></div>' +
       '<div class="card"><h3>Getting around</h3><p class="muted">Cabs and okadas show a top-down map with a blue route and a minimap while you ride. When you own a car or bike you drive it yourself: hold GO to speed up, steer with the arrows, STOP to brake. Follow the blue line, or tap Auto-drive. Cab is priced by distance. Okada is cheaper but dusty. Trekking is free but slow and tiring. A car or a bike is free or cheap to run, and you buy one at AbujaCars on the map. Cars are free except in go-slow; a bike only costs a little fuel and slips through traffic.</p></div>' +
       '<div class="card"><h3>Your phone</h3><p class="muted">Check Messages for real chances and scams, order food on Chowdeck, groceries from Shops, medication from Health, find a new home in Houses, change your look in the Boutique, check your rank on Forbes, and report scams to the Police.</p></div>' +
       '<div class="card"><h3>The goal</h3><p class="muted">Save money, pass IELTS, choose a visa route, avoid fake agents, then japa. Or stay and build a life here. Both are real endings.</p></div>' +
@@ -4452,45 +4668,83 @@ window.G3 = (function () {
   function lookSvg(l, view) {
     l = cleanLook(l);
     const skin = LOOK.skins[l.skin], col = LOOK.colors[l.color], hair = LOOK.hairs[l.hair][0], outfit = LOOK.outfits[l.outfit][0], acc = LOOK.accs[l.acc || 0][0], K = '#15110f';
-    const gele = col.toLowerCase() === '#d9a21b' ? '#b5382f' : '#d9a21b', GOLD = '#d9a21b', W = '#f2efe6', SUIT = '#23262c', BOB = '#3a2218';
-    const skirty = outfit === 'dress' || outfit === 'ankara', tc = outfit === 'suit' ? SUIT : outfit === 'jersey' ? '#0b7a43' : outfit === 'jacket' ? '#3b5b86' : col, sl = outfit === 'jersey' ? W : tc;
-    const legc = skirty || outfit === 'jersey' ? skin : (outfit === 'suit' ? SUIT : '#2b2f3a');
-    const vb = view === 'head' ? '16 2 68 68' : '0 0 100 140';
+    const shade = function (hex, f) { const n = parseInt(hex.slice(1), 16); const c = [n >> 16, (n >> 8) & 255, n & 255].map(function (v) { return Math.max(0, Math.min(255, Math.round(v * f))); }); return '#' + c.map(function (v) { return (v < 16 ? '0' : '') + v.toString(16); }).join(''); };
+    const mixc = function (a, b, t) { const p = parseInt(a.slice(1), 16), q = parseInt(b.slice(1), 16); const c = [16, 8, 0].map(function (s) { return Math.round(((p >> s) & 255) * (1 - t) + ((q >> s) & 255) * t); }); return '#' + c.map(function (v) { return (v < 16 ? '0' : '') + v.toString(16); }).join(''); };
+    const GOLD = '#d9a21b', W = '#f2efe6', SUIT = '#23262c', BOB = '#3a2218', DEN = '#3b5b86';
+    const gele = col.toLowerCase() === GOLD ? '#b5382f' : GOLD, dk = shade(col, 0.68), skd = shade(skin, 0.88);
+    const skirty = outfit === 'dress' || outfit === 'ankara', shorts = outfit === 'jersey', fem = skirty || hair === 'gele' || hair === 'bob';
+    const tc = outfit === 'suit' ? SUIT : outfit === 'jersey' ? '#0b7a43' : outfit === 'jacket' ? DEN : col;
+    const sleeves = outfit === 'dress' ? 'none' : (outfit === 'tee' || outfit === 'jersey' || outfit === 'ankara') ? 'short' : 'long';
+    const sc = outfit === 'jersey' ? W : tc;
+    const legc = skirty || shorts ? skin : (outfit === 'suit' ? SUIT : outfit === 'jacket' ? '#2f3b52' : '#2b2f3a');
+    const shoe = outfit === 'suit' ? '#15110f' : (outfit === 'agbada' || outfit === 'kaftan') ? '#7a5230' : skirty ? GOLD : '#f2efe6';
+    const lip = mixc(skin, '#6e2424', fem ? 0.5 : 0.34);
+    const vb = view === 'head' ? '12 -3 76 76' : '0 0 100 140';
     let v = '<svg class="' + (view ? 'bq-svg' : 'look-svg') + '" viewBox="' + vb + '" role="img" aria-label="Your character">';
-    /* hair that sits behind the body */
-    if (hair === 'afro') v += '<circle cx="50" cy="32" r="23" fill="' + K + '"/>';
-    if (hair === 'braids') v += [34, 42, 50, 58, 66].map(x => '<rect x="' + (x - 2) + '" y="32" width="4" height="40" rx="2" fill="' + K + '"/>').join('');
-    if (hair === 'dread') v += [30, 35, 40, 60, 65, 70].map((x, n) => '<rect x="' + (x - 2) + '" y="30" width="4" height="' + (30 + (n % 3) * 7) + '" rx="2" fill="' + K + '"/>').join('');
-    if (hair === 'bob') v += '<path d="M29 34 Q29 12 50 12 Q71 12 71 34 L73 66 L61 66 L61 44 L39 44 L39 66 L27 66 Z" fill="' + BOB + '"/>';
-    v += '<rect x="36" y="98" width="12" height="36" rx="3" fill="' + legc + '"/><rect x="52" y="98" width="12" height="36" rx="3" fill="' + legc + '"/>';
-    if (outfit === 'jersey') v += '<rect x="35.5" y="98" width="13" height="15" rx="3" fill="' + W + '"/><rect x="51.5" y="98" width="13" height="15" rx="3" fill="' + W + '"/>';
-    if (outfit === 'kaftan') v += '<rect x="28" y="52" width="44" height="64" rx="5" fill="' + col + '"/>';
-    else if (outfit === 'dress') v += '<rect x="32" y="52" width="36" height="22" rx="4" fill="' + col + '"/><path d="M32 70 L68 70 L80 114 L20 114 Z" fill="' + col + '"/>';
-    else if (outfit === 'ankara') v += '<rect x="32" y="52" width="36" height="22" rx="4" fill="' + col + '"/><path d="M32 70 L68 70 L80 114 L20 114 Z" fill="' + col + '"/><rect x="32" y="68" width="36" height="4" fill="' + GOLD + '"/><circle cx="40" cy="86" r="3" fill="' + GOLD + '"/><circle cx="58" cy="92" r="3" fill="' + W + '"/><circle cx="48" cy="102" r="3" fill="' + GOLD + '"/><circle cx="30" cy="106" r="2.6" fill="' + W + '"/><circle cx="70" cy="106" r="2.6" fill="' + GOLD + '"/><circle cx="62" cy="78" r="2.6" fill="' + GOLD + '"/>';
-    else if (outfit === 'agbada') v += '<path d="M28 52 L72 52 L86 118 L14 118 Z" fill="' + col + '"/><rect x="46" y="52" width="8" height="66" fill="' + GOLD + '"/><path d="M28 52 L8 94 L24 100 L34 66 Z" fill="' + col + '"/><path d="M72 52 L92 94 L76 100 L66 66 Z" fill="' + col + '"/>';
-    else v += '<rect x="30" y="52" width="40" height="48" rx="5" fill="' + tc + '"/>';
-    if (outfit === 'hoodie') v += '<ellipse cx="50" cy="54" rx="17" ry="7" fill="' + col + '" stroke="rgba(0,0,0,.25)"/><rect x="38" y="84" width="24" height="10" rx="3" fill="rgba(0,0,0,.2)"/><rect x="46" y="56" width="2" height="14" fill="' + W + '"/><rect x="52" y="56" width="2" height="14" fill="' + W + '"/>';
-    if (outfit === 'jersey') v += '<rect x="39" y="52" width="6" height="48" fill="' + W + '"/><rect x="55" y="52" width="6" height="48" fill="' + W + '"/><rect x="42" y="50" width="16" height="4" fill="' + W + '"/>';
-    if (outfit === 'jacket') v += '<rect x="42" y="52" width="16" height="48" fill="' + col + '"/><rect x="30" y="76" width="40" height="3" fill="#2c4568"/>';
-    if (outfit === 'suit') v += '<polygon points="43,52 57,52 50,76" fill="#f4f4f0"/><rect x="48.4" y="62" width="3.2" height="26" fill="' + col + '"/>';
-    if (outfit === 'agbada') v += '<circle cx="24" cy="97" r="5" fill="' + skin + '"/><circle cx="76" cy="97" r="5" fill="' + skin + '"/>';
-    else v += '<rect x="19" y="54" width="10" height="36" rx="4" fill="' + sl + '"/><rect x="71" y="54" width="10" height="36" rx="4" fill="' + sl + '"/><circle cx="24" cy="92" r="5" fill="' + skin + '"/><circle cx="76" cy="92" r="5" fill="' + skin + '"/>';
-    if (acc === 'chain') v += '<path d="M40 54 Q50 72 60 54" stroke="' + GOLD + '" stroke-width="2.4" fill="none"/><circle cx="50" cy="68" r="3.2" fill="' + GOLD + '"/>';
-    v += '<circle cx="50" cy="36" r="16" fill="' + skin + '"/>';
-    const cp = '<path d="M34 34 A16 16 0 0 1 66 34 Q50 24 34 34 Z" fill="' + K + '"/>';
-    if (hair === 'low' || hair === 'braids') v += cp;
-    if (hair === 'afro') v += '<path d="M30 34 A20 20 0 0 1 70 34 Q50 22 30 34 Z" fill="' + K + '"/>';
-    if (hair === 'gele') v += '<ellipse cx="50" cy="22" rx="21" ry="12" fill="' + gele + '"/><rect x="58" y="14" width="18" height="12" rx="4" fill="#b5382f"/>';
-    if (hair === 'fade') v += cp + '<rect x="37" y="14" width="26" height="12" rx="3" fill="' + K + '"/>';
-    if (hair === 'cornrow') v += cp + '<path d="M41 24 L41 34 M46 21 L46 32 M51 20 L51 31 M56 21 L56 32 M61 24 L61 34" stroke="#5a4a40" stroke-width="1.6" stroke-linecap="round"/>';
-    if (hair === 'bun') v += cp + '<circle cx="50" cy="16" r="8" fill="' + K + '"/>';
-    if (hair === 'puff') v += cp + '<circle cx="32" cy="22" r="9" fill="' + K + '"/><circle cx="68" cy="22" r="9" fill="' + K + '"/>';
-    if (hair === 'twist') v += cp + [[36, 24], [42, 18], [50, 15], [58, 18], [64, 24], [34, 31], [66, 31]].map(q => '<circle cx="' + q[0] + '" cy="' + q[1] + '" r="5" fill="' + K + '"/>').join('');
-    if (hair === 'dread') v += cp;
-    if (hair === 'bob') v += '<path d="M33 36 A17 17 0 0 1 67 36 Q50 22 33 36 Z" fill="' + BOB + '"/>';
-    v += '<circle cx="44" cy="38" r="1.7" fill="' + K + '"/><circle cx="56" cy="38" r="1.7" fill="' + K + '"/><path d="M45 44 Q50 48 55 44" stroke="' + K + '" stroke-width="1.6" fill="none" stroke-linecap="round"/>';
-    if (acc === 'glasses') v += '<rect x="36" y="34" width="12" height="8" rx="2.4" fill="#101418"/><rect x="52" y="34" width="12" height="8" rx="2.4" fill="#101418"/><rect x="47" y="36" width="6" height="2" fill="#101418"/>';
-    if (acc === 'cap') v += '<path d="M33 31 A17 17 0 0 1 67 31 Z" fill="' + col + '"/><rect x="33" y="29" width="34" height="4" rx="1.5" fill="' + col + '"/><rect x="45" y="30" width="30" height="4.5" rx="2.2" fill="rgba(0,0,0,.32)"/>';
+    /* hair that sits behind the head */
+    if (hair === 'afro') v += '<circle cx="50" cy="24" r="23" fill="' + K + '"/>';
+    if (hair === 'bob') v += '<path d="M32 32 Q31 9 50 9 Q69 9 68 32 L70 64 L58 64 L58 42 L42 42 L42 64 L30 64 Z" fill="' + BOB + '"/>';
+    /* legs and shoes */
+    [36, 52].forEach(function (x) {
+      v += '<rect x="' + x + '" y="90" width="12" height="42" rx="5.5" fill="' + legc + '"/>';
+      if (shorts) v += '<rect x="' + (x - 0.8) + '" y="90" width="13.6" height="18" rx="5" fill="' + W + '"/>';
+      v += '<ellipse cx="' + (x + 6) + '" cy="133.4" rx="8" ry="4.3" fill="' + shoe + '"/><rect x="' + (x - 2) + '" y="136" width="16" height="1.8" rx="0.9" fill="rgba(0,0,0,.35)"/>';
+    });
+    /* body */
+    const torso = 'M31 54 Q50 47 69 54 L66 95 Q50 99 34 95 Z';
+    if (outfit === 'kaftan') v += '<path d="M31 53 Q50 47 69 53 L74 114 Q50 119 26 114 Z" fill="' + col + '"/><rect x="48.6" y="52" width="2.8" height="44" fill="' + GOLD + '"/><rect x="38" y="86" width="24" height="3" fill="' + dk + '"/>';
+    else if (skirty) {
+      v += '<path d="' + torso + '" fill="' + col + '"/><path d="M34 78 L66 78 L80 122 Q50 128 20 122 Z" fill="' + col + '"/><rect x="34" y="76" width="32" height="4" fill="' + (outfit === 'ankara' ? GOLD : dk) + '"/>';
+      if (outfit === 'ankara') v += '<circle cx="38" cy="92" r="2.8" fill="' + GOLD + '"/><circle cx="58" cy="97" r="2.8" fill="' + W + '"/><circle cx="48" cy="108" r="2.8" fill="' + GOLD + '"/><circle cx="29" cy="112" r="2.5" fill="' + W + '"/><circle cx="71" cy="112" r="2.5" fill="' + GOLD + '"/><circle cx="64" cy="86" r="2.4" fill="' + GOLD + '"/><rect x="21" y="119" width="58" height="2.4" fill="' + GOLD + '"/>';
+    } else if (outfit === 'agbada') v += '<path d="M30 53 Q50 47 70 53 L88 120 Q50 126 12 120 Z" fill="' + col + '"/><rect x="46" y="52" width="8" height="70" fill="' + GOLD + '"/><rect x="14" y="116" width="72" height="3" fill="' + GOLD + '"/>';
+    else v += '<path d="' + torso + '" fill="' + tc + '"/>';
+    if (outfit === 'tee') v += '<path d="M43.5 52 Q50 58.5 56.5 52" stroke="' + dk + '" stroke-width="2.2" fill="none" stroke-linecap="round"/>';
+    if (outfit === 'hoodie') v += '<ellipse cx="50" cy="53" rx="15" ry="6" fill="' + col + '" stroke="rgba(0,0,0,.28)"/><rect x="39" y="82" width="22" height="10" rx="3" fill="' + dk + '"/><rect x="46" y="56" width="1.8" height="14" rx=".9" fill="' + W + '"/><rect x="52.2" y="56" width="1.8" height="14" rx=".9" fill="' + W + '"/>';
+    if (outfit === 'jersey') v += '<rect x="38" y="52" width="6" height="43" fill="' + W + '"/><rect x="56" y="52" width="6" height="43" fill="' + W + '"/><path d="M43.5 51 Q50 58 56.5 51" stroke="' + W + '" stroke-width="3" fill="none"/><circle cx="50" cy="66" r="3.2" fill="' + GOLD + '"/>';
+    if (outfit === 'jacket') v += '<rect x="44" y="53" width="12" height="42" fill="' + col + '"/><path d="M44 53 L40 62 L47 60 Z M56 53 L60 62 L53 60 Z" fill="' + DEN + '" stroke="rgba(0,0,0,.25)" stroke-width=".6"/><rect x="34" y="80" width="32" height="2.4" fill="#2c4568"/><rect x="44" y="53" width="1" height="42" fill="rgba(0,0,0,.28)"/><rect x="55" y="53" width="1" height="42" fill="rgba(0,0,0,.28)"/>';
+    if (outfit === 'suit') v += '<polygon points="43,52 57,52 50,76" fill="#f4f4f0"/><path d="M43 52 L48.5 76 L40 70 Z M57 52 L51.5 76 L60 70 Z" fill="#17191e"/><rect x="48.4" y="60" width="3.2" height="22" fill="' + col + '"/><polygon points="48,57 52,57 51.4,61 48.6,61" fill="' + col + '"/>';
+    /* arms */
+    [-1, 1].forEach(function (sd) {
+      const sx = 50 + sd * 18.5, ex = 50 + sd * 22.5, wx = 50 + sd * 23.5;
+      if (outfit === 'agbada') {
+        v += '<path d="M' + (50 + sd * 17) + ' 53 L' + (50 + sd * 43) + ' 100 L' + (50 + sd * 25) + ' 108 L' + (50 + sd * 14) + ' 70 Z" fill="' + col + '"/><circle cx="' + (50 + sd * 28) + '" cy="106" r="4.6" fill="' + skin + '"/>';
+        return;
+      }
+      const upc = sleeves === 'none' ? skin : sc, loc = sleeves === 'long' ? sc : skin;
+      v += '<line x1="' + sx + '" y1="56" x2="' + ex + '" y2="77" stroke="' + upc + '" stroke-width="9.5" stroke-linecap="round"/>';
+      v += '<line x1="' + ex + '" y1="77" x2="' + wx + '" y2="96" stroke="' + loc + '" stroke-width="8" stroke-linecap="round"/>';
+      if (outfit === 'ankara') v += '<circle cx="' + (sx + sd * 0.5) + '" cy="58" r="6" fill="' + col + '"/>';
+      if (sleeves === 'long' && outfit === 'suit') v += '<line x1="' + (wx - sd * 0.3) + '" y1="95" x2="' + wx + '" y2="96.5" stroke="#f4f4f0" stroke-width="8.2"/>';
+      v += '<ellipse cx="' + wx + '" cy="100.5" rx="4.2" ry="5.2" fill="' + skin + '"/>';
+    });
+    if (acc === 'chain') v += '<path d="M41 52 Q50 68 59 52" stroke="' + GOLD + '" stroke-width="2" fill="none"/><circle cx="50" cy="66.5" r="3" fill="' + GOLD + '"/>';
+    /* hair that hangs in front of the shoulders */
+    if (hair === 'braids') v += [34, 40, 60, 66].map(function (x, n) { return '<rect x="' + (x - 1.9) + '" y="30" width="3.8" height="' + (38 + (n % 2) * 6) + '" rx="1.9" fill="' + K + '"/><circle cx="' + x + '" cy="' + (70 + (n % 2) * 6) + '" r="2" fill="' + GOLD + '"/>'; }).join('');
+    if (hair === 'dread') v += [32.5, 36, 39.5, 60.5, 64, 67.5].map(function (x, n) { return '<rect x="' + (x - 1.8) + '" y="28" width="3.6" height="' + (30 + (n % 3) * 7) + '" rx="1.8" fill="' + K + '"/>'; }).join('');
+    /* neck, head, ears */
+    v += '<rect x="45" y="42" width="10" height="13" rx="3" fill="' + skd + '"/>';
+    v += '<ellipse cx="36.8" cy="31.5" rx="2.5" ry="4.2" fill="' + skd + '"/><ellipse cx="63.2" cy="31.5" rx="2.5" ry="4.2" fill="' + skd + '"/>';
+    v += '<ellipse cx="50" cy="30" rx="13.4" ry="15.8" fill="' + skin + '"/>';
+    /* hair on the head */
+    const cp = '<path d="M36 33 C34.5 19 41 13 50 13 C59 13 65.5 19 64 33 C60 25 55.5 21.5 50 21.5 C44.5 21.5 40 25 36 33 Z" fill="' + K + '"/>';
+    if (hair === 'low' || hair === 'braids' || hair === 'dread') v += cp;
+    if (hair === 'afro') v += '<path d="M32 33 C29 14 40 6 50 6 C60 6 71 14 68 33 C63 24 57 20 50 20 C43 20 37 24 32 33 Z" fill="' + K + '"/>';
+    if (hair === 'gele') v += cp + '<ellipse cx="50" cy="15" rx="19.5" ry="10.5" fill="' + gele + '"/><path d="M58 9 L77 5 L72 21 Z" fill="#b5382f"/><path d="M33 17 Q50 7 67 17" stroke="rgba(0,0,0,.2)" stroke-width="1.6" fill="none"/>';
+    if (hair === 'fade') v += cp + '<rect x="37.5" y="9" width="25" height="12" rx="4" fill="' + K + '"/>';
+    if (hair === 'cornrow') v += cp + '<path d="M41 24 L41 33 M45.5 20 L45.5 31 M50 18.5 L50 30 M54.5 20 L54.5 31 M59 24 L59 33" stroke="#5a4a40" stroke-width="1.5" stroke-linecap="round"/>';
+    if (hair === 'bun') v += cp + '<circle cx="50" cy="9" r="8" fill="' + K + '"/>';
+    if (hair === 'puff') v += cp + '<circle cx="34" cy="16" r="9" fill="' + K + '"/><circle cx="66" cy="16" r="9" fill="' + K + '"/>';
+    if (hair === 'twist') v += cp + [[37, 22], [43, 16], [50, 13], [57, 16], [63, 22], [35, 30], [65, 30]].map(function (q) { return '<circle cx="' + q[0] + '" cy="' + q[1] + '" r="5" fill="' + K + '"/>'; }).join('');
+    if (hair === 'bob') v += '<path d="M35 33 C34 16 43 12 51 13 C60 14 66 20 65 33 C61 26 53 22 45 24 C40 25 36.5 28 35 33 Z" fill="' + BOB + '"/>';
+    /* face */
+    const bh = fem ? 1.25 : 1.7, bc = hair === 'bald' ? skd : (hair === 'bob' ? BOB : K);
+    v += '<path d="M39.8 25.2 Q44 22.8 47.8 24.6" stroke="' + bc + '" stroke-width="' + bh + '" fill="none" stroke-linecap="round"/><path d="M52.2 24.6 Q56 22.8 60.2 25.2" stroke="' + bc + '" stroke-width="' + bh + '" fill="none" stroke-linecap="round"/>';
+    v += '<ellipse cx="43.8" cy="29.8" rx="3.2" ry="2.5" fill="#f6f3ec"/><ellipse cx="56.2" cy="29.8" rx="3.2" ry="2.5" fill="#f6f3ec"/><circle cx="43.8" cy="29.9" r="1.8" fill="#2a1710"/><circle cx="56.2" cy="29.9" r="1.8" fill="#2a1710"/><circle cx="43.2" cy="29.2" r=".55" fill="#fff"/><circle cx="55.6" cy="29.2" r=".55" fill="#fff"/>';
+    if (fem) v += '<path d="M40.2 28.2 Q43.8 26.4 47.4 28.2 M52.6 28.2 Q56.2 26.4 59.8 28.2" stroke="' + K + '" stroke-width="1" fill="none" stroke-linecap="round"/>';
+    v += '<ellipse cx="50" cy="35.4" rx="2.9" ry="3" fill="' + shade(skin, 0.88) + '"/><ellipse cx="50" cy="34.6" rx="1.5" ry="1.9" fill="' + shade(skin, 1.06) + '"/><circle cx="48.7" cy="37.2" r=".65" fill="rgba(0,0,0,.4)"/><circle cx="51.3" cy="37.2" r=".65" fill="rgba(0,0,0,.4)"/>';
+    v += '<ellipse cx="50" cy="42.6" rx="' + (fem ? 3.6 : 3) + '" ry="1.15" fill="' + lip + '"/><path d="M45.6 41 Q50 44.4 54.4 41" stroke="#3d1a18" stroke-width="1.15" fill="none" stroke-linecap="round"/>';
+    if (acc === 'glasses') v += '<rect x="37.4" y="26.4" width="11.6" height="7.6" rx="2.6" fill="#101418"/><rect x="51" y="26.4" width="11.6" height="7.6" rx="2.6" fill="#101418"/><rect x="48.4" y="28.4" width="3.2" height="1.6" fill="#101418"/><rect x="34" y="28" width="4" height="1.3" fill="#101418"/><rect x="62" y="28" width="4" height="1.3" fill="#101418"/><rect x="39" y="27.6" width="4" height="1.2" rx=".6" fill="rgba(255,255,255,.28)"/>';
+    if (acc === 'cap') v += '<path d="M34.6 23 C34.6 8 65.4 8 65.4 23 Z" fill="' + col + '"/><path d="M36 22.6 L72 22.6 Q74 25.4 70 25.6 L36 25.6 Z" fill="' + dk + '"/><circle cx="50" cy="10.4" r="1.7" fill="' + dk + '"/>';
     return v + '</svg>';
   }
   /* mode 'start': only what everybody starts with. Otherwise only what you own; the rest is in the Boutique */
@@ -4795,6 +5049,7 @@ window.G3 = (function () {
     }
     if (UI.sheet) h += renderSheet(UI.sheet);
     h += renderNav();
+    if ((UI.tab === 'home' || UI.tab === 'buy') && threeOk && !UI.trip && !UI.busy) h += '<div class="rot-pill' + (UI.tab === 'buy' ? ' up' : '') + '" role="group" aria-label="Turn the house view"><button class="rot-b" data-act="rotate" data-dir="-1" type="button" aria-label="Turn the house left"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg></button><span class="rot-l">Turn<br>house</span><button class="rot-b" data-act="rotate" data-dir="1" type="button" aria-label="Turn the house right"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 4v5h-5"/></svg></button></div>';
     if (UI.chat) h += renderChatView();
     if (UI.person) h += renderPerson();
     if (S.over) h += renderOver(); else if (S.event) h += renderEvent(); else if (UI.welcome) h += renderWelcome();
@@ -4829,6 +5084,7 @@ window.G3 = (function () {
   document.addEventListener('click', function (e) {
     const el = e.target.closest('[data-act]'); if (!el || el.disabled) return;
     const act = el.dataset.act, id = el.dataset.id;
+    if (act === 'rotate') { const hv = G3.views.home; if (hv && hv.rotate) { UI.prompt = null; hv.rotate(el.dataset.dir === '-1' ? -1 : 1); updatePins(); } return; }
     if (act === 'look') {
       const k = el.dataset.k, i = parseInt(id, 10), tgt = S ? S.look : UI.look;
       const lst = lookList(k), okWear = !lst || !lst[i] || (S ? ownsLook(S, k, i) : !lst[i][2]);
@@ -5019,7 +5275,7 @@ window.G3 = (function () {
   render();
   if (Auth.session) reconcile();
   handleAuthHash();
-  window.__game = { get S() { return S; }, UI: UI, render: render };
+  window.__game = { get S() { return S; }, UI: UI, render: render, lookSvg: lookSvg };
 })();
 
 </script>
