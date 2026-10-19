@@ -18,7 +18,7 @@
 :root {
   --bg: #e9efe7; --surface: #ffffff; --surface2: #e1e8df; --ink: #14201a; --muted: #566259; --line: #cfd8cc;
   --accent: #0b7a43; --accent-ink: #ffffff; --money: #8f5400; --warn: #b3261e; --warn-bg: #fbe9e7; --good-bg: #e3f3ea;
-  --glass: rgba(255, 255, 255, .88); --nav-h: 64px;
+  --glass: rgba(255, 255, 255, .88); --nav-h: 78px; --hud-h: 96px;
   --f-display: 'Bricolage Grotesque', 'Segoe UI', system-ui, sans-serif;
   --f-body: 'DM Sans', 'Segoe UI', system-ui, sans-serif;
   --f-mono: 'DM Mono', ui-monospace, Menlo, Consolas, monospace;
@@ -61,33 +61,57 @@ p { margin: 0; }
 .pin.here { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
 .pin.here .pin-s { color: inherit; opacity: .9; }
 
-/* status bar */
-.hud { position: fixed; top: 0; left: 0; right: 0; z-index: 8; padding: calc(8px + env(safe-area-inset-top, 0px)) 12px 6px; pointer-events: none; }
-.hud-in { max-width: 560px; margin-inline: auto; display: grid; gap: 6px; }
-.hud-row { display: flex; justify-content: space-between; gap: 8px; align-items: center; }
-.pill { pointer-events: auto; background: var(--glass); border: 1px solid var(--line); border-radius: 999px; padding: 6px 12px; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
-.clock { display: flex; gap: 6px; align-items: baseline; font-size: 13px; }
-.clock span { color: var(--muted); }
-.cashp { display: flex; gap: 8px; align-items: baseline; }
-.cashp .num { color: var(--money); font-weight: 500; font-size: 17px; }
-.cashp .num.neg { color: var(--warn); }
-.meters { display: grid; gap: 6px; border-radius: 14px; width: 100%; padding: 7px 12px; }
-.m-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-.m-row.m3 { grid-template-columns: repeat(3, 1fr); gap: 10px; }
-.m3 .meter { grid-template-columns: auto 1fr; gap: 5px; font-size: 10px; }
-.meter { display: grid; grid-template-columns: 46px 1fr; align-items: center; gap: 8px; font-size: 11px; color: var(--muted); letter-spacing: .06em; text-transform: uppercase; }
+/* progress bars used across the Phone apps */
 .bar { height: 7px; border-radius: 4px; background: var(--surface2); overflow: hidden; }
 .bar i { display: block; height: 100%; background: var(--accent); border-radius: 4px; }
 .bar.low i { background: var(--warn); }
-.goal { pointer-events: auto; background: var(--accent); color: var(--accent-ink); border-radius: 10px; padding: 5px 10px; font-size: 12.5px; font-weight: 700; justify-self: start; max-width: 100%; }
-.toast { position: fixed; z-index: 7; left: 12px; right: 12px; top: calc(166px + env(safe-area-inset-top, 0px)); max-width: 536px; margin-inline: auto; background: var(--glass); border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; font-size: 14px; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); box-shadow: 0 4px 14px rgba(0, 0, 0, .22); }
 
-/* bottom: dock above the tab bar */
-.nav { position: fixed; left: 0; right: 0; bottom: 0; z-index: 6; background: var(--surface); border-top: 1px solid var(--line); padding: 6px 8px calc(6px + env(safe-area-inset-bottom, 0px)); }
-.nav-in { max-width: 560px; margin-inline: auto; display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; }
-.navb { background: transparent; border: 0; border-radius: 12px; padding: 6px 0 4px; display: grid; justify-items: center; gap: 2px; font-size: 12px; font-weight: 700; color: var(--muted); }
-.navb svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
-.navb[aria-current="true"] { background: var(--surface2); color: var(--ink); }
+/* status bar: a day pill, a cash pill, and a row of need rings. Tap either to open the vitals sheet */
+.hud { position: fixed; top: 0; left: 0; right: 0; z-index: 8; padding: calc(8px + env(safe-area-inset-top, 0px)) 12px 6px; pointer-events: none; }
+.hud-in { max-width: 560px; margin-inline: auto; display: grid; gap: 7px; }
+.hud-top, .hud-sub { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.hp { pointer-events: auto; display: flex; align-items: center; gap: 8px; height: 40px; padding: 0 13px 0 11px; border-radius: 999px; background: var(--glass); border: 1px solid var(--line); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); box-shadow: 0 2px 10px rgba(0, 0, 0, .12); color: var(--ink); }
+button.hp { cursor: pointer; text-align: left; }
+.hp .tod { font-size: 18px; line-height: 1; }
+.hp .dn { display: grid; line-height: 1.1; }
+.hp .dn b { white-space: nowrap; font-family: var(--f-display); font-weight: 800; font-size: 14px; }
+.hp .dn small { white-space: nowrap; font-size: 10.5px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.gems { display: flex; gap: 5px; margin-left: 2px; }
+.gems i { width: 9px; height: 9px; border-radius: 2.5px; transform: rotate(45deg); background: var(--surface2); border: 1px solid var(--line); }
+.gems i.on { background: var(--accent); border-color: var(--accent); }
+.hp.cash { margin-left: auto; gap: 5px; padding: 0 14px; flex: none; }
+.hp.day { min-width: 0; flex: 0 1 auto; overflow: hidden; }
+.hp.cash .cur { font-family: var(--f-display); font-weight: 800; font-size: 15px; color: var(--money); }
+.hp.cash .num { font-size: 16px; font-weight: 500; }
+.hp.cash .num.neg { color: var(--warn); }
+.hchip { pointer-events: auto; flex: none; width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; font-size: 16px; background: var(--glass); border: 1px solid var(--line); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); cursor: pointer; padding: 0; }
+.hchip { position: relative; }
+.hchip .cb { position: absolute; right: -3px; top: -3px; min-width: 16px; height: 16px; border-radius: 8px; background: var(--ink); color: var(--surface); font: 800 10px/16px var(--f-body); text-align: center; font-style: normal; }
+.hchip.warn { border-color: var(--warn); background: var(--warn-bg); }
+.rings { pointer-events: auto; flex: none; display: flex; gap: 4px; padding: 4px 7px; border-radius: 999px; background: var(--glass); border: 1px solid var(--line); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); box-shadow: 0 2px 10px rgba(0, 0, 0, .12); cursor: pointer; }
+.ring { position: relative; width: 29px; height: 29px; display: grid; place-items: center; }
+.ring svg { position: absolute; inset: 0; width: 100%; height: 100%; transform: rotate(-90deg); }
+.ring circle { fill: none; stroke-width: 3.2; }
+.ring .tr { stroke: var(--surface2); }
+.ring .pg { stroke: var(--c); stroke-linecap: round; transition: stroke-dashoffset .5s; }
+.ring span { position: relative; font-size: 12px; line-height: 1; }
+.ring.low .pg { stroke: var(--warn); }
+.ring.low { animation: ringp 1.7s ease-in-out infinite; }
+@keyframes ringp { 50% { transform: scale(1.14); } }
+@media (prefers-reduced-motion: reduce) { .ring.low { animation: none; } }
+.hint { pointer-events: auto; flex: 1 1 auto; min-width: 0; height: 33px; display: flex; align-items: center; padding: 0 12px; border-radius: 999px; background: var(--accent); color: var(--accent-ink); font-size: 12.5px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; box-shadow: 0 2px 10px rgba(0, 0, 0, .14); }
+.hint.warn { background: var(--warn); color: #fff; }
+.toast { position: fixed; z-index: 7; left: 12px; right: 12px; top: calc(var(--hud-h) + 8px + env(safe-area-inset-top, 0px)); max-width: 536px; margin-inline: auto; background: var(--glass); border: 1px solid var(--line); border-radius: 16px; padding: 10px 14px; font-size: 14px; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); box-shadow: 0 6px 18px rgba(0, 0, 0, .2); }
+
+/* bottom: a floating tab capsule; only the open tab shows its name */
+.nav { position: fixed; left: 0; right: 0; bottom: 0; z-index: 6; padding: 0 14px calc(10px + env(safe-area-inset-bottom, 0px)); pointer-events: none; }
+.nav-in { pointer-events: auto; max-width: 420px; margin-inline: auto; display: flex; align-items: center; gap: 4px; padding: 6px; border-radius: 32px; background: var(--glass); border: 1px solid var(--line); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); box-shadow: 0 8px 26px rgba(0, 0, 0, .2); }
+.navb { flex: 1 1 0; min-width: 0; height: 48px; border: 0; border-radius: 26px; background: transparent; display: flex; align-items: center; justify-content: center; gap: 7px; font-size: 13.5px; font-weight: 800; color: var(--muted); transition: flex-grow .25s, background .2s; }
+.navb svg { width: 24px; height: 24px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; }
+.navb span { display: none; }
+.navb[aria-current="true"] { flex-grow: 2.3; background: var(--accent); color: var(--accent-ink); }
+.navb[aria-current="true"] span { display: inline; }
+.navb:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
 .dock { position: fixed; left: 0; right: 0; z-index: 5; bottom: calc(var(--nav-h) + env(safe-area-inset-bottom, 0px) + 8px); padding: 0 12px; pointer-events: none; }
 .dock-in { max-width: 560px; margin-inline: auto; background: var(--glass); border: 1px solid var(--line); border-radius: 16px; padding: 10px 12px; display: grid; gap: 8px; pointer-events: auto; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
 .loc { display: grid; gap: 1px; font-size: 14px; }
@@ -95,7 +119,7 @@ p { margin: 0; }
 .dock-btns .btn { flex: 1 1 auto; }
 
 /* full pages (Buy, Phone) */
-.page { position: fixed; inset: 0; z-index: 4; overflow-y: auto; background: var(--bg); padding: calc(172px + env(safe-area-inset-top, 0px)) 16px calc(var(--nav-h) + 28px + env(safe-area-inset-bottom, 0px)); display: grid; gap: 14px; align-content: start; }
+.page { position: fixed; inset: 0; z-index: 4; overflow-y: auto; background: var(--bg); padding: calc(var(--hud-h) + 12px + env(safe-area-inset-top, 0px)) 16px calc(var(--nav-h) + 28px + env(safe-area-inset-bottom, 0px)); display: grid; gap: 14px; align-content: start; }
 .page > * { width: 100%; max-width: 560px; margin-inline: auto; min-width: 0; }
 .page.nogl { z-index: 3; }
 .seg { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; background: var(--surface2); padding: 4px; border-radius: 12px; }
@@ -108,6 +132,37 @@ p { margin: 0; }
 .grab { width: 38px; height: 4px; border-radius: 2px; background: var(--line); justify-self: center; }
 .ps-head { display: flex; justify-content: space-between; gap: 12px; align-items: flex-start; }
 .xbtn { background: var(--surface2); border: 0; border-radius: 10px; padding: 7px 12px; font-weight: 700; font-size: 13px; }
+
+
+/* vitals sheet: opens from the day pill, the cash pill or the rings */
+.vwrap { position: fixed; inset: 0; z-index: 12; background: rgba(8, 14, 10, .5); display: flex; align-items: flex-end; animation: vfade .2s ease-out; }
+.vsheet { width: 100%; max-width: 560px; margin-inline: auto; max-height: 84%; overflow-y: auto; background: var(--surface); border-radius: 28px 28px 0 0; padding: 8px 18px calc(22px + env(safe-area-inset-bottom, 0px)); display: grid; gap: 16px; align-content: start; box-shadow: 0 -10px 36px rgba(0, 0, 0, .38); animation: vup .26s ease-out; }
+@keyframes vfade { from { opacity: 0; } }
+@keyframes vup { from { transform: translateY(40px); opacity: .4; } }
+@media (prefers-reduced-motion: reduce) { .vwrap, .vsheet { animation: none; } }
+.vhead { display: flex; align-items: center; gap: 12px; }
+.vav { width: 58px; height: 58px; border-radius: 50%; overflow: hidden; background: var(--surface2); flex: none; border: 2px solid var(--accent); }
+.vav svg { width: 100%; height: 100%; display: block; }
+.vtxt { min-width: 0; display: grid; }
+.vname { font-family: var(--f-display); font-weight: 800; font-size: 20px; line-height: 1.15; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.vsub { color: var(--muted); font-size: 13px; }
+.vx { margin-left: auto; flex: none; width: 38px; height: 38px; border-radius: 50%; border: 0; background: var(--surface2); font-size: 15px; font-weight: 800; }
+.vsec { font-size: 11px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin: 0 0 -6px; }
+.needs { display: grid; gap: 13px; }
+.need { display: grid; grid-template-columns: 42px 1fr; gap: 12px; align-items: center; }
+.need .ic { width: 42px; height: 42px; border-radius: 13px; display: grid; place-items: center; font-size: 20px; background: var(--surface2); background: color-mix(in srgb, var(--c) 20%, var(--surface)); }
+.need .nt { display: flex; justify-content: space-between; align-items: baseline; font-weight: 700; font-size: 14.5px; margin-bottom: 6px; }
+.need .nt .num { font-size: 13px; font-weight: 500; color: var(--muted); }
+.need .nb { height: 9px; border-radius: 5px; background: var(--surface2); overflow: hidden; }
+.need .nb i { display: block; height: 100%; border-radius: 5px; background: var(--c); }
+.need.low .nb i { background: var(--warn); }
+.need.low .nt .num { color: var(--warn); font-weight: 700; }
+.vcard { background: var(--surface2); border-radius: 18px; padding: 13px 15px; display: grid; gap: 7px; }
+.vcard .vrow { display: flex; align-items: center; justify-content: space-between; gap: 10px; font-weight: 700; font-size: 14.5px; }
+.vcard p { font-size: 13.5px; color: var(--muted); }
+.vcard.go { background: var(--good-bg); }
+.vcard.go.warn { background: var(--warn-bg); }
+.vcard.go b { font-size: 14.5px; }
 
 /* shared components */
 .banner { background: var(--good-bg); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; font-size: 14px; }
@@ -155,12 +210,12 @@ p { margin: 0; }
 
 .goal.warn { background: var(--warn); color: #fff; }
 .quick { display: flex; gap: 6px; }
-.rot-pill { position: fixed; right: 12px; bottom: calc(var(--nav-h) + env(safe-area-inset-bottom, 0px) + 14px); z-index: 5; display: flex; align-items: center; gap: 2px; padding: 5px; border-radius: 999px; background: var(--accent); color: #fff; box-shadow: 0 6px 18px rgba(0, 0, 0, .3); }
-.rot-pill.up { bottom: auto; top: calc(160px + env(safe-area-inset-top, 0px)); }
-.rot-b { display: grid; place-items: center; width: 44px; height: 44px; border: 0; border-radius: 50%; background: rgba(255, 255, 255, .16); color: #fff; cursor: pointer; }
-.rot-b:active { transform: scale(.92); background: rgba(255, 255, 255, .32); }
-.rot-b:focus-visible { outline: 3px solid #fff; outline-offset: 2px; }
-.rot-l { font: 800 10px/1.15 var(--f-body); letter-spacing: .04em; text-align: center; text-transform: uppercase; padding: 0 4px; }
+.rot-pill { position: fixed; right: 12px; bottom: calc(var(--nav-h) + env(safe-area-inset-bottom, 0px) + 14px); z-index: 5; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 4px; border-radius: 999px; background: var(--glass); color: var(--ink); border: 1px solid var(--line); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); box-shadow: 0 4px 14px rgba(0, 0, 0, .2); }
+.rot-pill.up { bottom: auto; top: calc(var(--hud-h) + 12px + env(safe-area-inset-top, 0px)); }
+.rot-b { display: grid; place-items: center; width: 42px; height: 42px; border: 0; border-radius: 50%; background: transparent; color: var(--ink); cursor: pointer; }
+.rot-b:active { transform: scale(.92); background: var(--surface2); }
+.rot-b:focus-visible { outline: 3px solid var(--accent); outline-offset: 1px; }
+.rot-l { display: none; }
 .qb { flex: 1 1 0; min-width: 0; display: grid; gap: 1px; justify-items: center; padding: 7px 4px; border-radius: 10px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); }
 .qb b { font-size: 13px; }
 .qb span { font-family: var(--f-mono); font-size: 10.5px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
@@ -578,7 +633,12 @@ const CITY = {
     shared: { name: 'Shared room in Nyanya', place: 'kubwa', rent: 30000, rest: 45, mood: -3 },
     room: { name: 'Self-contain in Kubwa', place: 'kubwa', rent: 60000, rest: 55, mood: 0 },
     estate: { name: '3-bed in Gwarinpa estate', place: 'gwarinpa', rent: 150000, rest: 62, mood: 1 },
-    flat: { name: '2-bed flat in Maitama', place: 'maitama', rent: 300000, rest: 70, mood: 2 }
+    flat: { name: '2-bed flat in Maitama', place: 'maitama', rent: 300000, rest: 70, mood: 2 },
+    karu: { name: 'Self-contain in Mararaba', place: 'karu', rent: 45000, rest: 52, mood: -1 },
+    bwari: { name: 'Bungalow in Bwari', place: 'bwari', rent: 95000, rest: 58, mood: 0 },
+    lokogoma: { name: '2-bed duplex in Lokogoma', place: 'lokogoma', rent: 200000, rest: 65, mood: 1 },
+    apo: { name: '3-bed flat in Apo', place: 'apo', rent: 260000, rest: 68, mood: 2 },
+    guzape: { name: 'Villa on Guzape Hills', place: 'guzape', rent: 700000, rest: 82, mood: 4 }
   },
   backgrounds: [
     { id: 'graduate', name: 'Fresh graduate', line: 'BSc in hand, NYSC not yet done. Everyone at home keeps asking what is next.', cash: 1000000, edu: 2, nysc: false, conn: 0, xp: {} },
@@ -945,7 +1005,49 @@ const CITY = {
       lines: ['You finished before the offices opened.', 'Someone left a cup on every desk. You smiled and moved on.'] },
     { id: 'insurance', name: 'Insurance sales', place: 'wuse', est: s => 7000, var: 0.5, energy: 14, skill: { k: 'social', l: 1 }, xp: { social: 1 },
       blurb: 'Nobody wants insurance until something happens. Convince them early.',
-      lines: ['Eleven calls. One yes. A good day.', 'A client said "I will think about it" for the ninth time.'] }
+      lines: ['Eleven calls. One yes. A good day.', 'A client said "I will think about it" for the ninth time.'] },
+    { id: 'loader', name: 'Warehouse loader', place: 'dutse', est: s => 6500, var: 0.05, energy: 26, mood: -2,
+      blurb: 'Cement, rice and cartons. Heavy work, steady pay, and your back will have opinions.',
+      lines: ['You loaded forty bags before the sun got hot.', 'The forklift broke and everybody carried by hand.'] },
+    { id: 'welder', name: 'Welder and fabricator', place: 'dutse', est: s => 8200 + 500 * lvl(s, 'hustle'), var: 0.2, energy: 24, startup: { key: 'weldkit', cost: 45000, label: 'Welding machine and mask' }, xp: { hustle: 1 }, mood: -1,
+      blurb: 'Gates, window guards and burglar proof. Every new estate needs your sparks.',
+      lines: ['You finished three gates for an estate in Lokogoma.', 'A client wanted a design from Pinterest and a price from 2015.'] },
+    { id: 'haulage', name: 'Haulage driver', place: 'dutse', est: s => 9000, var: 0.15, energy: 28, minEdu: 0, mood: -3,
+      blurb: 'Long roads, heavy trucks and checkpoints. The pay is good if the truck is.',
+      lines: ['You delivered cement to Karu and got back before dark.', 'A checkpoint cost you a small settlement and an hour.'] },
+    { id: 'housemgr', name: 'House manager', place: 'guzape', est: s => 11000, var: 0.05, energy: 16, minConn: 1, mood: 0,
+      blurb: 'You run a big house for a bigger man. Quiet work, high standards, and a lot of keys.',
+      lines: ['Madam changed the dinner menu three times before noon.', 'You fixed the pool pump before anyone noticed it stopped.'] },
+    { id: 'potter', name: 'Potter and craft seller', place: 'bwari', est: s => 5200, var: 0.3, energy: 16, startup: { key: 'kiln', cost: 20000, label: 'Clay, wheel and kiln share' }, xp: { hustle: 1 }, mood: 1,
+      blurb: 'Pots, plates and flower vases. Tourists pay more than neighbours, and they bargain less.',
+      lines: ['A visitor bought six pots and asked for a discount on each.', 'The kiln cracked half the batch. The other half sold out.'] },
+    { id: 'poultry', name: 'Poultry farm hand', place: 'bwari', est: s => 5000, var: 0.15, energy: 20, mood: -1,
+      blurb: 'Early mornings, feed sacks and eggs. The chickens never take a day off.',
+      lines: ['You collected four hundred eggs before breakfast.', 'A hen escaped and half the farm chased it.'] },
+    { id: 'parkagent', name: 'Motor park agent', place: 'karu', est: s => 6000, var: 0.45, energy: 18, xp: { hustle: 1 }, mood: -1,
+      blurb: 'You shout destinations, fill the buses and collect the tickets. The union takes its cut.',
+      lines: ['You filled four buses to Lokoja and lost your voice.', 'Two drivers argued over one passenger. You settled it for a small fee.'] },
+    { id: 'lecturer', name: 'University assistant', place: 'gwagwalada', est: s => 8000, var: 0.05, energy: 16, minEdu: 2, skill: { k: 'social', l: 1 }, mood: 0,
+      blurb: 'You mark scripts, run tutorials and wait for the promotion that takes years.',
+      lines: ['Four hundred scripts. One cup of tea.', 'A student begged for one more mark. You said no kindly.'] },
+    { id: 'bizcentre', name: 'Business centre operator', place: 'gwagwalada', est: s => 5000, var: 0.3, energy: 14, startup: { key: 'bizkit', cost: 35000, label: 'Printer, laptop and generator share' }, xp: { hustle: 1 }, mood: 0,
+      blurb: 'Printing, photocopy, scanning and result checking. Exam season is your harvest.',
+      lines: ['You printed three hundred project copies before midnight.', 'The network died while a student was submitting. You made him tea.'] },
+    { id: 'contractor', name: 'Building contractor', place: 'lokogoma', est: s => 9800 + 600 * lvl(s, 'hustle'), var: 0.4, energy: 26, startup: { key: 'sitegear', cost: 80000, label: 'Tools, site boys and first order' }, xp: { hustle: 1 }, mood: -2,
+      blurb: 'Every new estate needs somebody to build it. The money is good if the client pays.',
+      lines: ['You poured a slab on schedule. It rained at four.', 'A client paid half and promised the rest "after Christmas".'] },
+    { id: 'aide', name: 'Legislative aide', place: 'apo', est: s => 9500, var: 0.1, energy: 16, minEdu: 1, minConn: 1, conn: 0.1, mood: -1,
+      blurb: 'You draft letters, carry files and know who is meeting who. Nobody says your name in public.',
+      lines: ['You wrote the same speech three ways for one honourable.', 'You learned something you were not supposed to hear.'] },
+    { id: 'airport', name: 'Airport ground crew', place: 'lugbe', est: s => 8800, var: 0.05, energy: 24, minEdu: 1, mood: -1,
+      blurb: 'Bags, ramps and planes that leave on time (sometimes). You watch the whole world fly out.',
+      lines: ['You loaded two flights and misplaced nobody\u2019s luggage.', 'A passenger insisted the plane waited for him. It did not.'] },
+    { id: 'fruit', name: 'Fruit seller', place: 'lugbe', est: s => 4200, var: 0.2, energy: 18, mood: 0,
+      blurb: 'Oranges, watermelon and pineapples at the airport road. You know every driver by name.',
+      lines: ['A bus stopped and bought your whole tray.', 'It rained and the fruit sold itself to people with umbrellas.'] },
+    { id: 'telecom', name: 'Telecom tower technician', place: 'katampe', est: s => 10500, var: 0.1, energy: 26, minEdu: 1, skill: { k: 'tech', l: 1 }, xp: { tech: 1 }, mood: -2,
+      blurb: 'You climb towers, fix antennas and get a better view than anyone in the city.',
+      lines: ['You replaced an antenna on a hill and watched the sun go down.', 'A mast went offline at dawn and the whole street called you.'] }
   ],
   events: [
     { id: 'nepa', w: 3, text: 'NEPA took light at 7pm. Generator, fuel, noise. The same story.',
@@ -954,10 +1056,10 @@ const CITY = {
         if (s.items.generator) { const g = pr(s, 800); s.cash -= g; apply(s, { mood: -1 }); return 'Generator fuel cost ' + fmt(g) + '. Lights stayed on.'; }
         const c = pr(s, 1500); s.cash -= c; apply(s, { mood: -4 }); return 'Candles, power bank, and ₦' + c.toLocaleString('en-US') + ' of misery.';
       } }] },
-    { id: 'water', w: 2, when: s => s.home === 'shared' || s.home === 'room', text: 'No water this morning. The mai ruwa is at your gate with his jerrycans.',
+    { id: 'water', w: 2, when: s => s.home === 'shared' || s.home === 'room' || s.home === 'karu' || s.home === 'bwari', text: 'No water this morning. The mai ruwa is at your gate with his jerrycans.',
       choices: [{ label: 'Buy water', run: s => { const c = pr(s, 1200); s.cash -= c; apply(s, { mood: -2 }); return 'Water cost ' + fmt(c) + '. You washed in a hurry.'; } }] },
-    { id: 'levy', w: 2, when: s => s.home === 'flat' || s.home === 'estate', text: 'The estate chairman announces a service charge for security and street lights.',
-      choices: [{ label: 'Pay it', run: s => { const c = pr(s, s.home === 'flat' ? 20000 : 8000); s.cash -= c; apply(s, { mood: -2 }); return 'Service charge: ' + fmt(c) + '. The street light still flickers.'; } }] },
+    { id: 'levy', w: 2, when: s => s.home === 'flat' || s.home === 'estate' || s.home === 'lokogoma' || s.home === 'apo' || s.home === 'guzape', text: 'The estate chairman announces a service charge for security and street lights.',
+      choices: [{ label: 'Pay it', run: s => { const c = pr(s, s.home === 'guzape' ? 40000 : s.home === 'flat' || s.home === 'apo' ? 20000 : 8000); s.cash -= c; apply(s, { mood: -2 }); return 'Service charge: ' + fmt(c) + '. The street light still flickers.'; } }] },
     { id: 'dollar', w: 1, text: 'The dollar moved overnight. Everybody in the market adjusted their prices before breakfast.',
       choices: [{ label: 'Shrug', run: s => { s.price = Math.min(3, s.price * 1.03); apply(s, { mood: -2 }); return 'Prices rose about 3%.'; } }] },
     { id: 'faith', w: 2, text: 'Your community gathers this weekend: mosque, church, or a naming ceremony. People will ask how work is going.',
@@ -1159,7 +1261,21 @@ const JOB_META = {
   photo: ['\uD83D\uDCF7', ['Assistant Photographer', 'Photographer', 'Senior Photographer', 'Studio Lead', 'Studio Owner', 'Celebrity Photographer']],
   cleaner: ['\uD83E\uDDF9', ['Cleaner', 'Senior Cleaner', 'Team Lead', 'Supervisor', 'Facility Manager', 'Cleaning Company Owner']],
   carsales: ['\uD83D\uDE97', ['Showroom Assistant', 'Sales Executive', 'Senior Sales Executive', 'Sales Manager', 'General Manager', 'Dealership Owner']],
-  insurance: ['\uD83D\uDEE1\uFE0F', ['Sales Agent', 'Senior Agent', 'Team Lead', 'Branch Manager', 'Regional Head', 'Agency Director']]
+  insurance: ['\uD83D\uDEE1\uFE0F', ['Sales Agent', 'Senior Agent', 'Team Lead', 'Branch Manager', 'Regional Head', 'Agency Director']],
+  loader: ['\uD83D\uDCE6', ['Loader', 'Forklift Operator', 'Shift Lead', 'Warehouse Supervisor', 'Operations Manager', 'Logistics Director']],
+  welder: ['\uD83D\uDD25', ['Apprentice Welder', 'Welder', 'Master Welder', 'Workshop Owner', 'Fabrication Boss', 'Steel Works Owner']],
+  haulage: ['\uD83D\uDE9B', ['Truck Assistant', 'Truck Driver', 'Long-haul Driver', 'Fleet Lead', 'Haulage Manager', 'Transport Owner']],
+  housemgr: ['\uD83C\uDFE1', ['Houseboy', 'House Steward', 'House Manager', 'Estate Manager', 'Household Director', 'Chief Steward']],
+  potter: ['\uD83C\uDFFA', ['Potter\u2019s Helper', 'Potter', 'Craft Seller', 'Studio Owner', 'Export Supplier', 'Craft Brand Owner']],
+  poultry: ['\uD83D\uDC14', ['Farm Hand', 'Feed Attendant', 'Pen Supervisor', 'Farm Manager', 'Egg Distributor', 'Farm Owner']],
+  parkagent: ['\uD83D\uDE8C', ['Park Agent', 'Loading Agent', 'Park Supervisor', 'Route Deputy', 'Park Chairman', 'Transport Union Leader']],
+  lecturer: ['\uD83C\uDF93', ['Graduate Assistant', 'Assistant Lecturer', 'Lecturer II', 'Lecturer I', 'Senior Lecturer', 'Professor']],
+  bizcentre: ['\uD83D\uDDA8\uFE0F', ['Attendant', 'Operator', 'Senior Operator', 'Centre Owner', 'Two-Centre Owner', 'Franchise Owner']],
+  contractor: ['\uD83C\uDFD7\uFE0F', ['Site Boy', 'Foreman', 'Site Supervisor', 'Contractor', 'Project Lead', 'Construction Boss']],
+  aide: ['\uD83D\uDCDD', ['Aide', 'Senior Aide', 'Legislative Assistant', 'Committee Clerk', 'Chief of Staff', 'Special Assistant']],
+  airport: ['\u2708\uFE0F', ['Ramp Agent', 'Baggage Handler', 'Ground Supervisor', 'Station Officer', 'Station Manager', 'Airport Director']],
+  fruit: ['\uD83C\uDF4A', ['Hawker', 'Stall Seller', 'Fruit Dealer', 'Wholesale Supplier', 'Market Supplier', 'Produce Boss']],
+  telecom: ['\uD83D\uDCE1', ['Technician', 'Senior Technician', 'Site Engineer', 'Field Supervisor', 'Regional Engineer', 'Network Director']]
 };
 function jobIcon(j) { return (JOB_META[j.id] || ['\uD83D\uDCBC'])[0]; }
 function jobLadder(j) { return (JOB_META[j.id] || [0, ['Staff']])[1]; }
@@ -2440,6 +2556,12 @@ window.G3 = (function () {
       way: [[-1.2, 2.2], [1, 1.6], [-3, 3.6], [0.5, 3.6], [-5, 0.8], [2, 0.8]], lamps: [[-3.5, 2], [3, 2]]
     }
   };
+  /* the new homes reuse a floor plan with their own colours */
+  DEFS.karu = Object.assign({}, DEFS.room, { wall: 0xcdbd9f, ground: 0x8a6a4a });
+  DEFS.bwari = Object.assign({}, DEFS.room, { wall: 0xe6d2aa, ground: 0x7c9b5c, lawn: 1 });
+  DEFS.lokogoma = Object.assign({}, DEFS.estate, { wall: 0xf0e2c8, ground: 0x6f9a5a });
+  DEFS.apo = Object.assign({}, DEFS.flat, { wall: 0x4a5a6a, trim: 0x2c3540, ground: 0x8d9698 });
+  DEFS.guzape = Object.assign({}, DEFS.estate, { wall: 0xf6f0e2, trim: 0xb8a888, ground: 0x5f9a4f, floor: 0xd8c8aa });
   G.homeDefs = DEFS;
 
   /* ---------- scene ---------- */
@@ -4639,16 +4761,48 @@ window.G3 = (function () {
     const need = Math.min.apply(null, Object.keys(J.routes).map(k => J.routes[k].funds + J.routes[k].fee));
     return S.cash >= need ? 'Japa: you can apply. Open Phone, then Japa' : 'Japa: save ' + fmt(need) + ' for proof of funds';
   }
+  /* the needs, in the order the rings and the vitals sheet show them */
+  const NEEDS = [['energy', 'Energy', '⚡', '#f2b01e'], ['mood', 'Mood', '', '#e9577f'], ['food', 'Food', '🍲', '#ee8a3a'], ['fun', 'Fun', '🎉', '#8a6cf0'], ['clean', 'Clean', '🫧', '#27b0c0']];
+  const moodFace = v => v >= 80 ? '😄' : v >= 60 ? '🙂' : v >= 40 ? '😐' : v >= 20 ? '😟' : '😣';
+  const moodWord = v => v >= 80 ? 'Thriving' : v >= 60 ? 'Happy' : v >= 40 ? 'Okay' : v >= 20 ? 'Low' : 'Struggling';
+  const cashShort = n => { const a = Math.abs(n), f = (v, u) => String(parseFloat(v.toFixed(2))) + u; return a >= 1e12 ? f(n / 1e12, 'T') : a >= 1e9 ? f(n / 1e9, 'B') : a >= 1e7 ? f(n / 1e6, 'M') : Math.round(n).toLocaleString('en-NG'); };
+  const lowAt = () => (CITY.needs && CITY.needs.low) || 25;
+  function ringHtml(n) {
+    const v = Math.max(0, Math.min(100, Math.round(S[n[0]]))), C = 2 * Math.PI * 11.5, low = v < lowAt();
+    return '<span class="ring' + (low ? ' low' : '') + '" style="--c:' + n[3] + '"><svg viewBox="0 0 29 29" aria-hidden="true"><circle class="tr" cx="14.5" cy="14.5" r="11.5"/><circle class="pg" cx="14.5" cy="14.5" r="11.5" stroke-dasharray="' + C.toFixed(1) + '" stroke-dashoffset="' + (C * (1 - v / 100)).toFixed(1) + '"/></svg><span aria-hidden="true">' + (n[0] === 'mood' ? moodFace(S.mood) : n[2]) + '</span></span>';
+  }
   function renderHud() {
-    const chips = (S.rain ? '<span class="pill stat">\uD83C\uDF27\uFE0F Rain</span>' : '') + (S.slow ? '<span class="pill stat">\uD83D\uDEA6 Go-slow</span>' : '') + (S.sick ? '<span class="pill stat warn">\uD83E\uDD12 Unwell: Health app</span>' : '');
-    const left = Math.max(0, 3 - S.slot), pips = '<span class="pip-dots" aria-hidden="true">' + [0, 1, 2].map(function (i) { return '<i class="' + (i < left ? 'on' : '') + '"></i>'; }).join('') + '</span>';
+    const left = Math.max(0, 3 - S.slot), done = S.slot >= 3;
+    const tod = done ? '🌙' : (S.slot === 0 ? '☀️' : S.slot === 1 ? '🌤️' : '🌆');
+    const conds = [S.sick ? ['\uD83E\uDD12', 'You are unwell'] : null, S.slow ? ['\uD83D\uDEA6', 'Go-slow today'] : null, S.rain ? ['\uD83C\uDF27\uFE0F', 'Rain today'] : null].filter(Boolean);
+    const chips = conds.length ? '<button type="button" class="hchip' + (S.sick ? ' warn' : '') + '" data-act="vitals" aria-label="' + conds.map(function (c) { return c[1]; }).join(', ') + '">' + conds[0][0] + (conds.length > 1 ? '<i class="cb">' + conds.length + '</i>' : '') + '</button>' : '';
+    const gems = '<span class="gems" aria-hidden="true">' + [0, 1, 2].map(function (i) { return '<i class="' + (i < left ? 'on' : '') + '"></i>'; }).join('') + '</span>';
+    const wk = WD[(Math.max(1, S.day) - 1) % 7].slice(0, 3);
+    const lbl = done ? 'Night' : SLOTS[Math.min(2, S.slot)];
+    const aria = lbl + ', day ' + S.day + ', ' + left + ' of 3 actions left. Open your vitals.';
     return '<header class="hud"><div class="hud-in">' +
-      '<div class="hud-row"><div class="stat-chips">' + chips + '</div>' +
-      '<div class="pill cashp"><span class="lab">Cash</span><span class="num' + (S.cash < 0 ? ' neg' : '') + '">' + fmt(S.cash) + '</span></div></div>' +
-      '<div class="hud-row2"><div class="pill meters"><div class="m-row">' + bar('Energy', S.energy) + bar('Mood', S.mood) + '</div>' +
-      '<div class="m-row m3">' + bar('Food', S.food) + bar('Fun', S.fun) + bar('Clean', S.clean) + '</div>' +
-      '<button type="button" class="pip-row" data-act="pips" aria-label="What are actions?"><span>' + (left ? 'Actions left today' : 'Day is done: sleep in your bed') + '<span class="qm" aria-hidden="true">?</span></span>' + pips + '</button></div></div>' +
-      '<div class="goal' + (worstNeed(S) ? ' warn' : '') + '" role="status">' + nextGoal() + '</div></div></header>';
+      '<div class="hud-top"><button type="button" class="hp day" data-act="vitals" aria-label="' + aria + '"><span class="tod" aria-hidden="true">' + tod + '</span><span class="dn"><b>' + lbl + '</b><small>' + wk + ' · Day ' + S.day + '</small></span>' + gems + '</button>' + chips +
+      '<button type="button" class="hp cash" data-act="vitals" aria-label="Cash ' + fmt(S.cash) + '"><span class="cur" aria-hidden="true">₦</span><span class="num' + (S.cash < 0 ? ' neg' : '') + '">' + cashShort(S.cash) + '</span></button></div>' +
+      '<div class="hud-sub"><button type="button" class="rings" data-act="vitals" aria-label="Needs: ' + NEEDS.map(function (n) { return n[1] + ' ' + Math.round(S[n[0]]); }).join(', ') + '. Open your vitals.">' + NEEDS.map(ringHtml).join('') + '</button>' +
+      '<div class="hint' + (worstNeed(S) ? ' warn' : '') + '" role="status">' + nextGoal() + '</div></div></div></header>';
+  }
+  /* the full picture, as a sheet: needs, actions left today, and what to do next */
+  function renderVitals() {
+    if (!UI.vitals || !S) return '';
+    const left = Math.max(0, 3 - S.slot), home = CITY.homes[S.home], w = worstNeed(S);
+    const rows = NEEDS.map(function (n) {
+      const v = Math.max(0, Math.min(100, Math.round(S[n[0]]))), low = v < lowAt();
+      return '<div class="need' + (low ? ' low' : '') + '" style="--c:' + n[3] + '"><span class="ic" aria-hidden="true">' + (n[0] === 'mood' ? moodFace(S.mood) : n[2]) + '</span><div><div class="nt"><span>' + n[1] + '</span><span class="num">' + v + '%</span></div><div class="nb" role="progressbar" aria-label="' + n[1] + '" aria-valuenow="' + v + '" aria-valuemin="0" aria-valuemax="100"><i style="width:' + v + '%"></i></div></div></div>';
+    }).join('');
+    const gems = '<span class="gems" aria-hidden="true">' + [0, 1, 2].map(function (i) { return '<i class="' + (i < left ? 'on' : '') + '"></i>'; }).join('') + '</span>';
+    const cond = (S.rain ? '🌧️ Rain today. ' : '') + (S.slow ? '🚦 Go-slow today. ' : '') + (S.sick ? '🤒 You are unwell: open Health on your phone. ' : '');
+    return '<div class="vwrap" data-act="vitals-x"><div class="vsheet" role="dialog" aria-modal="true" aria-label="Your vitals"><div class="grab"></div>' +
+      '<div class="vhead"><span class="vav">' + lookSvg(S.look, 'head') + '</span><div class="vtxt"><span class="vname">' + esc(S.name || 'You') + '</span><span class="vsub">' + moodWord(S.mood) + ' · ' + esc(home ? home.name : '') + '</span></div><button type="button" class="vx" data-act="vitals-x" aria-label="Close">✕</button></div>' +
+      '<p class="vsec">Needs</p><div class="needs">' + rows + '</div>' +
+      '<div class="vcard"><div class="vrow"><span>Cash</span><span class="num" style="font-size:17px' + (S.cash < 0 ? ';color:var(--warn)' : '') + '">' + fmt(S.cash) + '</span></div></div>' +
+      '<div class="vcard"><div class="vrow"><span>Actions left today</span>' + gems + '</div><p>Each day gives you 3 actions. Working takes 2, most other things take 1, and rides take none. When they run out, sleep in your bed to start a new day.</p></div>' +
+      '<div class="vcard go' + (w ? ' warn' : '') + '"><b>' + (w ? 'Needs attention' : 'Next step') + '</b><p style="color:inherit">' + esc(nextGoal()) + '</p>' + (cond ? '<p>' + cond + '</p>' : '') + '</div>' +
+      '</div></div>';
   }
   const ICON = {
     home: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11l9-7 9 7M5 10v10h5v-6h4v6h5V10"/></svg>',
@@ -4658,7 +4812,7 @@ window.G3 = (function () {
   };
   function renderNav() {
     const tabs = [['home', 'Home'], ['buy', 'Buy'], ['map', 'Map'], ['phone', 'Phone']];
-    return '<nav class="nav" aria-label="Sections"><div class="nav-in">' + tabs.map(t => '<button class="navb" data-act="tab" data-id="' + t[0] + '"' + (UI.tab === t[0] ? ' aria-current="true"' : '') + '>' + ICON[t[0]] + '<span>' + t[1] + '</span></button>').join('') + '</div></nav>';
+    return '<nav class="nav" aria-label="Sections"><div class="nav-in">' + tabs.map(t => '<button class="navb" data-act="tab" data-id="' + t[0] + '" aria-label="' + t[1] + '"' + (UI.tab === t[0] ? ' aria-current="true"' : '') + '>' + ICON[t[0]] + '<span>' + t[1] + '</span></button>').join('') + '</div></nav>';
   }
 
   /* ---------- home and map overlays ---------- */
@@ -4835,7 +4989,7 @@ window.G3 = (function () {
   /* ---------- phone: jobs, japa, life, log ---------- */
   /* ---------- online leaderboard (Supabase over plain REST: no library, only the public anon key) ---------- */
   const BOARD = { url: 'https://tvbnoqwyekbqrlxxnztq.supabase.co', key: 'sb_publishable_db5quqce8u5iWU7qENLltg_U4OWrfYG' };   /* public client key: safe to ship */
-  const APP_VERSION = 'v1.9 · 18 Oct 2026';
+  const APP_VERSION = 'v1.12 · 19 Oct 2026';
   const ERRS = [];
   window.addEventListener('error', function (e) { ERRS.push(String((e && e.message) || 'error').slice(0, 140) + ' @' + ((e && e.lineno) || 0)); if (ERRS.length > 5) ERRS.shift(); });
   window.addEventListener('unhandledrejection', function (e) { ERRS.push('promise: ' + String((e && e.reason && e.reason.message) || (e && e.reason) || '').slice(0, 140)); if (ERRS.length > 5) ERRS.shift(); });
@@ -5159,7 +5313,7 @@ window.G3 = (function () {
     });
   }
   const BADNAME = /(fuck|shit|bitch|nigg|cunt|whore|pussy|hitler|nazi|slut)/i;
-  function safeErr(e) { return e && (e.status === 404 || e.code === '42P01' || e.code === 'PGRST205' || e.code === 'PGRST202') ? 'This needs the latest database update (supabase_safety.sql).' : (e && e.message) || 'Something went wrong.'; }
+  function safeErr(e) { return e && (e.status === 404 || e.code === '42P01' || e.code === 'PGRST205' || e.code === 'PGRST202') ? 'This needs the latest database update.' : (e && e.message) || 'Something went wrong.'; }
   function loadBlocks() {
     return chatApi('/rest/v1/blocks?select=blocked&blocker=eq.' + enc(Chat.uid)).then(function (rows) {
       Chat.blocked = {}; (Array.isArray(rows) ? rows : []).forEach(function (r) { Chat.blocked[r.blocked] = 1; }); Chat.blocksOk = true;
@@ -5335,7 +5489,7 @@ window.G3 = (function () {
       h += '<form class="chat-money" data-chatmoney novalidate><div class="cm-row"><b>Send money to @' + esc(c.name) + '</b><button class="chat-x" data-act="chatsend" type="button" aria-label="Close">✕</button></div>' +
         '<label class="namef"><span class="lab">Amount (you have ' + fmt(S.cash) + ')</span><input type="text" id="c-amt" inputmode="numeric" autocomplete="off" placeholder="₦0" value="' + esc(Chat.amt) + '"></label>' +
         '<div class="cm-chips">' + [1000, 10000, 100000, 1000000].map(function (n) { return '<button type="button" class="chip-btn" data-act="camt" data-id="' + n + '">' + fmt(n) + '</button>'; }).join('') + '</div>' +
-        '<p class="auth-err" id="c-amt-err" role="alert" hidden></p><button class="btn" type="submit" id="c-amt-btn">Send</button></form>';
+        '<p class="muted" style="font-size:12px;margin:2px 0 6px">Up to ' + fmt(10000000) + ' at a time and ' + fmt(30000000) + ' a day.</p><p class="auth-err" id="c-amt-err" role="alert" hidden></p><button class="btn" type="submit" id="c-amt-btn">Send</button></form>';
     }
     h += '<form class="chat-bar" data-chatform novalidate><input type="text" id="chat-input" maxlength="500" autocomplete="off" placeholder="Message @' + esc(c.name) + '…" value="' + esc(Chat.draft) + '"><button class="btn" type="submit" aria-label="Send message">Send</button></form></div>';
     return h;
@@ -5344,24 +5498,28 @@ window.G3 = (function () {
     body = String(body || '').trim().slice(0, 500); if (!body || !to || !Chat.me) return null;
     const m = { id: 0, pending: true, cid: newCid(), from_id: Chat.uid, to_id: to, kind: 'text', body: body, amount: null, created_at: new Date().toISOString() };
     Chat.msgs.push(m); if (UI.chat) paintChat(true);
-    return post(m, 2).then(function () { chatPoll(); }, function (e) { m.failed = true; if (UI.chat) paintChat(); showToast(esc(e.message)); });
+    return post(m, 2).then(function () { chatPoll(); }, function (e) { m.failed = true; if (UI.chat) paintChat(); showToast(esc(/row-level security|permission denied/i.test(e.message) ? 'Message not sent. You may be blocked, or sending too fast.' : e.message)); });
   }
   function sendText(body) { Chat.draft = ''; sendTextTo(UI.chat && UI.chat.id, body); }
   /* sending retries with the same message id, so a lost reply can never send it twice */
   function post(m, tries) {
-    return chatApi('/rest/v1/dms', { method: 'POST', prefer: 'return=minimal', body: { cid: m.cid, from_id: m.from_id, to_id: m.to_id, kind: m.kind, body: m.kind === 'text' ? m.body : null, amount: m.amount } }).catch(function (e) {
+    const req = m.kind === 'money'
+      ? chatApi('/rest/v1/rpc/send_money', { method: 'POST', body: { p_to: m.to_id, p_amount: m.amount, p_cid: m.cid } })
+      : chatApi('/rest/v1/dms', { method: 'POST', prefer: 'return=minimal', body: { cid: m.cid, from_id: m.from_id, to_id: m.to_id, kind: 'text', body: m.body, amount: null } });
+    return req.catch(function (e) {
       if (e.status === 409) return null;
       if (e.status && e.status < 500) throw e;
       if (tries > 0) return new Promise(function (r) { setTimeout(r, 1500); }).then(function () { return post(m, tries - 1); });
       throw e;
     });
   }
+  const MONEY_MAX = 10000000;   /* the server enforces this too, plus a daily limit */
   function sendMoney() {
     const el = document.getElementById('c-amt'), err = document.getElementById('c-amt-err'), to = UI.chat && UI.chat.id;
     const amt = parseInt(String((el && el.value) || '').replace(/[^0-9]/g, ''), 10), bad = function (t) { if (err) { err.textContent = t; err.hidden = false; } };
     if (!amt || amt < 1) return bad('Type how much to send.');
     if (amt > S.cash) return bad('You only have ' + fmt(S.cash) + '.');
-    if (amt > 1000000000000) return bad('That is too much to send at once.');
+    if (amt > MONEY_MAX) return bad('You can send up to ' + fmt(MONEY_MAX) + ' at a time.');
     if (!to || !Chat.me) return;
     S.cash -= amt; log(S, 'You sent ' + who(to) + ' ' + fmt(amt) + '.'); save();
     const m = { id: 0, pending: true, cid: newCid(), from_id: Chat.uid, to_id: to, kind: 'money', body: null, amount: amt, created_at: new Date().toISOString() };
@@ -5519,7 +5677,8 @@ window.G3 = (function () {
   }
   function deleteAccount() {
     if (!Auth.session) return;
-    chatApi('/rest/v1/rpc/delete_my_account', { method: 'POST', body: {} }).then(function () {
+    const bi = boardIdent(false);
+    chatApi('/rest/v1/rpc/delete_my_account', { method: 'POST', body: bi ? { p_board_id: bi.id, p_board_secret: bi.secret } : {} }).then(function () {
       clearTimeout(Auth.timer); wipeLocal(); [AK.sess, AK.guest].forEach(lsDel);
       Auth.session = null; Auth.guest = false; Auth.tab = 'signup'; Auth.status = ''; Auth.savedAt = 0; chatReset(); UI.chat = null; UI.confirmDel = false; S = null; UI.tab = 'home'; UI.sheet = null; UI.phone = 'home'; UI.toast = '';
       if (G3.views && G3.views.home) G3.views.home.sig = ''; render(); showToast('Your account was deleted.');
@@ -6135,7 +6294,8 @@ window.G3 = (function () {
     }
     if (UI.sheet) h += renderSheet(UI.sheet);
     h += renderNav();
-    if ((UI.tab === 'home' || UI.tab === 'buy') && threeOk && !UI.trip && !UI.busy) h += '<div class="rot-pill' + (UI.tab === 'buy' ? ' up' : '') + '" role="group" aria-label="Turn the house view"><button class="rot-b" data-act="rotate" data-dir="-1" type="button" aria-label="Turn the house left"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg></button><span class="rot-l">Turn<br>house</span><button class="rot-b" data-act="rotate" data-dir="1" type="button" aria-label="Turn the house right"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 4v5h-5"/></svg></button></div>';
+    if ((UI.tab === 'home' || UI.tab === 'buy') && threeOk && !UI.trip && !UI.busy) h += '<div class="rot-pill' + (UI.tab === 'buy' ? ' up' : '') + '" role="group" aria-label="Turn the house view"><button class="rot-b" data-act="rotate" data-dir="-1" type="button" aria-label="Turn the house left"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg></button><button class="rot-b" data-act="rotate" data-dir="1" type="button" aria-label="Turn the house right"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 4v5h-5"/></svg></button></div>';
+    if (UI.vitals) h += renderVitals();
     if (UI.chat) h += renderChatView();
     if (UI.person) h += renderPerson();
     if (S.over) h += renderOver(); else if (S.event) h += renderEvent(); else if (UI.welcome) h += renderWelcome();
@@ -6211,6 +6371,8 @@ window.G3 = (function () {
     if (!S) return;
     if (UI.busy) { if (act === 'tab' && G3.views.home) G3.views.home.finish(); else return; }
     if (act === 'toast') { UI.toast = ''; render(false); return; }
+    if (act === 'vitals') { UI.vitals = true; render(false); return; }
+    if (act === 'vitals-x') { if (el.classList.contains('vwrap') && e.target !== el) return; UI.vitals = false; render(false); return; }
     if (act === 'pips') { showToast('Each day gives you 3 actions. Working takes 2, most other things take 1, and rides take none. When the dots run out, sleep in your bed to start a new day.'); render(false); return; }
     if (act === 'walkto') { const st = G3.views.home && G3.views.home.stn && G3.views.home.stn[id]; UI.prompt = null; updatePins(); if (st) G3.views.home.walkTo(st.x, st.z); return; }
     if (act === 'tab') { UI.prompt = null; if (id === 'phone' && UI.tab === 'phone') UI.phone = 'home'; UI.tab = id; UI.sheet = null; UI.confirmNew = false; render(); const pg = document.querySelector('.page'); if (pg) pg.scrollTop = 0; return; }
