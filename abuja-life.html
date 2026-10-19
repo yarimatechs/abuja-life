@@ -4989,7 +4989,7 @@ window.G3 = (function () {
   /* ---------- phone: jobs, japa, life, log ---------- */
   /* ---------- online leaderboard (Supabase over plain REST: no library, only the public anon key) ---------- */
   const BOARD = { url: 'https://tvbnoqwyekbqrlxxnztq.supabase.co', key: 'sb_publishable_db5quqce8u5iWU7qENLltg_U4OWrfYG' };   /* public client key: safe to ship */
-  const APP_VERSION = 'v1.12 · 19 Oct 2026';
+  const APP_VERSION = 'v1.13 · 19 Oct 2026';
   const ERRS = [];
   window.addEventListener('error', function (e) { ERRS.push(String((e && e.message) || 'error').slice(0, 140) + ' @' + ((e && e.lineno) || 0)); if (ERRS.length > 5) ERRS.shift(); });
   window.addEventListener('unhandledrejection', function (e) { ERRS.push('promise: ' + String((e && e.reason && e.reason.message) || (e && e.reason) || '').slice(0, 140)); if (ERRS.length > 5) ERRS.shift(); });
@@ -5030,7 +5030,7 @@ window.G3 = (function () {
     });
   }
   function boardSubmit(force) {
-    if (!boardOn() || !S || !boardJoined()) return Promise.resolve(false);
+    if (!boardOn() || !S || !boardJoined() || S.creator) return Promise.resolve(false);
     const id = boardIdent(false); if (!id) return Promise.resolve(false);
     const nw = Math.max(0, Math.round(netWorth(S))), now = Date.now(), L = Board.last;
     if (!force && L && L.day === S.day && L.nw === nw) return Promise.resolve(false);
@@ -5647,7 +5647,7 @@ window.G3 = (function () {
         '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px"><button class="btn" data-act="fbsend" type="button"' + (FB.busy ? ' disabled' : '') + '>' + (FB.busy ? 'Sending…' : 'Send feedback') + '</button>' +
         (FB.fail ? '<button class="btn ghost" data-act="fbcopy" type="button">Copy it</button><button class="btn ghost" data-act="fbwa" type="button">WhatsApp</button>' : '') + '</div></div>';
     }
-    return h + '<p class="muted" style="font-size:12px">Game ' + esc(APP_VERSION) + '. Your day, cash and device type are sent with it, to help find the problem.</p>';
+    return h + '<p class="muted" style="font-size:12px"><span data-act="vtap">Game ' + esc(APP_VERSION) + '</span>. Your day, cash and device type are sent with it, to help find the problem.</p>';
   }
   function sendFeedback() {
     const t = FB.text.trim();
@@ -5683,6 +5683,42 @@ window.G3 = (function () {
       Auth.session = null; Auth.guest = false; Auth.tab = 'signup'; Auth.status = ''; Auth.savedAt = 0; chatReset(); UI.chat = null; UI.confirmDel = false; S = null; UI.tab = 'home'; UI.sheet = null; UI.phone = 'home'; UI.toast = '';
       if (G3.views && G3.views.home) G3.views.home.sig = ''; render(); showToast('Your account was deleted.');
     }, function (e) { UI.confirmDel = false; showToast('Could not delete: ' + esc(safeErr(e))); render(false); });
+  }
+  /* ---------- creator tools: hidden, for testing. Unlock by tapping the version line in Feedback 7 times and typing the creator code ---------- */
+  const CREATOR_HASH = '55de2a4aec386b1c40c8fb12d7885b5c45c181bd0eb19f79e5af735b0e607f0e';
+  const creatorOn = () => lsGet('bn-creator') === '1';
+  let vTaps = 0, vTapAt = 0;
+  function sha256hex(t) {
+    if (!(window.crypto && crypto.subtle && window.TextEncoder)) return Promise.resolve('');
+    return crypto.subtle.digest('SHA-256', new TextEncoder().encode(t)).then(function (b) { return Array.from(new Uint8Array(b)).map(function (x) { return ('0' + x.toString(16)).slice(-2); }).join(''); });
+  }
+  function versionTap() {
+    const now = Date.now(); vTaps = now - vTapAt > 3000 ? 1 : vTaps + 1; vTapAt = now;
+    if (vTaps < 7) return;
+    vTaps = 0;
+    if (creatorOn()) { showToast('Creator tools are already on. Find them in Phone, then Me.'); return; }
+    let code = null; try { code = window.prompt('Creator code'); } catch (e) {}
+    if (!code) return;
+    sha256hex(code.trim()).then(function (hx) {
+      if (hx && hx === CREATOR_HASH) { lsSet('bn-creator', '1'); showToast('Creator tools on. Find them in Phone, then Me.'); render(false); } else showToast('That code is not right.');
+    });
+  }
+  function creatorDo(id) {
+    if (!S || !creatorOn()) return;
+    if (id === 'off') { lsDel('bn-creator'); showToast('Creator tools hidden.'); render(false); return; }
+    S.creator = 1;   /* this save is marked, and never posts to the leaderboard */
+    if (id === 'cash') { S.cash = 2000000000; S.dayStartCash = S.cash; }
+    else if (id === 'plus') S.cash += 100000000;
+    else if (id === 'needs') { S.energy = 100; S.mood = 100; S.food = 100; S.fun = 100; S.clean = 100; S.sick = 0; }
+    else if (id === 'ready') { S.edu = 3; S.nysc = true; S.conn = 10; S.xp = { tech: 30, hustle: 30, social: 30 }; }
+    else if (id === 'slots') { S.slot = 0; }
+    log(S, 'Creator tools: ' + id + '.'); save(); showToast('Done.'); render(false);
+  }
+  function creatorCard() {
+    if (!creatorOn() || !S) return '';
+    const b = (id, t) => '<button type="button" class="chip-btn" data-act="creator" data-id="' + id + '">' + t + '</button>';
+    return '<div class="card"><h3>Creator tools</h3><p class="muted">For testing. Using any of these marks this save, and it stays off the leaderboard. Your cash is ' + fmt(S.cash) + '.</p><div class="cm-chips" style="flex-wrap:wrap">' +
+      b('cash', 'Cash ' + fmt(2000000000)) + b('plus', '+' + fmt(100000000)) + b('needs', 'Fill needs') + b('ready', 'Max skills, degree, NYSC, connections') + b('slots', 'Refill actions') + b('off', 'Hide these tools') + '</div></div>';
   }
   function accountCard() {
     if (Auth.session) {
@@ -6037,7 +6073,7 @@ window.G3 = (function () {
 
   function renderLife() {
     const H = CITY.homes[S.home];
-    let h = '<h2>Your life</h2>' + accountCard() + '<div class="card"><h3>You</h3>' + nameField(S.name) + lookEditor(S.look) + '</div><div class="card"><h3>Where you stand</h3><div class="kv">' +
+    let h = '<h2>Your life</h2>' + accountCard() + creatorCard() + '<div class="card"><h3>You</h3>' + nameField(S.name) + lookEditor(S.look) + '</div><div class="card"><h3>Where you stand</h3><div class="kv">' +
       '<div><span>Home</span><span>' + H.name + '</span></div>' +
       '<div><span>Rent</span><span class="num">' + fmt(rentDue(S)) + ' a month</span></div>' +
       '<div><span>Education</span><span>' + EDU[S.edu] + '</span></div>' +
@@ -6371,6 +6407,8 @@ window.G3 = (function () {
     if (!S) return;
     if (UI.busy) { if (act === 'tab' && G3.views.home) G3.views.home.finish(); else return; }
     if (act === 'toast') { UI.toast = ''; render(false); return; }
+    if (act === 'vtap') { versionTap(); return; }
+    if (act === 'creator') { creatorDo(id); return; }
     if (act === 'vitals') { UI.vitals = true; render(false); return; }
     if (act === 'vitals-x') { if (el.classList.contains('vwrap') && e.target !== el) return; UI.vitals = false; render(false); return; }
     if (act === 'pips') { showToast('Each day gives you 3 actions. Working takes 2, most other things take 1, and rides take none. When the dots run out, sleep in your bed to start a new day.'); render(false); return; }
