@@ -240,6 +240,13 @@ button.hp { cursor: pointer; text-align: left; }
 .quick.one .qb { flex: 0 0 auto; min-width: 132px; padding: 7px 16px; }
 
 .dock-in.busy { opacity: .9; }
+.mapbar { max-width: 560px; margin-inline: auto; display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; pointer-events: none; }
+.mpill { pointer-events: auto; display: flex; align-items: center; gap: 7px; height: 46px; padding: 0 15px; border-radius: 23px; background: var(--glass); border: 1px solid var(--line); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); box-shadow: 0 4px 14px rgba(0, 0, 0, .18); font-weight: 800; font-size: 14px; color: var(--ink); }
+.mpill small { font-family: var(--f-mono); font-size: 11px; font-weight: 500; color: var(--muted); }
+.mpill.need { border-color: var(--warn); box-shadow: 0 4px 14px rgba(0, 0, 0, .18), inset 0 0 0 1px var(--warn); }
+.mpill:disabled { opacity: .6; cursor: not-allowed; }
+.mpill:active { transform: scale(.97); }
+.mpill:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
 .prompt { position: absolute; left: 0; top: 0; pointer-events: auto; width: 188px; display: grid; gap: 6px; background: var(--glass); border: 1px solid var(--line); border-radius: 14px; padding: 8px; box-shadow: 0 6px 22px rgba(0, 0, 0, .25); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); z-index: 4; }
 .pr-t { font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); padding: 0 2px; }
 .pr-b { display: flex; justify-content: space-between; align-items: center; gap: 8px; text-align: left; border: 0; border-radius: 9px; padding: 9px 10px; background: var(--accent); color: var(--accent-ink); font-weight: 700; font-size: 13.5px; }
@@ -461,6 +468,13 @@ const pr = (s, n) => Math.round(n * s.price);
 const wage = (s, n) => n * (1 + (s.price - 1) * 0.85);
 const lvl = (s, k) => Math.min(5, Math.floor(s.xp[k] / 6));
 const pick = arr => arr[Math.floor(rnd() * arr.length)];
+/* there is no daily action limit any more: effort costs energy, and sleeping in your bed starts the next day.
+   SLOT_E is what one old "slot" of the day is worth in energy; a shift at work is two of them plus the job's own strain. */
+const SLOT_E = 16;
+const slotsE = n => SLOT_E * (n || 0);
+const actionEnergy = a => (a.energy || 0) + slotsE(a.slots === undefined ? 1 : a.slots);
+const workCost = j => (j.energy || 0) + slotsE(2);
+const spendE = (s, n) => { s.energy = clamp(s.energy - slotsE(n), 0, 100); };
 
 /* ---------- City data: swap this block to make another city ---------- */
 const CITY = {
@@ -540,16 +554,16 @@ const CITY = {
       run: (s, m) => { apply(s, { cash: m.amt, mood: 4 }); return 'Aunty Bisi’s ' + fmt(m.amt) + ' landed in your account. You called to thank her.'; } },
     lead: { from: 'Kunle (friend)', amt: s => Math.round(wage(s, 4500) / 100) * 100,
       text: () => 'My oga at the market needs an extra hand tomorrow. Tell him I sent you. No fees, just show up.',
-      label: () => 'Go and help (1 slot)', block: s => s.slot + 1 > 3 ? 'Not enough of the day left' : s.energy < 12 ? 'Too tired' : null,
-      run: (s, m) => { s.slot += 1; apply(s, { energy: -12, cash: m.amt, conn: 0.5, xp: { hustle: 1 }, mood: 1 }); return 'You helped out all day and earned ' + fmt(m.amt) + ', plus a new contact.'; } },
+      label: () => 'Go and help', block: s => s.energy < 12 + SLOT_E ? 'Too tired' : null,
+      run: (s, m) => { apply(s, { energy: -(12 + SLOT_E), cash: m.amt, conn: 0.5, xp: { hustle: 1 }, mood: 1 }); return 'You helped out all day and earned ' + fmt(m.amt) + ', plus a new contact.'; } },
     owambe: { from: 'Chidi', amt: s => pr(s, 3000),
       text: () => 'Owambe tonight in Jabi. Come and link up, there will be jollof and good connections.',
-      label: (s, m) => 'Go (' + fmt(m.amt) + ' for aso-ebi, 1 slot)', block: (s, m) => s.slot + 1 > 3 ? 'Not enough of the day left' : s.cash < m.amt ? 'Need ' + fmt(m.amt) : null,
-      run: (s, m) => { s.cash -= m.amt; s.slot += 1; apply(s, { fun: 30, food: 20, mood: 5, conn: 0.4, xp: { social: 1 } }); return 'You danced, ate jollof and collected useful phone numbers.'; } },
+      label: (s, m) => 'Go (' + fmt(m.amt) + ' for aso-ebi)', block: (s, m) => s.energy < SLOT_E ? 'Too tired' : s.cash < m.amt ? 'Need ' + fmt(m.amt) : null,
+      run: (s, m) => { s.cash -= m.amt; spendE(s, 1); apply(s, { fun: 30, food: 20, mood: 5, conn: 0.4, xp: { social: 1 } }); return 'You danced, ate jollof and collected useful phone numbers.'; } },
     ielts: { from: 'Classmate Ada', when: s => s.japa.prep < CITY.japa.prepNeeded && s.japa.status === 'none',
       text: () => 'I found a free IELTS speaking practice group in Garki. Want me to add you?',
-      label: () => 'Join (1 slot)', block: s => s.slot + 1 > 3 ? 'Not enough of the day left' : null,
-      run: s => { s.slot += 1; s.japa.prep += 1; apply(s, { mood: 2, xp: { social: 1 } }); return 'You practised speaking for an afternoon. That counts as a prep session.'; } }
+      label: () => 'Join', block: s => s.energy < SLOT_E ? 'Too tired' : null,
+      run: s => { spendE(s, 1); s.japa.prep += 1; apply(s, { mood: 2, xp: { social: 1 } }); return 'You practised speaking for an afternoon. That counts as a prep session.'; } }
   },
   /* sold at AbujaCars. shape picks the 3D body, col its paint, stars its comfort in the catalogue */
   cars: {
@@ -574,7 +588,7 @@ const CITY = {
   health: {
     meds: { name: 'Malaria and pain medication', cost: 4500, desc: 'Delivered by a pharmacy rider. Clears a fever fast.' },
     vitamins: { name: 'Vitamins and malt', cost: 2500, desc: 'A small energy lift. Once a day.' },
-    hospital: { name: 'Hospital check-up', cost: 25000, slots: 2, desc: 'Doctor, tests and a drip. Takes two slots of the day.' }
+    hospital: { name: 'Hospital check-up', cost: 25000, slots: 0, desc: 'Doctor, tests and a drip. Once a day, and you leave rested.' }
   },
   chow: {
     fee: 700,
@@ -675,7 +689,6 @@ const CITY = {
         { id: 'class', label: 'Attend evening class', slots: 1, energy: 14,
           show: s => !!s.enrolled,
           descf: s => s.enrolled ? CITY.programs[s.enrolled.to].name + ': ' + s.enrolled.prog + ' of ' + s.enrolled.need + ' sessions.' : '',
-          when: s => s.slot < 2 ? 'Classes hold in the evening' : null,
           run: s => {
             const e = s.enrolled; e.prog += 1; apply(s, { mood: -1 });
             if (e.prog >= e.need) { s.edu = e.to; s.enrolled = null; apply(s, { mood: 12, conn: 0.3 }); return 'You graduated. You now hold a ' + EDU[s.edu] + '.'; }
@@ -713,8 +726,7 @@ const CITY = {
       name: 'Maitama', tag: 'Big gates, bigger names',
       line: 'Quiet streets, loud money. Every gate has a guard and a story.',
       actions: [
-        { id: 'owambe', label: 'Attend an owambe', desc: 'Evening only. Dress well, smile more.', slots: 1, energy: 10, cost: s => pr(s, 8000),
-          when: s => s.slot < 2 ? 'Parties start in the evening' : null,
+        { id: 'owambe', label: 'Attend an owambe', desc: 'Dress well, smile more.', slots: 1, energy: 10, cost: s => pr(s, 8000),
           run: s => { apply(s, { conn: 0.7, mood: 8, food: 25, fun: 40, xp: { social: 2 } }); return 'You danced, ate jollof, and collected three phone numbers.'; } },
         { id: 'move-flat', label: 'Rent the 2-bed flat', show: s => s.home !== 'flat', slots: 1, energy: 0,
           descf: s => 'Rent ' + fmt(CITY.homes.flat.rent) + ' a month. Better sleep, better mood. Deposit is one month.',
@@ -728,8 +740,7 @@ const CITY = {
       actions: [
         { id: 'lake', label: 'Hang out at the lake', desc: 'Boat view, grilled fish, easy conversation.', slots: 1, energy: 0, cost: s => pr(s, 2500),
           run: s => { apply(s, { mood: 10, fun: 45, food: 15, conn: 0.2, xp: { social: 1 } }); return 'You sat by the water and forgot your problems for an hour.'; } },
-        { id: 'date', label: 'Take someone out', desc: 'Evening only. Costs more than you planned.', slots: 1, energy: 4, cost: s => pr(s, 6000),
-          when: s => s.slot < 2 ? 'Evening only' : null,
+        { id: 'date', label: 'Take someone out', desc: 'Costs more than you planned.', slots: 1, energy: 4, cost: s => pr(s, 6000),
           run: s => { apply(s, { mood: 14, fun: 50, food: 30, xp: { social: 1 } }); return 'A good evening. The bill hurt, the mood did not.'; } }
       ]
     },
@@ -737,8 +748,7 @@ const CITY = {
       name: 'Gwarinpa Estate', tag: 'The biggest estate, mid-range dreams',
       line: 'Rows of 1st Avenue houses, 2nd Avenue gossip, and a landlord on every corner.',
       actions: [
-        { id: 'estate-meet', label: 'Join the estate meeting', desc: 'Evening only. Complaints, levies, and useful contacts.', slots: 1, energy: 4,
-          when: s => s.slot < 2 ? 'Evening only' : null,
+        { id: 'estate-meet', label: 'Join the estate meeting', desc: 'Complaints, levies, and useful contacts.', slots: 1, energy: 4,
           run: s => { apply(s, { conn: 0.3, mood: 1, fun: 6, xp: { social: 1 } }); return 'The meeting ran long, but you left knowing three useful people.'; } },
         { id: 'move-estate', label: 'Rent the 3-bed in the estate', show: s => s.home !== 'estate', slots: 1, energy: 0,
           descf: s => 'Rent ' + fmt(CITY.homes.estate.rent) + ' a month. Room to breathe. Deposit is one month.',
@@ -779,8 +789,7 @@ const CITY = {
       name: 'Asokoro', tag: 'Near the villa, far from your budget',
       line: 'Wide roads, tall walls, and quiet that costs money.',
       actions: [
-        { id: 'dinner', label: 'Go to a networking dinner', desc: 'Evening only. Dress code: expensive.', slots: 1, energy: 8, cost: s => pr(s, 25000),
-          when: s => s.slot < 2 ? 'Evening only' : null,
+        { id: 'dinner', label: 'Go to a networking dinner', desc: 'Dress code: expensive.', slots: 1, energy: 8, cost: s => pr(s, 25000),
           run: s => { apply(s, { conn: 1, mood: 5, food: 30, fun: 18, xp: { social: 2 } }); return 'You shook many hands and one of them might matter.'; } }
       ]
     },
@@ -788,8 +797,7 @@ const CITY = {
       name: 'Guzape Hills', tag: 'Hilltop mansions and quiet money',
       line: 'Long driveways, glass walls, and guards who never smile.',
       actions: [
-        { id: 'poolparty', label: 'Go to a pool party', desc: 'Evening only. Swimwear optional, drip compulsory.', slots: 1, energy: 8, cost: s => pr(s, 20000),
-          when: s => s.slot < 2 ? 'Evening only' : null,
+        { id: 'poolparty', label: 'Go to a pool party', desc: 'Swimwear optional, drip compulsory.', slots: 1, energy: 8, cost: s => pr(s, 20000),
           run: s => { apply(s, { conn: 0.8, mood: 8, food: 20, fun: 35, xp: { social: 2 } }); return 'You swam, you networked, and somebody important knew your name by midnight.'; } }
       ]
     },
@@ -807,7 +815,7 @@ const CITY = {
       name: 'Katampe Hill', tag: 'Big views, bigger house numbers',
       line: 'The hill looks over the whole city, and the landlord knows it.',
       actions: [
-        { id: 'sunset', label: 'Watch the sunset', desc: 'Free. Abuja looks calm from up here.', slots: 1, energy: 3, once: true,
+        { id: 'sunset', label: 'Watch the sunset', desc: 'Free. Abuja looks calm from up here.', slots: 0, energy: 0, once: true,
           run: s => { apply(s, { mood: 8, fun: 16, xp: { social: 1 } }); return 'The whole city went gold for ten minutes. Your worries got smaller.'; } }
       ]
     },
@@ -839,8 +847,7 @@ const CITY = {
       name: 'Apo', tag: 'Legislative quarters and mid-range flats',
       line: 'Where honourables sleep and everybody else rents.',
       actions: [
-        { id: 'townhall', label: 'Attend a town hall', desc: 'Evening only. Speeches, snacks and useful faces.', slots: 1, energy: 5,
-          when: s => s.slot < 2 ? 'Evening only' : null,
+        { id: 'townhall', label: 'Attend a town hall', desc: 'Speeches, snacks and useful faces.', slots: 1, energy: 5,
           run: s => { apply(s, { conn: 0.4, mood: 1, food: 8, xp: { social: 1 } }); return 'Long speeches, short answers. You still collected two numbers.'; } }
       ]
     },
@@ -856,7 +863,7 @@ const CITY = {
       name: 'Lugbe', tag: 'Airport road and long queues',
       line: 'You can watch planes land while stuck in traffic.',
       actions: [
-        { id: 'planes', label: 'Watch the planes land', desc: 'Free. Somebody is always leaving for Japa.', slots: 1, energy: 2,
+        { id: 'planes', label: 'Watch the planes land', desc: 'Free. Somebody is always leaving for Japa.', slots: 0, energy: 0, once: true,
           run: s => { apply(s, { mood: 4, fun: 10 }); return 'A plane went over every few minutes. You wondered which one was yours, one day.'; } },
         { id: 'fruit', label: 'Buy fruit on the airport road', desc: 'Oranges, watermelon and a seller who knows your face.', slots: 0, energy: 0, once: true, cost: s => pr(s, 1500),
           run: s => { apply(s, { energy: 3, mood: 2, food: 18 }); return 'You bought more fruit than you planned and ate it in the car.'; } }
@@ -883,11 +890,11 @@ const CITY = {
       when: s => s.at !== homePlace(s) ? 'You are not at home' : null,
       desc: 'Once a day. Water, soap, and a bucket if the tap is dry.',
       run: s => { apply(s, { clean: CITY.needs.bathClean, mood: 2 }); return 'You washed and felt like a new person.'; } },
-    { id: 'relax', label: 'Unwind at home', slots: 1, energy: 0,
+    { id: 'relax', label: 'Unwind at home', desc: 'Once a day.', slots: 0, energy: 0, once: true,
       when: s => s.at !== homePlace(s) ? 'You are not at home' : null,
       descf: s => 'Music, football or Nollywood. ' + (s.items.tv ? 'The TV helps a lot.' : 'A TV would help.'),
       run: s => { const g = relaxFun(s); apply(s, { fun: g, mood: 3 }); return s.items.tv ? 'You watched a match and forgot the day.' : 'You played music on your phone and stared at the ceiling.'; } },
-    { id: 'rest', label: 'Rest at home', desc: 'Lie down, charge your phone, do nothing.', slots: 1, energy: 0,
+    { id: 'rest', label: 'Rest at home', desc: 'Lie down, charge your phone, do nothing. Once a day, gives back some energy.', slots: 0, energy: 0, once: true,
       when: s => s.at !== CITY.homes[s.home].place ? 'You are not at home' : null,
       run: s => { apply(s, { energy: 25, mood: 3, fun: 4 }); return 'You rested. It helped.'; } }
   ],
@@ -1185,8 +1192,8 @@ function tripOptions(s, a, b) {
   out.push({ mode: 'okada', name: ownBike ? (bk ? bk.name : 'Your motorbike') : 'Okada', cost: ok, slots: 0, energy: 2, clean: rain ? 6 : 3, mood: rain ? -2 : 0,
     note: ownBike ? 'Fuel only. Slips through the go-slow' : slow ? 'Slips through the go-slow, but dusty' : 'Cheaper than a cab, but dusty', block: '' });
   const tSlots = km <= 5 ? 0 : km <= 13 ? 1 : 2;
-  out.push({ mode: 'trek', name: 'Trek', cost: 0, slots: tSlots, energy: 3 + Math.round(km * 1.8), clean: Math.round(km * 1.2) + (rain ? 8 : 0), mood: rain ? -3 : km > 8 ? -1 : 0,
-    note: tSlots ? 'Free, but it eats ' + (tSlots === 1 ? 'a slot' : 'two slots') + ' and your strength' : 'Free, a short walk', block: '' });
+  out.push({ mode: 'trek', name: 'Trek', cost: 0, slots: 0, energy: 3 + Math.round(km * 1.8) + slotsE(tSlots), clean: Math.round(km * 1.2) + (rain ? 8 : 0), mood: rain ? -3 : km > 8 ? -1 : 0,
+    note: tSlots ? 'Free, but a long walk wears you out' : 'Free, a short walk', block: '' });
   if (hasCar(s)) {
     const fuel = slow ? Math.max(300, r50(cabBase(a, b) * 0.4 * P * ((CITY.cars[s.owned.carId] || CITY.cars.corolla).fuel || 1))) : 0;
     out.push({ mode: 'car', name: s.owned.car ? (CITY.cars[s.owned.carId] || CITY.cars.corolla).name : 'Your car', cost: fuel, slots: 0, energy: 0, clean: 0, mood: slow ? -2 : 0,
@@ -1207,7 +1214,7 @@ function rentDue(s) { return Math.round((CITY.homes[s.home].rent + s.rentBump) *
 function newGame(bgId, look, name) {
   const bg = CITY.backgrounds.find(b => b.id === bgId) || CITY.backgrounds[0];
   const s = {
-    v: 1, day: 1, slot: 0, home: bg.home || 'room', at: 'kubwa', bg: bg.id,
+    v: 1, day: 1, home: bg.home || 'room', at: 'kubwa', bg: bg.id,
     cash: bg.cash, energy: 90, mood: 70, food: 80, fun: 70, clean: 80, edu: bg.edu, nysc: !!bg.nysc, conn: bg.conn,
     xp: Object.assign({ tech: 0, hustle: 0, social: 0 }, bg.xp || {}),
     job: null, tenure: 0, owned: {}, items: {}, nepa: false, enrolled: null, price: 1, rentBump: 0, rain: false, slow: false, sick: 0, pantry: 0, chow: null, unreported: 0, inbox: [], msgSeq: 0, wise: 0,
@@ -1307,12 +1314,12 @@ function applyJob(s, id) {
   if (s.over || !j) return { ok: false, msg: 'Not possible.' };
   if (s.job === id) return { ok: false, msg: 'You already work here.' };
   if (j.place !== 'any' && s.at !== j.place) return { ok: false, msg: 'Go to ' + CITY.places[j.place].name + ' first.' };
-  if (s.slot + 1 > 3) return { ok: false, msg: 'Not enough of the day left.' };
+  if (s.energy < SLOT_E) return { ok: false, msg: 'You are too tired to apply today.' };
   if (!jobReqs(s, j).every(r => r.ok)) return { ok: false, msg: 'You do not meet the requirements yet.' };
   const c = ownsStartup(s, j) ? 0 : j.startup.cost;
   if (c > s.cash) return { ok: false, msg: 'You need ' + fmt(c) + ' for ' + j.startup.label.toLowerCase() + '.' };
   s.cash -= c; if (j.startup) s.owned[j.startup.key] = true;
-  s.slot += 1; s.job = id; s.tenure = 0; s.stats.jobsSeen[id] = 1;
+  spendE(s, 1); s.job = id; s.tenure = 0; s.stats.jobsSeen[id] = 1;
   const m = 'You got the job: ' + j.name + '.' + (c ? ' Startup cost: ' + fmt(c) + '.' : '');
   log(s, m);
   return { ok: true, msg: m };
@@ -1327,8 +1334,7 @@ function workBlock(s) {
   const j = s.job && jobById(s.job);
   if (!j) return 'You have no job';
   if (j.place !== 'any' && s.at !== j.place) return 'Go to ' + CITY.places[j.place].name + ' to work';
-  if (s.slot + 2 > 3) return 'Not enough of the day left';
-  if (s.energy < j.energy) return 'Too tired';
+  if (s.energy < workCost(j)) return 'Too tired';
   return null;
 }
 function work(s) {
@@ -1339,10 +1345,10 @@ function work(s) {
   let p = Math.round(base * (1 + (rnd() * 2 - 1) * (j.var || 0)));
   let extra = '';
   if (j.viral && rnd() < 0.08 + 0.02 * lvl(s, 'social')) { const v = Math.round(wage(s, 25000)); p += v; extra = ' A video blew up and added ' + fmt(v) + '.'; }
-  apply(s, { cash: p, energy: -j.energy, mood: j.mood === undefined ? -2 : j.mood, xp: j.xp, conn: j.conn });
+  apply(s, { cash: p, energy: -workCost(j), mood: j.mood === undefined ? -2 : j.mood, xp: j.xp, conn: j.conn });
   apply(s, { fun: -4, clean: j.energy >= 22 ? -8 : -3 });
   const rank0 = jobRank(s, j);
-  s.slot += 2; s.tenure += 1; s.stats.workDays += 1; s.hang = null;
+  s.tenure += 1; s.stats.workDays += 1; s.hang = null;
   let m = pick(j.lines) + ' You earned ' + fmt(p) + '.' + extra;
   if (jobRank(s, j) > rank0) { apply(s, { mood: 6, conn: 0.2 }); m += ' Promotion! You are now ' + jobTitle(s, j) + '.'; }
   if (j.corper && s.tenure >= 60) {
@@ -1359,11 +1365,10 @@ function actionList(s) {
 }
 function actionBlock(s, a) {
   if (s.over) return 'Game over';
-  const slots = a.slots === undefined ? 1 : a.slots;
-  if (slots > 0 && s.slot + slots > 3) return 'Not enough of the day left';
   if (a.once && s.done[a.id] === s.day) return 'Already done today';
   if (a.when) { const r = a.when(s); if (r) return r; }
-  if (a.energy && s.energy < a.energy) return 'Too tired';
+  const need = actionEnergy(a);
+  if (need > 0 && s.energy < need) return 'Too tired';
   const c = a.cost ? a.cost(s) : 0;
   if (c > s.cash) return 'Not enough cash';
   return null;
@@ -1374,8 +1379,7 @@ function doAction(s, id) {
   const why = actionBlock(s, a);
   if (why) return { ok: false, msg: why };
   const c = a.cost ? a.cost(s) : 0;
-  s.cash -= c; s.hang = null; s.energy = clamp(s.energy - (a.energy || 0), 0, 100);
-  s.slot += a.slots === undefined ? 1 : a.slots;
+  s.cash -= c; s.hang = null; s.energy = clamp(s.energy - actionEnergy(a), 0, 100);
   if (a.once) s.done[a.id] = s.day;
   const m = a.run(s);
   log(s, m);
@@ -1392,10 +1396,9 @@ function travel(s, to, mode) {
   let m;
   if (mode === 'trek') {
     const before = s.energy, spent = o.energy;
-    s.slot = Math.min(3, s.slot + o.slots);
     apply(s, { energy: -spent, clean: -o.clean, mood: o.mood });
     if (before < spent) apply(s, { mood: -4 });
-    m = 'You walked to ' + name + '. It cost you ' + spent + ' energy' + (o.slots ? ' and ' + (o.slots === 1 ? 'a slice' : 'most') + ' of the day' : '') + '.' + (s.rain ? ' The rain made it miserable.' : '');
+    m = 'You walked to ' + name + '. It cost you ' + spent + ' energy.' + (s.rain ? ' The rain made it miserable.' : '');
     if (before < spent) m += ' You were too tired for it and arrived worn out.';
   } else {
     apply(s, { energy: -o.energy, clean: -o.clean, mood: o.mood });
@@ -1514,13 +1517,13 @@ function richList(s) {
   return list;
 }
 
-/* moving house from your phone: deposit is one month's rent, and it takes a slot */
+/* moving house from your phone: deposit is one month's rent, and it wears you out */
 function moveBlock(s, id) {
   const H = CITY.homes[id];
   if (s.over) return 'Game over';
   if (!H) return 'Not available';
   if (s.home === id) return 'You live here';
-  if (s.slot + 1 > 3) return 'Not enough of the day left';
+  if (s.energy < SLOT_E) return 'Too tired';
   if (H.rent > s.cash) return 'Need ' + fmt(H.rent);
   return null;
 }
@@ -1528,7 +1531,7 @@ function moveHome(s, id) {
   const why = moveBlock(s, id);
   if (why) return { ok: false, msg: why };
   const H = CITY.homes[id];
-  s.cash -= H.rent; s.home = id; s.rentBump = 0; s.at = H.place; s.slot += 1;
+  s.cash -= H.rent; s.home = id; s.rentBump = 0; s.at = H.place; spendE(s, 1);
   const m = 'You paid ' + fmt(H.rent) + ' deposit and moved into ' + H.name + '. Your things came with you.';
   apply(s, { mood: 2 }); log(s, m); return { ok: true, msg: m };
 }
@@ -1539,7 +1542,7 @@ function healthBlock(s, id) {
   if (s.over) return 'Game over';
   if (id === 'meds' && !s.sick) return 'You are not sick';
   if (id === 'vitamins' && s.done.vitamins === s.day) return 'Already taken today';
-  if (id === 'hospital') { if (s.done.hospital === s.day) return 'Already checked today'; if (s.slot + h.slots > 3) return 'Not enough of the day left'; }
+  if (id === 'hospital') { if (s.done.hospital === s.day) return 'Already checked today'; }
   if (c > s.cash) return 'Need ' + fmt(c);
   return null;
 }
@@ -1550,7 +1553,7 @@ function doHealth(s, id) {
   s.cash -= c; let m;
   if (id === 'meds') { s.sick = 0; apply(s, { energy: 8, mood: 2 }); m = 'The pharmacy rider arrived in twenty minutes. By evening the fever broke.'; }
   else if (id === 'vitamins') { s.done.vitamins = s.day; apply(s, { energy: 8, mood: 1 }); m = 'Vitamins and a cold malt. You feel a little stronger.'; }
-  else { s.slot += h.slots; s.done.hospital = s.day; s.sick = 0; apply(s, { energy: 30, mood: 4 }); m = 'The doctor ran tests and put you on a drip. You left rested, and a little poorer.'; }
+  else { s.done.hospital = s.day; s.sick = 0; apply(s, { energy: 30, mood: 4 }); m = 'The doctor ran tests and put you on a drip. You left rested, and a little poorer.'; }
   log(s, m); return { ok: true, msg: m };
 }
 
@@ -1598,7 +1601,7 @@ function orderGroceries(s, id) {
 function reportBlock(s) {
   if (s.over) return 'Game over';
   if (!(s.unreported > 0)) return 'You have nothing to report';
-  if (s.slot + 1 > 3) return 'Not enough of the day left';
+  if (s.energy < SLOT_E) return 'Too tired';
   if (pr(s, 2000) > s.cash) return 'Need ' + fmt(pr(s, 2000));
   return null;
 }
@@ -1606,7 +1609,7 @@ function reportScam(s) {
   const why = reportBlock(s);
   if (why) return { ok: false, msg: why };
   const c = pr(s, 2000), lost = s.unreported;
-  s.cash -= c; s.slot += 1; s.unreported = 0;
+  s.cash -= c; spendE(s, 1); s.unreported = 0;
   let m;
   if (rnd() < 0.2) { const back = Math.round(lost * 0.4); apply(s, { cash: back, mood: 6 }); m = 'The officers traced part of it. You got ' + fmt(back) + ' back and a stern warning about agents.'; }
   else { apply(s, { mood: -2 }); m = 'They wrote down your statement and said they would look into it. Nothing came back. At least it is on record.'; }
@@ -1689,8 +1692,7 @@ function hangoutBlock(s, id) {
   if (s.over) return 'Game over';
   if (!h) return 'Not available';
   if (s.hang === id) return 'You are already here';
-  if (s.slot + 1 > 3) return 'Not enough of the day left';
-  if (s.energy < h.energy) return 'Too tired';
+  if (s.energy < h.energy + SLOT_E) return 'Too tired';
   if (pr(s, h.cost) > s.cash) return 'Need ' + fmt(pr(s, h.cost));
   return null;
 }
@@ -1698,8 +1700,8 @@ function visitHangout(s, id) {
   const why = hangoutBlock(s, id);
   if (why) return { ok: false, msg: why };
   const h = CITY.hangouts[id], c = pr(s, h.cost);
-  s.cash -= c; s.stats.spent += c; s.slot += 1; s.hang = id;
-  apply(s, { fun: h.fun, mood: h.mood, energy: -h.energy, clean: -h.clean, conn: h.conn || 0 });
+  s.cash -= c; s.stats.spent += c; s.hang = id;
+  apply(s, { fun: h.fun, mood: h.mood, energy: -(h.energy + SLOT_E), clean: -h.clean, conn: h.conn || 0 });
   const m = h.did + (c ? ' It cost ' + fmt(c) + '.' : '');
   log(s, m);
   return { ok: true, msg: m };
@@ -1738,7 +1740,7 @@ function japaBlock(s, id) {
   if (s.over) return 'Game over';
   if (s.japa.status === 'pending') return 'An application is already pending';
   if (s.japa.status === 'approved') return 'You already have an approved visa';
-  if (s.slot + 1 > 3) return 'Not enough of the day left';
+  if (s.energy < SLOT_E) return 'Too tired';
   if (!japaReqs(s, id).every(x => x.ok)) return 'Requirements not met';
   return null;
 }
@@ -1746,7 +1748,7 @@ function applyJapa(s, id) {
   const why = japaBlock(s, id);
   if (why) return { ok: false, msg: why };
   const r = CITY.japa.routes[id], j = s.japa;
-  s.cash -= r.fee; s.stats.spent += r.fee; s.slot += 1;
+  s.cash -= r.fee; s.stats.spent += r.fee; spendE(s, 1);
   j.status = 'pending'; j.route = id; j.appliedDay = s.day; j.decideDay = s.day + r.days; j.attempts += 1;
   const m = 'You submitted your ' + r.name.toLowerCase() + ' application for ' + fmt(r.fee) + '. A decision should come in about ' + r.days + ' days. Keep your proof of funds untouched.';
   log(s, m);
@@ -1757,9 +1759,9 @@ function hireAgent(s) {
   if (s.over) return { ok: false, msg: 'Game over' };
   if (j.status !== 'none') return { ok: false, msg: 'Not while an application is open' };
   if (j.agent > 0) return { ok: false, msg: 'Your agent is already working for you' };
-  if (s.slot + 1 > 3) return { ok: false, msg: 'Not enough of the day left' };
+  if (s.energy < SLOT_E) return { ok: false, msg: 'Too tired' };
   if (fee > s.cash) return { ok: false, msg: 'You need ' + fmt(fee) };
-  s.cash -= fee; s.stats.spent += fee; s.slot += 1;
+  s.cash -= fee; s.stats.spent += fee; spendE(s, 1);
   let m;
   if (rnd() < 0.3) { j.agent = 12; m = 'The agent is real. He knows an officer and prepared your file properly. Your chances improved.'; }
   else { scammed(s, fee); apply(s, { mood: -15 }); m = 'The agent took ' + fmt(fee) + ' and blocked your number. You were scammed.'; }
@@ -1873,8 +1875,8 @@ function endDay(s) {
   apply(s, { food: -N.decay.food, fun: -N.decay.fun, clean: -N.decay.clean });
   const net = s.cash - s.dayStartCash;
   log(s, 'Day ' + d + ' closed. Living costs ' + fmt(live) + '.' + rentLine + ' Net for the day: ' + fmt(net) + '.' + (notes.length ? ' ' + notes.join(' ') : ''));
-  s.day += 1; s.at = homePlace(s); s.hang = null; s.slot = s.mood < 15 ? 1 : 0;
-  if (s.mood < 15) log(s, 'You woke up with no strength. The morning is gone.');
+  s.day += 1; s.at = homePlace(s); s.hang = null;
+  if (s.mood < 15) { spendE(s, 1); log(s, 'You woke up with no strength. The morning is gone.'); }
   dailyMessages(s);
   if (s.sick > 0) { s.sick -= 1; apply(s, { energy: -12, mood: -3 }); log(s, s.sick ? 'Still feverish. Your body aches.' : 'The fever finally passed.'); }
   else if (rnd() < (notes.length ? 0.12 : 0.04)) { s.sick = 2; apply(s, { energy: -12, mood: -3 }); log(s, 'You woke up feverish. Malaria again? Order medication or visit the hospital from your phone.'); }
@@ -2958,7 +2960,7 @@ window.G3 = (function () {
     ctx.glass.forEach(function (g) { g.m.color.copy(env.sky).lerp(new T.Color(0xffffff), env.night ? 0.05 : 0.35); });
     V.rain.visible = env.rain;
     V.away = s.at !== CITY.homes[s.home].place;
-    V.sleeping = s.slot >= 3;
+    V.sleeping = false;
     V.avatar.visible = !V.away;
     if (!V.job) {
       if (V.sleeping) { lieDown(); }
@@ -4738,8 +4740,8 @@ window.G3 = (function () {
 
   const money = n => '<span class="num">' + fmt(n) + '</span>';
   const chipMoney = n => '<span class="chip money">' + fmt(n) + '</span>';
-  const chipSlot = n => '<span class="chip">' + (n === 0 ? 'free time' : n + (n === 1 ? ' slot' : ' slots')) + '</span>';
   const chipEnergy = n => n ? '<span class="chip">-' + n + ' energy</span>' : '';
+  const eLabel = n => n ? '-' + n + ' energy' : 'free';
   function row(attrs, title, desc, chips, disabled, cls) {
     return '<button class="row' + (cls ? ' ' + cls : '') + '" ' + attrs + (disabled ? ' disabled' : '') + '><span class="row-main"><span class="row-title">' + title +
       '</span><span class="row-desc">' + desc + '</span></span><span class="row-chips">' + chips + '</span></button>';
@@ -4772,16 +4774,15 @@ window.G3 = (function () {
     return '<span class="ring' + (low ? ' low' : '') + '" style="--c:' + n[3] + '"><svg viewBox="0 0 29 29" aria-hidden="true"><circle class="tr" cx="14.5" cy="14.5" r="11.5"/><circle class="pg" cx="14.5" cy="14.5" r="11.5" stroke-dasharray="' + C.toFixed(1) + '" stroke-dashoffset="' + (C * (1 - v / 100)).toFixed(1) + '"/></svg><span aria-hidden="true">' + (n[0] === 'mood' ? moodFace(S.mood) : n[2]) + '</span></span>';
   }
   function renderHud() {
-    const left = Math.max(0, 3 - S.slot), done = S.slot >= 3;
-    const tod = done ? '🌙' : (S.slot === 0 ? '☀️' : S.slot === 1 ? '🌤️' : '🌆');
+    const cs = (window.G3 && G3.clockSlot) ? G3.clockSlot() : 1;   /* the real time of day, same as the lighting */
+    const tod = ['☀️', '🌤️', '🌆', '🌙'][cs];
     const conds = [S.sick ? ['\uD83E\uDD12', 'You are unwell'] : null, S.slow ? ['\uD83D\uDEA6', 'Go-slow today'] : null, S.rain ? ['\uD83C\uDF27\uFE0F', 'Rain today'] : null].filter(Boolean);
     const chips = conds.length ? '<button type="button" class="hchip' + (S.sick ? ' warn' : '') + '" data-act="vitals" aria-label="' + conds.map(function (c) { return c[1]; }).join(', ') + '">' + conds[0][0] + (conds.length > 1 ? '<i class="cb">' + conds.length + '</i>' : '') + '</button>' : '';
-    const gems = '<span class="gems" aria-hidden="true">' + [0, 1, 2].map(function (i) { return '<i class="' + (i < left ? 'on' : '') + '"></i>'; }).join('') + '</span>';
     const wk = WD[(Math.max(1, S.day) - 1) % 7].slice(0, 3);
-    const lbl = done ? 'Night' : SLOTS[Math.min(2, S.slot)];
-    const aria = lbl + ', day ' + S.day + ', ' + left + ' of 3 actions left. Open your vitals.';
+    const lbl = ['Morning', 'Afternoon', 'Evening', 'Night'][cs];
+    const aria = lbl + ', day ' + S.day + '. Open your vitals.';
     return '<header class="hud"><div class="hud-in">' +
-      '<div class="hud-top"><button type="button" class="hp day" data-act="vitals" aria-label="' + aria + '"><span class="tod" aria-hidden="true">' + tod + '</span><span class="dn"><b>' + lbl + '</b><small>' + wk + ' · Day ' + S.day + '</small></span>' + gems + '</button>' + chips +
+      '<div class="hud-top"><button type="button" class="hp day" data-act="vitals" aria-label="' + aria + '"><span class="tod" aria-hidden="true">' + tod + '</span><span class="dn"><b>' + lbl + '</b><small>' + wk + ' · Day ' + S.day + '</small></span></button>' + chips +
       '<button type="button" class="hp cash" data-act="vitals" aria-label="Cash ' + fmt(S.cash) + '"><span class="cur" aria-hidden="true">₦</span><span class="num' + (S.cash < 0 ? ' neg' : '') + '">' + cashShort(S.cash) + '</span></button></div>' +
       '<div class="hud-sub"><button type="button" class="rings" data-act="vitals" aria-label="Needs: ' + NEEDS.map(function (n) { return n[1] + ' ' + Math.round(S[n[0]]); }).join(', ') + '. Open your vitals.">' + NEEDS.map(ringHtml).join('') + '</button>' +
       '<div class="hint' + (worstNeed(S) ? ' warn' : '') + '" role="status">' + nextGoal() + '</div></div></div></header>';
@@ -4789,18 +4790,17 @@ window.G3 = (function () {
   /* the full picture, as a sheet: needs, actions left today, and what to do next */
   function renderVitals() {
     if (!UI.vitals || !S) return '';
-    const left = Math.max(0, 3 - S.slot), home = CITY.homes[S.home], w = worstNeed(S);
+    const home = CITY.homes[S.home], w = worstNeed(S);
     const rows = NEEDS.map(function (n) {
       const v = Math.max(0, Math.min(100, Math.round(S[n[0]]))), low = v < lowAt();
       return '<div class="need' + (low ? ' low' : '') + '" style="--c:' + n[3] + '"><span class="ic" aria-hidden="true">' + (n[0] === 'mood' ? moodFace(S.mood) : n[2]) + '</span><div><div class="nt"><span>' + n[1] + '</span><span class="num">' + v + '%</span></div><div class="nb" role="progressbar" aria-label="' + n[1] + '" aria-valuenow="' + v + '" aria-valuemin="0" aria-valuemax="100"><i style="width:' + v + '%"></i></div></div></div>';
     }).join('');
-    const gems = '<span class="gems" aria-hidden="true">' + [0, 1, 2].map(function (i) { return '<i class="' + (i < left ? 'on' : '') + '"></i>'; }).join('') + '</span>';
-    const cond = (S.rain ? '🌧️ Rain today. ' : '') + (S.slow ? '🚦 Go-slow today. ' : '') + (S.sick ? '🤒 You are unwell: open Health on your phone. ' : '');
+    const cond = (S.rain ? '🌧️ Rain today. ' : '') + (S.slow ? '🚦 Go-slow today: cabs and cars suffer, okadas slip through. ' : '') + (S.sick ? '🤒 You are unwell: open Health on your phone. ' : '');
     return '<div class="vwrap" data-act="vitals-x"><div class="vsheet" role="dialog" aria-modal="true" aria-label="Your vitals"><div class="grab"></div>' +
       '<div class="vhead"><span class="vav">' + lookSvg(S.look, 'head') + '</span><div class="vtxt"><span class="vname">' + esc(S.name || 'You') + '</span><span class="vsub">' + moodWord(S.mood) + ' · ' + esc(home ? home.name : '') + '</span></div><button type="button" class="vx" data-act="vitals-x" aria-label="Close">✕</button></div>' +
       '<p class="vsec">Needs</p><div class="needs">' + rows + '</div>' +
       '<div class="vcard"><div class="vrow"><span>Cash</span><span class="num" style="font-size:17px' + (S.cash < 0 ? ';color:var(--warn)' : '') + '">' + fmt(S.cash) + '</span></div></div>' +
-      '<div class="vcard"><div class="vrow"><span>Actions left today</span>' + gems + '</div><p>Each day gives you 3 actions. Working takes 2, most other things take 1, and rides take none. When they run out, sleep in your bed to start a new day.</p></div>' +
+      '<div class="vcard"><div class="vrow"><span>How your days work</span></div><p>Everything you do uses energy, and work uses the most. Cabs and cars cost no energy. When you run low, sleep in your bed to recover and start a new day. A better home gives you more energy back.</p></div>' +
       '<div class="vcard go' + (w ? ' warn' : '') + '"><b>' + (w ? 'Needs attention' : 'Next step') + '</b><p style="color:inherit">' + esc(nextGoal()) + '</p>' + (cond ? '<p>' + cond + '</p>' : '') + '</div>' +
       '</div></div>';
   }
@@ -4816,7 +4816,7 @@ window.G3 = (function () {
   }
 
   /* ---------- home and map overlays ---------- */
-  function shortWhy(w) { return /day left/.test(w) ? 'Too late' : /cash/.test(w) ? 'Need cash' : /not at home/i.test(w) ? 'Not home' : w; }
+  function shortWhy(w) { return /cash/.test(w) ? 'Need cash' : /not at home/i.test(w) ? 'Not home' : w; }
   /* ---------- things you can do by tapping the house ---------- */
   const HOME_ANIM = { meal: 'eat', bathe: 'wash', relax: 'relax', rest: 'rest' };
   const DESK_JOBS = { freelance: 1, pos: 1 };
@@ -4847,12 +4847,12 @@ window.G3 = (function () {
         const j = S.job && jobById(S.job);
         if (!deskJob(j)) { h += '<button class="pr-b" disabled>Work<span>' + (j ? 'Not a home job' : 'No job yet') + '</span></button>'; return; }
         const why = j.place !== 'any' && S.at !== j.place ? 'Go to ' + CITY.places[j.place].name : workBlock(S);
-        h += '<button class="pr-b" data-act="work"' + (why ? ' disabled' : '') + '>' + j.name + '<span>' + (why ? shortWhy(why) : '2 slots') + '</span></button>'; return;
+        h += '<button class="pr-b" data-act="work"' + (why ? ' disabled' : '') + '>' + j.name + '<span>' + (why ? shortWhy(why) : eLabel(workCost(j))) + '</span></button>'; return;
       }
       if (a[0] === 'sleep') { h += '<button class="pr-b" data-act="endday">Sleep until morning</button>'; return; }
       const act = actionList(S).find(x => x.id === a[0]); if (!act) return;
       const why = actionBlock(S, act), c = act.cost ? act.cost(S) : 0;
-      h += '<button class="pr-b" data-act="act" data-id="' + a[0] + '"' + (why ? ' disabled' : '') + '>' + a[1] + '<span>' + (why ? why : (c ? fmt(c) : (act.slots === 0 ? 'free time' : '1 slot'))) + '</span></button>';
+      h += '<button class="pr-b" data-act="act" data-id="' + a[0] + '"' + (why ? ' disabled' : '') + '>' + a[1] + '<span>' + (why ? why : (c ? fmt(c) : eLabel(actionEnergy(act)))) + '</span></button>';
     });
     return h + '<button class="pr-b ghost" data-act="walkto" data-id="' + UI.prompt.kind + '">Just walk there</button></div>';
   }
@@ -4866,12 +4866,13 @@ window.G3 = (function () {
     const jb = S.job && jobById(S.job), canDesk = !away && deskJob(jb) && (jb.place === 'any' || jb.place === S.at);
     const ids = away ? ['meal'] : ['meal', 'bathe', 'relax'], lab = { meal: 'Eat', bathe: 'Bath', relax: 'Unwind' }, need = { meal: S.food, bathe: S.clean, relax: S.fun };
     const done = { meal: 'Ate today', bathe: 'Washed today' };
-    const workBtn = canDesk ? (function () { const why = workBlock(S); return '<button class="qb' + (!why && S.energy >= jb.energy ? '' : '') + '" data-act="work"' + (why ? ' disabled' : '') + '><b>Work</b><span>' + (why ? shortWhy(why) : '2 slots') + '</span></button>'; })() : '';
+    const workBtn = canDesk ? (function () { const why = workBlock(S); return '<button class="qb" data-act="work"' + (why ? ' disabled' : '') + '><b>Work</b><span>' + (why ? shortWhy(why) : eLabel(workCost(jb))) + '</span></button>'; })() : '';
     return '<div class="quick' + (ids.length === 1 ? ' one' : '') + '">' + workBtn + ids.map(function (id) {
       const a = actionList(S).find(x => x.id === id); if (!a) return '';
       const why = actionBlock(S, a), c = a.cost ? a.cost(S) : 0, dn = why === 'Already done today';
-      const sub = dn ? done[id] : (c ? fmt(c) : (id === 'relax' ? '1 slot' : ''));
-      return '<button class="qb' + (!why && need[id] < 50 ? ' need' : '') + '" data-act="act" data-id="' + id + '"' + (why ? ' disabled' : '') + (why && !dn ? ' title="' + why + '"' : '') + '><b>' + lab[id] + '</b><span>' + (why && !dn ? shortWhy(why) : sub) + '</span></button>';
+      if (dn) return '';
+      const sub = c ? fmt(c) : '';
+      return '<button class="qb' + (!why && need[id] < 50 ? ' need' : '') + '" data-act="act" data-id="' + id + '"' + (why ? ' disabled' : '') + (why && !dn ? ' title="' + why + '"' : '') + '><b>' + lab[id] + '</b><span>' + (why ? shortWhy(why) : sub) + '</span></button>';
     }).join('') + '</div>';
   }
   function renderDock() {
@@ -4882,7 +4883,7 @@ window.G3 = (function () {
     h += '<div class="loc"><span class="lab">You are at</span><b>' + p.name + '</b>' + (away ? '<span class="muted"> · Home is in ' + hpName + '</span>' : '') + (S.slow ? '<span class="slow">Go-slow today</span>' : '') + (S.sick ? '<span class="slow">You are unwell: see Health on your phone</span>' : '') + '</div>' + quickActions(away) + '<div class="dock-btns">';
     h += '<button class="btn" data-act="sheet" data-id="' + S.at + '">What to do here</button>';
     if (away) h += '<button class="btn ghost" data-act="sheet" data-id="' + hp + '">Go home</button>';
-    else h += '<button class="btn ghost" data-act="endday">' + (S.slot >= 3 ? 'Sleep until morning' : 'End the day') + '</button>';
+    else h += '<button class="btn ghost" data-act="endday">' + 'Sleep until morning' + '</button>';
     return h + '</div></div></div>';
   }
   function renderAway() {
@@ -4890,7 +4891,12 @@ window.G3 = (function () {
     return '<div class="dock"><div class="dock-in away"><span><b>' + CITY.places[S.at].name + '</b> is where you are. Home is in ' + CITY.places[hp].name + '.</span><button class="btn" data-act="sheet" data-id="' + hp + '">Go home</button></div></div>';
   }
   function renderMapBar() {
-    return '<div class="dock"><div class="dock-in"><div class="loc"><span class="lab">Abuja</span><b>Tap a place to visit</b>' + (S.slow ? '<span class="slow">Go-slow today: cabs and cars suffer, okadas slip through</span>' : '') + '</div>' + quickActions(true) + '<div class="dock-btns"><button class="btn ghost" data-act="findme">Find me</button><button class="btn ghost" data-act="overview">See all of Abuja</button></div></div></div>';
+    /* no card and no headings: just the few things you can do from the map */
+    const a = actionList(S).find(x => x.id === 'meal'), why = a ? actionBlock(S, a) : 'none', c = a && a.cost ? a.cost(S) : 0;
+    const eat = a && why !== 'Already done today' ? '<button type="button" class="mpill' + (!why && S.food < 50 ? ' need' : '') + '" data-act="act" data-id="meal"' + (why ? ' disabled' : '') + '><span aria-hidden="true">\uD83C\uDF72</span>Eat' + (why ? '<small>' + esc(shortWhy(why)) + '</small>' : (c ? '<small>' + fmt(c) + '</small>' : '')) + '</button>' : '';
+    return '<div class="dock"><div class="mapbar">' + eat +
+      '<button type="button" class="mpill" data-act="findme"><span aria-hidden="true">\uD83D\uDCCD</span>Find me</button>' +
+      '<button type="button" class="mpill" data-act="overview"><span aria-hidden="true">\uD83D\uDDFA\uFE0F</span>All Abuja</button></div></div>';
   }
   function renderToast() {
     return UI.toast ? '<div class="toast" role="status" data-act="toast">' + UI.toast + '</div>' : '';
@@ -4901,7 +4907,7 @@ window.G3 = (function () {
     if (S.job === j.id) return 'You work here';
     if (!jobReqs(S, j).every(r => r.ok)) return 'Requirements not met';
     if (j.place !== 'any' && S.at !== j.place) return 'Go there first';
-    if (S.slot + 1 > 3) return 'Not enough of the day left';
+    if (S.energy < SLOT_E) return 'Too tired';
     if (!ownsStartup(S, j) && j.startup.cost > S.cash) return 'Need ' + fmt(j.startup.cost);
     return '';
   }
@@ -4912,7 +4918,7 @@ window.G3 = (function () {
       '<div class="ps-head"><div><div class="eyebrow">' + pl.tag + '</div><h2>' + pl.name + '</h2></div><button class="xbtn" data-act="close" aria-label="Close">Close</button></div><p class="muted">' + pl.line + '</p>';
     if (!here) {
       h += '<div class="eyebrow">How do you want to go?</div>' + (S.slow ? '<p class="slow-note">Go-slow today. Cabs cost more, cars burn fuel, okadas slip through.</p>' : '') + '<div class="list">' + tripOptions(S, S.at, id).map(function (o) {
-        const chips = (o.block === 'No car yet' ? '<span class="chip">Locked</span>' : o.cost ? chipMoney(o.cost) : '<span class="chip">Free</span>') + (o.slots ? '<span class="chip">' + o.slots + ' slot' + (o.slots > 1 ? 's' : '') + '</span>' : '') + (o.energy ? '<span class="chip">-' + o.energy + ' energy</span>' : '');
+        const chips = (o.block === 'No car yet' ? '<span class="chip">Locked</span>' : o.cost ? chipMoney(o.cost) : '<span class="chip">Free</span>') + (o.energy ? '<span class="chip">-' + o.energy + ' energy</span>' : '');
         return row('data-act="go" data-id="' + id + '" data-mode="' + o.mode + '"', o.name, o.note, chips, !!o.block, o.mode === 'cab' && !o.block ? 'primary' : '');
       }).join('') + '</div>';
       if (id === 'abujacars') h += '<p class="muted">Get here first, then you can buy a car or a bike.</p>';
@@ -4922,15 +4928,15 @@ window.G3 = (function () {
       const j = S.job && jobById(S.job);
       if (j && (j.place === 'any' || j.place === id)) {
         const why = workBlock(S);
-        h += '<div class="list">' + row('data-act="work"', 'Work: ' + j.name, why ? why : 'About ' + fmt(Math.round(nominalPay(S, j))) + ' for a full day. Uses morning and afternoon.', chipSlot(2) + chipEnergy(j.energy), !!why, 'primary') + '</div>';
+        h += '<div class="list">' + row('data-act="work"', 'Work: ' + j.name, why ? why : 'About ' + fmt(Math.round(nominalPay(S, j))) + ' for a shift.', chipEnergy(workCost(j)), !!why, 'primary') + '</div>';
       } else if (j) {
         h += '<div class="banner">Your job (' + j.name + ') is in ' + CITY.places[j.place].name + '. Open the Map and go there to work.</div>';
       }
       if (id === 'abujacars') h += '<div class="card"><h3>Showroom</h3><p class="muted">Pay in full, and your old car or bike is traded in for half its price.</p>' + wheelRows() + '</div>';
       h += '<div class="list"><h3>Do something here</h3>';
       for (const a of actionList(S)) {
-        const why = actionBlock(S, a), c = a.cost ? a.cost(S) : 0, slots = a.slots === undefined ? 1 : a.slots;
-        h += row('data-act="act" data-id="' + a.id + '"', a.label, why ? why : (a.descf ? a.descf(S) : a.desc), (c ? chipMoney(c) : '') + chipSlot(slots) + chipEnergy(a.energy), !!why);
+        const why = actionBlock(S, a), c = a.cost ? a.cost(S) : 0;
+        h += row('data-act="act" data-id="' + a.id + '"', a.label, why ? why : (a.descf ? a.descf(S) : a.desc), (c ? chipMoney(c) : '') + chipEnergy(actionEnergy(a)), !!why);
       }
       h += '</div>';
       const hiring = CITY.jobs.filter(x => x.place === id);
@@ -4989,7 +4995,7 @@ window.G3 = (function () {
   /* ---------- phone: jobs, japa, life, log ---------- */
   /* ---------- online leaderboard (Supabase over plain REST: no library, only the public anon key) ---------- */
   const BOARD = { url: 'https://tvbnoqwyekbqrlxxnztq.supabase.co', key: 'sb_publishable_db5quqce8u5iWU7qENLltg_U4OWrfYG' };   /* public client key: safe to ship */
-  const APP_VERSION = 'v1.13 · 19 Oct 2026';
+  const APP_VERSION = 'v1.15 · 20 Oct 2026';
   const ERRS = [];
   window.addEventListener('error', function (e) { ERRS.push(String((e && e.message) || 'error').slice(0, 140) + ' @' + ((e && e.lineno) || 0)); if (ERRS.length > 5) ERRS.shift(); });
   window.addEventListener('unhandledrejection', function (e) { ERRS.push('promise: ' + String((e && e.reason && e.reason.message) || (e && e.reason) || '').slice(0, 140)); if (ERRS.length > 5) ERRS.shift(); });
@@ -5669,7 +5675,7 @@ window.G3 = (function () {
     const li = function (i, t) { return '<div class="wl"><span class="wl-i">' + i + '</span><span>' + t + '</span></div>'; };
     return '<div class="veil"><div class="sheet" role="dialog" aria-modal="true" aria-label="Welcome"><div class="eyebrow">Welcome to Abuja Life</div><h2>Can you make it out?</h2>' +
       li('🎯', '<b>The goal:</b> save money, pass IELTS, get a visa and japa. Or stay and build a life here. Both are real endings.') +
-      li('☀️', '<b>Each day has 3 actions</b> (the dots at the top). Working takes 2. When they run out, go to sleep to start a new day.') +
+      li('⚡', '<b>Everything you do uses energy.</b> Work uses the most. When it runs low, sleep in your bed to recover and start a new day.') +
       li('📱', '<b>Your phone runs your life:</b> Jobs, Bank, Chowdeck, Ride, Houses, Cars and more. Watch the food, fun and clean bars.') +
       li('🗺️', '<b>Tap a place on the map</b> to go there. Beware of scam messages. Some offers are real.') +
       li('💭', '<b>Chat</b> lets you find a friend by username and send money. <b>Feedback</b> tells the maker what is broken or boring.') +
@@ -5711,14 +5717,13 @@ window.G3 = (function () {
     else if (id === 'plus') S.cash += 100000000;
     else if (id === 'needs') { S.energy = 100; S.mood = 100; S.food = 100; S.fun = 100; S.clean = 100; S.sick = 0; }
     else if (id === 'ready') { S.edu = 3; S.nysc = true; S.conn = 10; S.xp = { tech: 30, hustle: 30, social: 30 }; }
-    else if (id === 'slots') { S.slot = 0; }
     log(S, 'Creator tools: ' + id + '.'); save(); showToast('Done.'); render(false);
   }
   function creatorCard() {
     if (!creatorOn() || !S) return '';
     const b = (id, t) => '<button type="button" class="chip-btn" data-act="creator" data-id="' + id + '">' + t + '</button>';
     return '<div class="card"><h3>Creator tools</h3><p class="muted">For testing. Using any of these marks this save, and it stays off the leaderboard. Your cash is ' + fmt(S.cash) + '.</p><div class="cm-chips" style="flex-wrap:wrap">' +
-      b('cash', 'Cash ' + fmt(2000000000)) + b('plus', '+' + fmt(100000000)) + b('needs', 'Fill needs') + b('ready', 'Max skills, degree, NYSC, connections') + b('slots', 'Refill actions') + b('off', 'Hide these tools') + '</div></div>';
+      b('cash', 'Cash ' + fmt(2000000000)) + b('plus', '+' + fmt(100000000)) + b('needs', 'Fill needs') + b('ready', 'Max skills, degree, NYSC, connections') + b('off', 'Hide these tools') + '</div></div>';
   }
   function accountCard() {
     if (Auth.session) {
@@ -5769,8 +5774,8 @@ window.G3 = (function () {
   }
   function renderPhoneHome() {
     const gd = gameDate(), dark = document.documentElement.getAttribute('data-theme') === 'dark';
-    let h = '<div class="phone"><div class="phone-screen"><div class="ph-status"><span>' + clockText(S.slot) + '</span><span class="ph-island"></span><span>●●● 4G ▭</span></div>' +
-      '<div class="ph-clock num">' + clockText(S.slot, true) + '</div><div class="ph-date">' + gd.text + ' · ' + CITY.name.split(',')[0] + '</div>' +
+    let h = '<div class="phone"><div class="phone-screen"><div class="ph-status"><span>' + clockText() + '</span><span class="ph-island"></span><span>●●● 4G ▭</span></div>' +
+      '<div class="ph-clock num">' + clockText(0, true) + '</div><div class="ph-date">' + gd.text + ' · ' + CITY.name.split(',')[0] + '</div>' +
       '<button class="ph-pill" data-act="theme" type="button">' + (dark ? '☀️ Day mode' : '🌙 Night mode') + '</button><div class="ph-grid">';
     APPS.forEach(function (a) {
       const b = appBadge(a[0]);
@@ -5793,7 +5798,7 @@ window.G3 = (function () {
     return row('data-act="' + act + '" data-id="' + id + '"', title, desc + (why && why !== 'Owned' && why !== 'You live here' ? ' <b>(' + why + ')</b>' : ''), chips, !!why, cls);
   }
   function renderHouses() {
-    let h = '<h2>Houses</h2><p class="muted">Find a new home. Moving costs one month’s rent as deposit and a slot of the day. Your furniture comes with you.</p><div class="list">';
+    let h = '<h2>Houses</h2><p class="muted">Find a new home. Moving costs one month’s rent as deposit and some of your energy. Your furniture comes with you.</p><div class="list">';
     for (const id in CITY.homes) {
       const H = CITY.homes[id], why = moveBlock(S, id), here = S.home === id, pl = CITY.places[H.place].name;
       h += appRow('moveto', id, H.name, pl + '. Rent ' + fmt(H.rent) + ' a month. ' + (H.rest >= 60 ? 'Great sleep.' : H.rest >= 50 ? 'Decent sleep.' : 'Poor sleep.') + (H.mood > 0 ? ' Lifts your mood.' : H.mood < 0 ? ' Wears on your mood.' : ''), here ? '<span class="chip">You live here</span>' : chipMoney(H.rent), why, here ? 'primary' : '');
@@ -5848,7 +5853,7 @@ window.G3 = (function () {
     let h = '<h2>Health</h2>' + (S.sick ? '<div class="banner"><b>You are unwell.</b> A fever drains your energy each morning until it passes. Medication clears it today.</div>' : '<div class="banner">You feel fine. Keep eating, washing and resting to stay that way.</div>') + '<div class="list">';
     for (const id in CITY.health) {
       const it = CITY.health[id], why = healthBlock(S, id), c = pr(S, it.cost);
-      h += appRow('health', id, it.name, it.desc, chipMoney(c) + (it.slots ? '<span class="chip">' + it.slots + ' slots</span>' : ''), why);
+      h += appRow('health', id, it.name, it.desc, chipMoney(c), why);
     }
     return h + '</div>';
   }
@@ -5902,7 +5907,7 @@ window.G3 = (function () {
   }
   function renderPolice() {
     const why = reportBlock(S);
-    return '<h2>Police</h2><div class="card"><h3>Report a scam</h3><p class="muted">' + (S.unreported > 0 ? 'You lost ' + fmt(S.unreported) + ' that has not been reported. Filing costs ' + fmt(pr(S, 2000)) + ' and a slot. Most reports go nowhere, but some recover part of the money.' : 'Nothing to report right now. Fake agents and fraud emails show up in this game: watch out.') + '</p>' +
+    return '<h2>Police</h2><div class="card"><h3>Report a scam</h3><p class="muted">' + (S.unreported > 0 ? 'You lost ' + fmt(S.unreported) + ' that has not been reported. Filing costs ' + fmt(pr(S, 2000)) + ' and some energy. Most reports go nowhere, but some recover part of the money.' : 'Nothing to report right now. Fake agents and fraud emails show up in this game: watch out.') + '</p>' +
       '<button class="btn" data-act="report"' + (why ? ' disabled' : '') + '>' + (why && S.unreported > 0 ? why : 'File a report') + '</button></div>' +
       '<div class="card"><h3>Stay safe</h3><p class="muted">A real visa agent never asks you to pay into a personal account, and nobody can guarantee approval. Total lost to scams so far: ' + fmt(S.stats.lost) + '.</p></div>';
   }
@@ -5924,7 +5929,7 @@ window.G3 = (function () {
     return h;
   }
   function renderHelp() {
-    return '<h2>Help and guide</h2><div class="card"><h3>The day</h3><p class="muted">Each day gives you 3 actions (the dots at the top). Working takes 2, most other things like eating out, studying, applying or a test drive take 1, and rides in a cab, okada or your own car take none. When the dots run out, go home and sleep to start a new day. The time on your phone follows the real clock, but your day only moves when you use your actions.</p></div>' +
+    return '<h2>Help and guide</h2><div class="card"><h3>The day</h3><p class="muted">Everything you do uses energy: working uses the most, studying, going out and applying use some, and rides in a cab, okada or your own car use little or none. Watch the energy ring at the top. When you are too tired to do more, go home and sleep in your bed to recover and start a new day. A better home gives you more rest. The time on your phone follows the real clock; your day moves when you sleep.</p></div>' +
       '<div class="card"><h3>Your needs</h3><p class="muted">Keep food, fun and clean above 25 or you pay for it overnight. Eat, bathe and unwind at home or out.</p></div>' +
       '<div class="card"><h3>Your house</h3><p class="muted">The two walls facing you turn to glass so you can see in. Tap the green Turn house buttons to spin the house and see every side. Tap the floor to walk around. Your person can only leave through the front door.</p></div>' +
       '<div class="card"><h3>Getting around</h3><p class="muted">Cabs and okadas show the city in 3D from behind the vehicle, with a blue route on the road and a flat minimap. Tap Map view to look from above instead. Roads have a lane each way: keep to the right, the oncoming lane has real traffic. Obey the traffic lights (running a red costs ₦10,000) and do not hit buildings. When you own a car or bike you drive it yourself: hold GO to speed up, steer with the arrows, STOP to brake. Follow the blue line, or tap Auto-drive. Cab is priced by distance. Okada is cheaper but dusty. Trekking is free but slow and tiring. A car or a bike is free or cheap to run, and you buy one at AbujaCars on the map. Cars are free except in go-slow; a bike only costs a little fuel and slips through traffic.</p></div>' +
@@ -6048,7 +6053,7 @@ window.G3 = (function () {
       if (mine) block = 'You work here';
       else if (!elig) block = 'Requirements not met';
       else if (j.place !== 'any' && S.at !== j.place) block = 'Go to ' + where + ' to apply';
-      else if (S.slot + 1 > 3) block = 'Not enough of the day left';
+      else if (S.energy < SLOT_E) block = 'Too tired';
       else if (needStart && j.startup.cost > S.cash) block = 'Need ' + fmt(j.startup.cost);
       return { j: j, reqs: reqs, elig: elig, mine: mine, needStart: needStart, where: where, block: block, here: j.place === 'any' || S.at === j.place };
     });
@@ -6060,7 +6065,7 @@ window.G3 = (function () {
     h += shown.map(function (r) {
       const j = r.j, mine = r.mine, left = 60 - ((S.tenure || 0) % 60), lad = jobLadder(j), top = mine && jobRank(S, j) >= Math.min(5, lad.length - 1);
       let c = '<div class="jb' + (mine ? ' mine' : '') + '"><div class="jb-top"><span class="jb-ic" aria-hidden="true">' + jobIcon(j) + '</span><div class="jb-t"><b>' + esc(j.name) + '</b><span>' + (mine ? esc(jobTitle(S, j)) : 'Starts as ' + esc(jobStartTitle(j))) + '</span></div>' +
-        '<div class="jb-pay"><b>' + fmt(Math.round(nominalPay(S, j))) + '</b><span>per shift</span></div></div><p class="jb-d">' + esc(j.blurb) + '</p><div class="jb-tags"><span>\uD83D\uDD52 2 slots a shift</span><span>\uD83D\uDCCD ' + esc(r.where) + '</span><span>\u26A1 ' + j.energy + ' energy</span>' +
+        '<div class="jb-pay"><b>' + fmt(Math.round(nominalPay(S, j))) + '</b><span>per shift</span></div></div><p class="jb-d">' + esc(j.blurb) + '</p><div class="jb-tags"><span>\u26A1 ' + workCost(j) + ' energy a shift</span><span>\uD83D\uDCCD ' + esc(r.where) + '</span>' +
         (j.startup ? '<span>\uD83E\uDDF0 ' + esc(j.startup.label) + ': ' + (r.needStart ? fmt(j.startup.cost) : 'owned') + '</span>' : '') + '</div>';
       if (mine) c += '<p class="jb-note">' + (top ? 'You are at the top of this ladder.' : 'Next promotion in ' + left + ' working days: ' + esc(lad[Math.min(lad.length - 1, jobRank(S, j) + 1)]) + '.') + ' You have worked ' + S.tenure + ' days here.</p>';
       else c += '<div class="jb-reqs">' + (r.reqs.length ? r.reqs.map(function (q) { return '<span class="jr ' + (q.ok ? 'ok' : 'no') + '">' + (q.ok ? '\u2713 ' : '\u2715 ') + esc(q.text) + '</span>'; }).join('') : '<span class="jr ok">\u2713 No requirements</span>') + '</div>';
@@ -6083,7 +6088,7 @@ window.G3 = (function () {
       '<div><span>Days worked</span><span class="num">' + S.stats.workDays + '</span></div></div></div>';
     h += '<div class="card"><h3>Skills</h3>' +
       ['tech', 'hustle', 'social'].map(k => progRow(SK[k], S.xp[k], 30, 'Level ' + lvl(S, k))).join('') + '</div>';
-    if (S.enrolled) h += '<div class="card"><h3>In school</h3>' + progRow(CITY.programs[S.enrolled.to].name, S.enrolled.prog, S.enrolled.need, S.enrolled.prog + ' of ' + S.enrolled.need) + '<p class="muted">Classes hold in the evening at Kubwa and Nyanya.</p></div>';
+    if (S.enrolled) h += '<div class="card"><h3>In school</h3>' + progRow(CITY.programs[S.enrolled.to].name, S.enrolled.prog, S.enrolled.need, S.enrolled.prog + ' of ' + S.enrolled.need) + '<p class="muted"> at Kubwa and Nyanya.</p></div>';
     h += UI.confirmNew
       ? '<div class="card"><p>Start a new life? Your current progress will be lost.</p><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" data-act="newlife-yes">Yes, start over</button><button class="btn ghost" data-act="newlife-no">Keep playing</button></div></div>'
       : '<div><button class="btn ghost" data-act="newlife">Start a new life</button></div>';
@@ -6116,9 +6121,9 @@ window.G3 = (function () {
       '<p class="muted">Prepare for IELTS in Kubwa and Nyanya (self-study) or in Garki (class and exam).</p></div>';
     if (j.status === 'none') {
       const fee = Math.round(J.agentFee * S.price);
-      const why = j.agent > 0 ? 'Your agent is already working for you' : (S.slot + 1 > 3 ? 'Not enough of the day left' : (fee > S.cash ? 'Need ' + fmt(fee) : ''));
+      const why = j.agent > 0 ? 'Your agent is already working for you' : (S.energy < SLOT_E ? 'Too tired' : (fee > S.cash ? 'Need ' + fmt(fee) : ''));
       h += '<div class="card"><div class="eyebrow">Shortcut</div><h3>Hire an agent</h3><p class="muted">Everyone knows a man who "can fix it". Some are real. Most are not. Pay ' + fmt(fee) + ' and find out. If he is real, your chances go up by about 12 points.</p>' +
-        '<div><button class="btn ghost" data-act="agent"' + (why ? ' disabled' : '') + '>' + (why || 'Meet the agent (1 slot)') + '</button></div></div>';
+        '<div><button class="btn ghost" data-act="agent"' + (why ? ' disabled' : '') + '>' + (why || 'Meet the agent') + '</button></div></div>';
     }
     for (const id in J.routes) {
       const r = J.routes[id], reqs = japaReqs(S, id), ok = reqs.every(x => x.ok), why = japaBlock(S, id);
@@ -6127,7 +6132,7 @@ window.G3 = (function () {
         '<div class="kv"><div><span>Application fee</span><span class="num">' + fmt(r.fee) + '</span></div><div><span>Proof of funds</span><span class="num">' + fmt(r.funds) + '</span></div>' +
         (ok ? '<div><span>Estimated chance</span><span class="num">about ' + japaOdds(S, id) + '%</span></div>' : '') + '</div>' +
         '<div class="reqs">' + reqs.map(x => '<div class="req ' + (x.ok ? 'ok' : 'no') + '">' + x.text + '</div>').join('') + '</div>' +
-        '<div><button class="btn" data-act="japa-apply" data-id="' + id + '"' + (why ? ' disabled' : '') + '>' + (here ? (j.status === 'pending' ? 'Pending' : 'Approved') : (why && why !== 'Requirements not met' ? why : (ok ? 'Apply (1 slot)' : 'Requirements not met'))) + '</button></div></div>';
+        '<div><button class="btn" data-act="japa-apply" data-id="' + id + '"' + (why ? ' disabled' : '') + '>' + (here ? (j.status === 'pending' ? 'Pending' : 'Approved') : (why && why !== 'Requirements not met' ? why : (ok ? 'Apply' : 'Requirements not met'))) + '</button></div></div>';
     }
     const can = S.cash >= J.stayNeed;
     h += '<div class="card"><div class="eyebrow">Another ending</div><h3>Stay and build here</h3><p class="muted">Not everyone leaves. With ' + fmt(J.stayNeed) + ' saved you can stop chasing visas and build a life in ' + CITY.name + '. This ends your game.</p>' +
@@ -6411,7 +6416,6 @@ window.G3 = (function () {
     if (act === 'creator') { creatorDo(id); return; }
     if (act === 'vitals') { UI.vitals = true; render(false); return; }
     if (act === 'vitals-x') { if (el.classList.contains('vwrap') && e.target !== el) return; UI.vitals = false; render(false); return; }
-    if (act === 'pips') { showToast('Each day gives you 3 actions. Working takes 2, most other things take 1, and rides take none. When the dots run out, sleep in your bed to start a new day.'); render(false); return; }
     if (act === 'walkto') { const st = G3.views.home && G3.views.home.stn && G3.views.home.stn[id]; UI.prompt = null; updatePins(); if (st) G3.views.home.walkTo(st.x, st.z); return; }
     if (act === 'tab') { UI.prompt = null; if (id === 'phone' && UI.tab === 'phone') UI.phone = 'home'; UI.tab = id; UI.sheet = null; UI.confirmNew = false; render(); const pg = document.querySelector('.page'); if (pg) pg.scrollTop = 0; return; }
     if (act === 'theme') {
