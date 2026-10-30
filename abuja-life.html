@@ -312,6 +312,8 @@ button.hp { cursor: pointer; text-align: left; }
 .pol-fx { position: fixed; inset: 0; z-index: 3; pointer-events: none; box-shadow: inset 0 0 70px 6px rgba(255, 40, 40, .55); animation: polfx .5s steps(2) infinite; }
 @keyframes polfx { 50% { box-shadow: inset 0 0 70px 6px rgba(50, 110, 255, .6); } }
 @media (prefers-reduced-motion: reduce) { .tr-chip.pol, .pol-fx, .tr-chip.mis.low, .call-av.ring, .pin.mis { animation: none; } }
+#cp-sheet { z-index: 60; }
+.tr-chip.cp { background: #1b3fae; border: 2px solid #fff; }
 .tr-chip.mis { background: #7a4b00; border: 2px solid #f2b01e; }
 .tr-chip.mis.low { background: #b3261e; border-color: #fff; animation: polchip .5s steps(2) infinite; }
 .veil.call { z-index: 70; }
@@ -1717,25 +1719,25 @@ function misNew() { return { rep: 0, done: 0, failed: 0, earned: 0, active: null
 function misRank(rep) { let r = 0; for (let i = 0; i < MIS_RANKS.length; i++) if (rep >= MIS_RANKS[i][0]) r = i; return r; }
 function misVeh(s) { return hasCar(s) || !!s.owned.bike; }
 CITY.contacts = {
-  ngozi: { name: 'Auntie Ngozi', ic: '👩🏾‍🍳', role: 'Sells food at Wuse Market', rep: 0, w: 1.6, from: ['wuse'], to: ['maitama', 'asokoro', 'garki', 'jabi', 'utako', 'secretariat', 'gwarinpa'],
+  ngozi: { name: 'Auntie Ngozi', ic: '👩🏾‍🍳', role: 'Sells food at Wuse Market', item: 'food packs', rep: 0, w: 1.6, from: ['wuse'], to: ['maitama', 'asokoro', 'garki', 'jabi', 'utako', 'secretariat', 'gwarinpa'],
     base: 2500, km: 200, spd: 7.5, slack: 14,
     ask: ['My pikin, customers dey wait for hot jollof in {to}. Collect the packs from my stall in {from} and bring am quick. I go pay you {pay}.',
       'Good day o! I get big order for {to} and my boy no show. Carry the food from {from}. Do am well and {pay} is yours.'],
     good: ['God bless you, my pikin! The customers are smiling. Your money don enter.', 'Ah ah, you are fast! Come back anytime.'],
     bad: ['Hmm. The food went cold and the customer cancelled. Next time, abeg.', 'Which kind of delay be this? I will find another person.'] },
-  chidi: { name: 'Chidi Dispatch', ic: '📦', role: 'Runs a courier desk', rep: 3, w: 1.3, from: ['wuse', 'garki', 'utako', 'jabi'], to: ['maitama', 'gwarinpa', 'kubwa', 'karu', 'katampe', 'dutse', 'jahi', 'apo', 'lokogoma', 'guzape'],
+  chidi: { name: 'Chidi Dispatch', ic: '📦', role: 'Runs a courier desk', item: 'parcel', rep: 3, w: 1.3, from: ['wuse', 'garki', 'utako', 'jabi'], to: ['maitama', 'gwarinpa', 'kubwa', 'karu', 'katampe', 'dutse', 'jahi', 'apo', 'lokogoma', 'guzape'],
     base: 3500, km: 250, spd: 8.5, slack: 10,
     ask: ['Boss, Chidi here. I have a parcel waiting in {from} for a client in {to}. Nobody else is free. {pay} if it gets there on time.',
       'Parcel dey {from}, address dey {to}. My riders are stuck in go-slow. You fit help? {pay}.'],
     good: ['Parcel delivered and the client is happy. Your {pay} has been sent. Good work.', 'Clean delivery. I will keep you in mind for the next one.'],
     bad: ['The client said the parcel came late. I have to refund them. Be faster next time.', 'You missed the window, boss. I lost money on that one.'] },
-  tunde: { name: 'Tunde Mechanic', ic: '🔧', role: 'Garage owner', rep: 6, w: 1.1, from: ['abujacars', 'karu', 'garki'], to: ['wuse', 'utako', 'jabi', 'gwarinpa', 'katampe', 'lugbe', 'apo'],
+  tunde: { name: 'Tunde Mechanic', ic: '🔧', role: 'Garage owner', item: 'part', rep: 6, w: 1.1, from: ['abujacars', 'karu', 'garki'], to: ['wuse', 'utako', 'jabi', 'gwarinpa', 'katampe', 'lugbe', 'apo'],
     base: 4500, km: 280, spd: 9, slack: 9,
     ask: ['Oga, I need a gearbox part urgently. It is in {from}. Bring it to my customer in {to} before he loses patience. {pay}.',
       'Tunde here. Car is on jack and the part is in {from}. Run it to {to} for me, {pay} for the trouble.'],
     good: ['That is how to do it! The car is back on the road. Take your {pay}.', 'You saved my day. The customer even tipped me.'],
     bad: ['By the time you came, the customer had gone to another garage. Chai.', 'Too slow, my guy. The job is gone.'] },
-  musa: { name: 'Alhaji Musa', ic: '🧔🏾', role: 'Businessman, wants a driver he can trust', rep: 12, w: 0.9, need: s => hasCar(s), from: ['maitama', 'asokoro', 'guzape'], to: ['secretariat', 'garki', 'wuse', 'jabi', 'abujacars', 'katampe'],
+  musa: { name: 'Alhaji Musa', ic: '🧔🏾', role: 'Businessman, wants a driver he can trust', item: 'Alhaji', rep: 12, w: 0.9, need: s => hasCar(s), from: ['maitama', 'asokoro', 'guzape'], to: ['secretariat', 'garki', 'wuse', 'jabi', 'abujacars', 'katampe'],
     base: 7000, km: 450, spd: 9.8, slack: 7,
     ask: ['Good afternoon. I have a meeting at {to} and my driver is sick. Pick me at {from} and drive me properly. {pay}. I do not like late.',
       'Young man, you drive well. Come to {from} and take me to {to}. {pay}. No wahala on the road, please.'],
@@ -1746,13 +1748,41 @@ CITY.contacts = {
     ask: ['You do not know me but I know you. Collect a bag in {from}. Do not open it. Drop it at {to}. {pay}. If police stop you, you never saw me.',
       'Package at {from}. Destination {to}. Fast and quiet. {pay} cash. Police love to ask questions, so do not give them reasons.'],
     good: ['Package received. {pay} as agreed. Stay quiet and stay ready.', 'Neat. You are not as green as you look.'],
-    bad: ['The package never made it. People are angry. Do not call this number.', 'You failed. Do not expect a call again soon.'] }
+    bad: ['The package never made it. People are angry. Do not call this number.', 'You failed. Do not expect a call again soon.'] },
+  bisi: { name: 'Bisi Events', ic: '\uD83D\uDC83\uD83C\uDFFE', role: 'Owambe planner who needs reliable rides for guests', item: 'guest', pax: true, frag: 2, rep: 4, w: 1.2, need: s => misVeh(s),
+    from: ['wuse', 'utako', 'garki', 'jabi', 'maitama'], to: ['asokoro', 'guzape', 'maitama', 'gwarinpa', 'katampe', 'karu', 'jabi'],
+    base: 3000, km: 220, spd: 8.5, slack: 12,
+    ask: ['Hello dear! I have a guest waiting at {from} who must reach {to} for the owambe. Drive smoothly, she is wearing her gele. {pay}, plus a tip if she arrives happy.',
+      'Please I need a safe driver. My aunty is at {from} and she is going to {to}. No hard braking o! {pay}.'],
+    good: ['My aunty said five stars! Thank you, dear. {pay} is on its way.', 'She arrived with her gele intact. You are booked for the next owambe!'],
+    bad: ['My aunty said she will never enter your car again. Hmm.', 'Too many bumps, my dear. I have to find another driver.'] },
+  mama: { name: 'Mama Cass Catering', ic: '\uD83C\uDF72', role: 'Caterer with two drops to make', item: 'trays', multi: true, rep: 5, w: 1.1,
+    from: ['wuse', 'garki', 'utako'], to: ['maitama', 'asokoro', 'jabi', 'gwarinpa', 'guzape', 'katampe', 'karu', 'secretariat'],
+    base: 6000, km: 260, spd: 8.5, slack: 14,
+    ask: ['Boss, two events today and I am alone! Take the trays from {from} to {to}, then straight to {to2}. {pay} for both drops.',
+      'My dear, two parties, one of me. Pick up the food in {from}. First drop {to}, second drop {to2}. {pay} in total.'],
+    good: ['Both parties ate well! Your {pay} is ready. God bless your hustle.', 'Two drops, zero complaints. You are my number one driver now.'],
+    bad: ['The food came late and both hosts complained. I am not happy.', 'You embarrassed me at two parties in one day. Ah!'] },
+  amina: { name: 'Dr. Amina', ic: '\uD83E\uDE7A', role: 'Doctor, rushes samples between hospitals', item: 'sample box', frag: 1, rush: true, rep: 10, w: 0.9, need: s => misVeh(s),
+    from: ['jabi', 'utako', 'karu', 'gwarinpa'], to: ['garki', 'maitama', 'asokoro', 'wuse'],
+    base: 8000, km: 380, spd: 10, slack: 5,
+    ask: ['This is Dr. Amina. I need a lab sample moved from {from} to {to} urgently, and it must not be shaken. {pay}. Please drive carefully but quickly.',
+      'Emergency. A sample is waiting at {from} and the lab is in {to}. Smooth and fast. I will pay {pay}.'],
+    good: ['The sample arrived intact. The patient will get the result in time. Thank you. {pay} sent.', 'Perfect handling. Please save my number.'],
+    bad: ['The sample was spoiled. We have to start again. This is serious.', 'It did not arrive in good shape. I cannot use you again for now.'] },
+  femi: { name: 'Femi Nights', ic: '\uD83C\uDFA7', role: 'Club promoter, only calls after dark', item: 'VIP guests', night: true, rep: 8, w: 1.4, need: s => misVeh(s), bonus: 1.4,
+    from: ['jabi', 'maitama', 'wuse', 'utako'], to: ['guzape', 'asokoro', 'maitama', 'jabi', 'katampe'],
+    base: 7000, km: 330, spd: 9.5, slack: 8,
+    ask: ['Boss, Femi here. The VIPs are at {from} and the party is in {to}. Night rates apply. {pay}, but the DJ drops the beat soon!',
+      'The club is packed and my guests are stuck in {from}. Bring them to {to} quick. {pay} and free drinks, ha ha.'],
+    good: ['The guests are inside and the music is loud! {pay} for you. See you next Friday.', 'You dey try! The VIPs loved the ride.'],
+    bad: ['The VIPs got tired of waiting and took a cab. Next time, abeg.', 'Party started without them. Not cool.'] }
 };
-function misFill(t, o) { return t.replace('{from}', CITY.places[o.from].name).replace('{to}', CITY.places[o.to].name).replace('{pay}', fmt(o.pay)); }
+function misFill(t, o) { return t.replace('{from}', CITY.places[o.from].name).replace('{to}', CITY.places[o.to].name).replace('{to2}', o.to2 ? CITY.places[o.to2].name : '').replace('{pay}', fmt(o.pay)); }
 function misPlace(id) { return CITY.places[id].name; }
 function misManh(a, b) { const p = CITY.mapPos[a], q = CITY.mapPos[b]; return Math.abs(p.x - q.x) + Math.abs(p.z - q.z); }
-function misMake(s, via, cid) {
-  const m = s.mis, ok = Object.keys(CITY.contacts).filter(k => { const c = CITY.contacts[k]; return m.rep >= c.rep && (!c.need || c.need(s)); });
+function misMake(s, via, cid, slot) {
+  const m = s.mis, sl = slot == null ? 1 : slot, ok = Object.keys(CITY.contacts).filter(k => { const c = CITY.contacts[k]; return m.rep >= c.rep && (!c.need || c.need(s)) && (!c.night || sl >= 2); });
   if (!ok.length) return null;
   let k = cid && ok.indexOf(cid) >= 0 ? cid : null;
   if (!k) {
@@ -1762,11 +1792,15 @@ function misMake(s, via, cid) {
     for (let i = 0; i < pool.length; i++) { t -= wt[i]; if (t <= 0) { k = pool[i]; break; } }
   }
   const c = CITY.contacts[k], from = pick(c.from), to = pick(c.to.filter(x => x !== from));
-  const drive = misVeh(s) || !!c.need, km = tripKm(from, to);
-  const o = { who: k, from: from, to: to, kind: drive ? 'drive' : 'errand', risky: !!c.risky, dl: s.day + 3 };
-  o.pay = Math.max(1500, Math.round(pr(s, (c.base + km * c.km) * (drive ? 1.5 : 1)) / 500) * 500);
-  o.limit = drive ? Math.round(misManh(from, to) * 1.15 / c.spd + c.slack) : 0;
-  o.text = misFill(pick(c.ask), o) + (drive ? ' You drive it yourself and the clock starts when you set off with the goods.' : ' No clock on this one, but get it done within 3 days.');
+  const to2 = c.multi ? pick(c.to.filter(x => x !== from && x !== to)) : null;
+  const drive = misVeh(s) || !!c.need, km = tripKm(from, to) + (to2 ? tripKm(to, to2) : 0);
+  const rush = drive && !c.risky && !c.pax && !c.multi && (c.rush || rnd() < 0.2);
+  const o = { who: k, from: from, to: to, to2: to2, n: to2 ? 2 : 1, leg: 1, kind: drive ? 'drive' : 'errand', risky: !!c.risky, dl: s.day + 3, item: c.item || 'goods', pax: !!c.pax, frag: c.frag == null ? null : c.frag, rush: !!rush, night: !!c.night };
+  o.pay = Math.round(pr(s, (c.base + km * c.km) * (drive ? 1.5 : 1) * (c.bonus || 1) * (rush ? 1.35 : 1)) / 500) * 500; o.pay = Math.max(1500, o.pay);
+  const lim = (a, b) => Math.round(misManh(a, b) * 1.15 / c.spd * (rush ? 0.8 : 1) + c.slack);
+  o.limit = drive ? lim(from, to) : 0; o.limit2 = drive && to2 ? lim(to, to2) : 0;
+  const txt = misFill(pick(c.ask), o);
+  o.text = txt + (drive ? (c.pax ? ' The clock starts when you set off, and your rider quits if you keep crashing.' : c.frag != null ? ' The clock starts when you set off. Too many crashes and the cargo is ruined.' : ' You drive it yourself and the clock starts when you set off with the ' + o.item + '.') : ' No clock on this one, but get it done within 3 days.');
   const msg = { id: ++s.msgSeq, tpl: 'mis', d: s.day, state: 'new', amt: 0, res: '', via: via, o: o };
   s.inbox.push(msg);
   if (s.inbox.length > 16) { const i = s.inbox.findIndex(x => x.state === 'done'); s.inbox.splice(i < 0 ? 0 : i, 1); }
@@ -1775,13 +1809,14 @@ function misMake(s, via, cid) {
 }
 function misAccept(s, m) {
   const o = m.o, c = CITY.contacts[o.who];
-  s.mis.active = { who: o.who, from: o.from, to: o.to, kind: o.kind, pay: o.pay, limit: o.limit, risky: o.risky, dl: o.dl, stage: s.at === o.from ? 'deliver' : 'pickup', left: null };
+  s.mis.active = { who: o.who, from: o.from, to: o.to, to2: o.to2, n: o.n || 1, leg: 1, kind: o.kind, pay: o.pay, limit: o.limit, limit2: o.limit2 || 0, risky: o.risky, dl: o.dl, item: o.item, pax: o.pax, frag: o.frag == null ? null : o.frag, rush: o.rush, night: o.night, stage: s.at === o.from ? 'deliver' : 'pickup', left: null };
   return 'Job accepted from ' + c.name + '. ' + misGoal(s);
 }
 function misGoal(s) {
   const a = s.mis && s.mis.active; if (!a) return '';
-  if (a.stage === 'pickup') return 'Go to ' + misPlace(a.from) + ' and collect the goods.';
-  return 'Deliver to ' + misPlace(a.to) + ' for ' + fmt(a.pay) + (a.kind === 'drive' ? ' (drive it yourself, ' + a.limit + ' s on the clock)' : ' before day ' + a.dl + '.');
+  if (a.stage === 'pickup') return 'Go to ' + misPlace(a.from) + ' and collect the ' + (a.item || 'goods') + '.';
+  const dropOf = a.n > 1 ? 'Drop ' + a.leg + ' of ' + a.n + ': ' : '';
+  return dropOf + 'Deliver to ' + misPlace(a.to) + ' for ' + fmt(a.pay) + (a.kind === 'drive' ? ' (drive it yourself, ' + a.limit + ' s on the clock)' : ' before day ' + a.dl + '.');
 }
 function misInfo(s, who, text, res) {
   const msg = { id: ++s.msgSeq, tpl: 'mis', d: s.day, state: 'done', amt: 0, res: res || '', via: 'text', o: { who: who, text: text } };
@@ -1792,7 +1827,7 @@ function misFail(s, why) {
   const a = s.mis.active; if (!a) return '';
   const c = CITY.contacts[a.who], loss = a.risky ? 3 : 2, before = s.mis.rep;
   s.mis.rep = Math.max(0, s.mis.rep - (why === 'drop' ? 1 : loss)); s.mis.failed += 1; s.mis.active = null;
-  const t = why === 'time' ? 'You ran out of time. ' + c.name + ' cancelled the job.' : why === 'seized' ? 'The police took the goods. The job is dead.' : why === 'late' ? c.name + ' gave the job to someone else.' : 'You dropped the job.';
+  const t = why === 'time' ? 'You ran out of time. ' + c.name + ' cancelled the job.' : why === 'seized' ? 'The police took the goods. The job is dead.' : why === 'late' ? c.name + ' gave the job to someone else.' : why === 'broke' ? (a.pax ? 'Your passenger had enough of the bumps and got out. One star.' : 'Too many crashes. The ' + (a.item || 'cargo') + ' was ruined.') : 'You dropped the job.';
   apply(s, { mood: -3 }); log(s, t + ' Rep ' + (s.mis.rep - before) + '.');
   if (why !== 'drop') misInfo(s, a.who, pick(c.bad), 'Rep ' + (s.mis.rep - before));
   return t + ' Rep ' + (s.mis.rep - before) + '.';
@@ -1805,21 +1840,29 @@ function misDaily(s) {
 /* arriving somewhere: collect the goods, or hand them over and get paid. opts.mis is the timer record from a driven trip. */
 function misArrive(s, to, mode, opts) {
   const m = s.mis, a = m && m.active; if (!a) return '';
-  if (a.stage === 'pickup' && to === a.from) { a.stage = 'deliver'; return ' 📦 You collected the goods. ' + misGoal(s); }
+  if (a.stage === 'pickup' && to === a.from) { a.stage = 'deliver'; return ' 📦 You collected the ' + (a.item || 'goods') + '. ' + misGoal(s); }
   if (a.stage !== 'deliver' || to !== a.to) return '';
+  const M = opts && opts.mis;
   if (a.kind === 'drive') {
     const mine = mode === 'car' || (mode === 'okada' && !!s.owned.bike);
-    if (!(mine && opts && opts.mis)) return ' This job needs you to drive it yourself in your own vehicle. Leave and come back.';
+    if (!(mine && M)) return ' This job needs you to drive it yourself in your own vehicle. Leave and come back.';
   }
-  let pay = a.pay, note = '';
-  if (a.kind === 'drive' && opts && opts.mis) {
-    const M = opts.mis;
+  const part = a.n > 1 && a.leg < a.n, leg1 = part ? Math.round(a.pay * 0.4 / 100) * 100 : 0;
+  let pay = part ? leg1 : a.pay, note = '';
+  if (a.kind === 'drive' && M) {
     if (M.left / M.limit >= 0.4) { pay = Math.round(pay * 1.25); note = ' Fast delivery bonus.'; }
     if (M.crashes > 0) { pay = Math.round(pay * (1 - Math.min(0.4, 0.1 * M.crashes))); note += ' Crash damage cut the pay.'; }
+    if (a.pax && !part && M.crashes === 0) { pay = Math.round(pay * 1.4); note += ' ⭐ Five-star ride tip.'; }
   }
   pay = Math.round(pay / 100) * 100;
-  const c = CITY.contacts[a.who], gain = a.risky ? 4 : a.kind === 'drive' ? 2 : 1, r0 = misRank(m.rep);
-  s.cash += pay; s.stats.earned += pay; m.rep += gain; m.done += 1; m.earned += pay; m.active = null;
+  s.cash += pay; s.stats.earned += pay; m.earned += pay;
+  if (part) {
+    a.pay -= leg1; a.leg += 1; a.from = a.to; a.to = a.to2; a.limit = a.limit2; a.left = null;
+    const t1 = 'First drop done at ' + misPlace(a.from) + '. You earned ' + fmt(pay) + '.' + note;
+    log(s, t1); return ' 💰 ' + t1 + ' ' + misGoal(s);
+  }
+  const c = CITY.contacts[a.who], gain = (a.risky ? 4 : a.kind === 'drive' ? 2 : 1) + (a.frag != null || a.n > 1 ? 1 : 0), r0 = misRank(m.rep);
+  m.rep += gain; m.done += 1; m.active = null;
   apply(s, { mood: 4, energy: -3 });
   const up = misRank(m.rep) > r0 ? ' Rank up: ' + MIS_RANKS[misRank(m.rep)][1] + '!' : '';
   const t = 'Delivered to ' + misPlace(to) + '. You earned ' + fmt(pay) + '.' + note + ' Rep +' + gain + '.' + up;
@@ -1827,13 +1870,13 @@ function misArrive(s, to, mode, opts) {
   return ' 💰 ' + t;
 }
 /* every few minutes of real play, somebody rings or texts you with a job */
-function misTick(s, now) {
+function misTick(s, now, slot) {
   const m = s.mis; if (!m || s.over || m.active) return null;
   if (!m.next) { m.next = now + 25000; return null; }
   if (now < m.next) return null;
   if (s.inbox.filter(x => x.tpl === 'mis' && x.state === 'new').length >= 2) { m.next = now + 60000; return null; }
   m.next = now + 90000 + Math.random() * 120000;
-  return misMake(s, Math.random() < 0.6 ? 'call' : 'text');
+  return misMake(s, Math.random() < 0.6 ? 'call' : 'text', null, slot);
 }
 
 function itemBlock(s, id) {
@@ -5043,6 +5086,7 @@ window.G3 = (function () {
     halo.visible = V.camMode === 'top';
     V.trip = { o: o, route: route, cum: cum, len: len, mode: o.drive ? 'drive' : 'ride', s: 0, v: 0, x: p0.x, z: p0.z, h: Math.atan2(p0.dx, p0.dz), camH: Math.atan2(p0.dx, p0.dz), veh: veh, root: root, rib: rib, ring: ring, bike: bike, halo: halo, lights: lights, tailM: tailM,
       saved: { dist: V.dist, el: V.el, tx: V.target.x, tz: V.target.z }, time: 0, done: false, info: null, bump: 0 };
+    if (o.cp && o.drive) cpPlan(V.trip);
     V.goal = null; V.anim = null; V.input.left = V.input.right = V.input.gas = V.input.brake = false;
     tripStep(0.001);
   };
@@ -5054,7 +5098,7 @@ window.G3 = (function () {
     if (at && CITY.mapPos[at]) { const pp = place(at); V.marker.position.set(pp.x, 0, pp.z); V.at = at; V.target.set(CITY.mapPos[at].x, 0, CITY.mapPos[at].z + 4); }
     if (!quiet) frame();
   };
-  V.autopilot = function () { const t = V.trip; if (!t || t.mode !== 'drive' || t.pol || t.polWait) return; const q = onRoute(t, t.x, t.z); t.mode = 'ride'; t.s = q.s; t.auto = true; };
+  V.autopilot = function () { const t = V.trip; if (!t || t.mode !== 'drive' || t.pol || t.polWait || V.cpPending()) return; const q = onRoute(t, t.x, t.z); t.mode = 'ride'; t.s = q.s; t.auto = true; };
   V.skipTrip = function () { const t = V.trip; if (t && t.mode === 'ride') t.s = t.len; };
   /* two views: 'chase' sits behind and above the vehicle and looks down the road at the 3D city; 'top' is the map-from-above view */
   V.camMode = 'chase';
@@ -5134,7 +5178,7 @@ window.G3 = (function () {
       t.x = q.x; t.z = q.z; const th = Math.atan2(q2.dx, q2.dz); t.h += wrapA(th - t.h) * Math.min(1, dt * 9);
       if (t.s >= t.len - 0.01) { finishTrip(t); }
     } else {
-      const I = (t.pol && (t.pol.state === 'busting' || t.pol.state === 'busted')) ? { brake: true } : V.input, car = o.vehicle !== 'bike', base = o.top || (car ? 16 : 15);
+      const I = ((t.pol && (t.pol.state === 'busting' || t.pol.state === 'busted')) || (t.cp && t.cp.state === 'hold')) ? { brake: true } : V.input, car = o.vehicle !== 'bike', base = o.top || (car ? 16 : 15);
       const rd = roadDist(t.x, t.z), nearDistrict = Object.keys(CITY.mapPos).some(function (k) { const m = CITY.mapPos[k]; return Math.abs(t.x - m.x) < 11 && Math.abs(t.z - m.z) < 11; });
       const off = rd > HR + 1.1 && !nearDistrict, rough = rd > HR + 1.1 && nearDistrict;
       let cap = base * (slow ? (car ? 0.55 : 0.85) : 1) * (off ? 0.22 : rough ? 0.5 : 1);
@@ -5157,7 +5201,7 @@ window.G3 = (function () {
         if (inJ >= 0 && t.jin !== inJ && t.v > 3 && lightAxis(Math.abs(Math.sin(t.h)) > Math.abs(Math.cos(t.h))) === 'r') { t.rl = 3; if (V.onEvent) V.onEvent({ type: 'redlight' }); polMaybe(t, 'redlight'); }
         t.jin = inJ;
       }
-      polStep(t, dt);
+      polStep(t, dt); cpStep(t, dt);
       t.off = off; t.rough = rough;
       const dest = t.route[t.route.length - 1]; if (Math.hypot(t.x - dest[0], t.z - dest[1]) < 6.5) finishTrip(t);
     }
@@ -5169,9 +5213,54 @@ window.G3 = (function () {
     const dark = !!(V.env && (V.env.night || V.env.rain || V.env.slot === 2)); if (t.lights.visible !== dark) t.lights.visible = dark;
     const q = onRoute(t, t.x, t.z), turn = nextTurn(t, q.s);
     t.info = { dt: dt, x: t.x, z: t.z, h: t.h, v: t.v, s: q.s, len: t.len, remain: Math.max(0, t.len - q.s), crash: (t.crashT || 0) > 0, redlight: (t.rl || 0) > 0, off: q.d > 6.5 && t.mode === 'drive', wrong: t.mode === 'drive' && t.v > 2 && q.lat < -1.9 && q.d < 6.5, offRoad: !!t.off, rough: !!t.rough, turn: turn, mode: t.mode, slow: slow, done: t.done, pol: t.pol ? { x: t.pol.x, z: t.pol.z, gap: t.pol.gap, bust: t.pol.meter, state: t.pol.state } : null };
+    t.info.cp = cpInfo(t, q);
     tripCamera(t, dt);
     if (V.onTrip) V.onTrip(t.info, t);
   }
+
+  /* ---------- police checkpoints: a barrier across the road on some drives. Stop and deal with it, or smash through and be chased. ---------- */
+  function cpBuild(t, s) {
+    const q = routeAtS(t, s), g = new T.Group(), h = Math.atan2(q.dx, q.dz), x0 = -LANE - 0.45, x1 = LANE + HR + 0.45, W = x1 - x0;
+    g.position.set(q.x, ROAD_Y, q.z); g.rotation.y = h;
+    const red = new T.MeshLambertMaterial({ color: 0xd32f2f }), white = new T.MeshLambertMaterial({ color: 0xf4f4f4 }), post = new T.MeshLambertMaterial({ color: 0x303338 });
+    const bar = new T.Group(); bar.position.set(x0, 1.05, 0); g.add(bar);
+    for (let k = 0; k < 6; k++) { const b = new T.Mesh(new T.BoxGeometry(W / 6, 0.38, 0.22), k % 2 ? white : red); b.position.set(W / 6 * (k + 0.5), 0, 0); bar.add(b); }
+    [x0, x1].forEach(function (px) { const p = new T.Mesh(new T.BoxGeometry(0.3, 1.4, 0.3), post); p.position.set(px, 0.7, 0); g.add(p); });
+    const cone = new T.ConeGeometry(0.32, 0.8, 8), cm = new T.MeshLambertMaterial({ color: 0xff7a1a });
+    for (let k = 0; k < 6; k++) { const c = new T.Mesh(cone, cm); c.position.set(x0 + 0.6 + k * (W - 1.2) / 5, 0.4, -2.2 - (k % 2) * 3.2); g.add(c); }
+    const car = polBuild(); car.position.set(x1 + 2.3, 0, 1.6); car.rotation.y = -P / 2; g.add(car);
+    const vest = new T.MeshLambertMaterial({ color: 0xc8e63c }), skin = new T.MeshLambertMaterial({ color: 0x5b3a26 }), bg = new T.CylinderGeometry(0.3, 0.34, 1.05, 8), hg = new T.SphereGeometry(0.23, 8, 6);
+    [x0 + 1.1, x1 - 1.3].forEach(function (px) { const b = new T.Mesh(bg, vest); b.position.set(px, 0.55, 1.1); g.add(b); const hd = new T.Mesh(hg, skin); hd.position.set(px, 1.35, 1.1); g.add(hd); });
+    return { g: g, bar: bar, car: car, x: q.x, z: q.z };
+  }
+  function cpPlan(t) {
+    if (t.len < 100) return;
+    const J = V.junctions || [];
+    for (let k = 0; k < 24; k++) {
+      const f = 0.5 + (k % 2 ? 1 : -1) * Math.ceil(k / 2) * 0.03, s = t.len * Math.max(0.3, Math.min(0.75, f));
+      if (s < 55 || t.len - s < 55) continue;
+      const a = routeAtS(t, s - 9), b = routeAtS(t, s + 9); if (a.dx * b.dx + a.dz * b.dz < 0.985) continue;
+      const q = routeAtS(t, s); let bad = false;
+      for (let j = 0; j < J.length; j++) if (Math.hypot(q.x - J[j].x, q.z - J[j].z) < 16) { bad = true; break; }
+      if (bad) continue;
+      const m = cpBuild(t, s); t.root.add(m.g);
+      t.cp = { s: s, x: m.x, z: m.z, state: 'ahead', lift: 0, flash: 0, bar: m.bar, car: m.car, g: m.g }; return;
+    }
+  }
+  function cpStep(t, dt) {
+    const c = t.cp; if (!c) return;
+    c.flash += dt; const ph = Math.floor(c.flash * 4) % 2; c.car.userData.red.visible = ph === 0; c.car.userData.blue.visible = ph === 1;
+    if (c.state === 'open') { c.lift = Math.min(1.45, c.lift + dt * 1.8); c.bar.rotation.z = c.lift; return; }
+    if (c.state === 'ran') { c.bar.visible = false; return; }
+    const q = onRoute(t, t.x, t.z), ahead = c.s - q.s;
+    if (c.state === 'ahead') {
+      if (ahead < 24 && ahead > 1.5 && t.v < 1.6 && q.d < 9) { c.state = 'hold'; if (V.onEvent) V.onEvent({ type: 'checkpoint' }); }
+      else if (ahead <= 1.5 && q.d < 12) { c.state = 'ran'; t.polWait = t.polUsed ? null : 'cp'; if (V.onEvent) V.onEvent({ type: 'cprun' }); }
+    }
+  }
+  function cpInfo(t, q) { const c = t.cp; if (!c || c.state === 'open' || c.state === 'ran') return null; return { d: Math.max(0, c.s - q.s), st: c.state, x: c.x, z: c.z }; }
+  V.cpPending = function () { const t = V.trip; return !!(t && t.cp && (t.cp.state === 'ahead' || t.cp.state === 'hold')); };
+  V.cpRelease = function (kind) { const t = V.trip; if (!t || !t.cp) return; t.cp.state = 'open'; if (kind === 'run' && !t.polUsed) t.polWait = 'cp'; };
 
   /* ---------- police pursuit: a patrol car follows YOUR path; stay ahead, or pull over and pay ---------- */
   V.polOdds = { redlight: 0.6, crash: 0.45 };
@@ -5568,7 +5657,7 @@ window.G3 = (function () {
   /* ---------- phone: jobs, japa, life, log ---------- */
   /* ---------- online leaderboard (Supabase over plain REST: no library, only the public anon key) ---------- */
   const BOARD = { url: 'https://tvbnoqwyekbqrlxxnztq.supabase.co', key: 'sb_publishable_db5quqce8u5iWU7qENLltg_U4OWrfYG' };   /* public client key: safe to ship */
-  const APP_VERSION = 'v1.19 · 30 Oct 2026';
+  const APP_VERSION = 'v1.21 · 30 Oct 2026';
   const ERRS = [];
   window.addEventListener('error', function (e) { ERRS.push(String((e && e.message) || 'error').slice(0, 140) + ' @' + ((e && e.lineno) || 0)); if (ERRS.length > 5) ERRS.shift(); });
   window.addEventListener('unhandledrejection', function (e) { ERRS.push('promise: ' + String((e && e.reason && e.reason.message) || (e && e.reason) || '').slice(0, 140)); if (ERRS.length > 5) ERRS.shift(); });
@@ -6318,6 +6407,15 @@ window.G3 = (function () {
     return short ? h12 + ':' + mm : h12 + ':' + mm + (h < 12 ? 'AM' : 'PM');
   }
   /* ---------- gigs: the app, the ringing phone, and the map markers ---------- */
+  function misTagHtml(o) {
+    let h = ''; const w = ' style="background:var(--warn-bg);color:var(--warn)"';
+    if (o.rush) h += '<span class="chip"' + w + '>RUSH</span>';
+    if (o.pax) h += '<span class="chip">\u2B50 Passenger</span>';
+    if (o.frag != null) h += '<span class="chip">Fragile</span>';
+    if (o.n > 1) h += '<span class="chip">2 drops</span>';
+    if (o.night) h += '<span class="chip">\uD83C\uDF19 Night job</span>';
+    return h;
+  }
   function misTarget() { const a = S && S.mis && S.mis.active; return a ? (a.stage === 'pickup' ? a.from : a.to) : null; }
   function renderGigs() {
     const m = S.mis, r = misRank(m.rep), nx = MIS_RANKS[r + 1], a = m.active;
@@ -6327,12 +6425,12 @@ window.G3 = (function () {
       '<div class="kv"><div><span>Jobs done</span><span>' + m.done + '</span></div><div><span>Jobs failed</span><span>' + m.failed + '</span></div><div><span>Earned from gigs</span><span class="num">' + fmt(m.earned) + '</span></div></div></div>';
     if (a) {
       const c = CITY.contacts[a.who];
-      h += '<div class="card"><h3>' + c.ic + ' Current job · ' + esc(c.name) + '</h3><p>' + (a.stage === 'pickup' ? '<b>1.</b> Collect at ' + esc(misPlace(a.from)) + '<br><span class="muted"><b>2.</b> Deliver to ' + esc(misPlace(a.to)) + '</span>' : '<span class="muted">1. Collected at ' + esc(misPlace(a.from)) + '</span><br><b>2.</b> Deliver to ' + esc(misPlace(a.to))) + '</p>' +
-        '<div style="display:flex;gap:6px;flex-wrap:wrap"><span class="chip money">' + fmt(a.pay) + '</span>' + (a.kind === 'drive' ? '<span class="chip">Drive it yourself · ' + a.limit + ' s</span>' : '<span class="chip">Any transport · by day ' + a.dl + '</span>') + (a.risky ? '<span class="chip" style="background:var(--warn-bg);color:var(--warn)">Police risk</span>' : '') + '</div>' +
+      h += '<div class="card"><h3>' + c.ic + ' Current job · ' + esc(c.name) + '</h3><p>' + (a.stage === 'pickup' ? '<b>1.</b> Collect at ' + esc(misPlace(a.from)) + '<br><span class="muted"><b>2.</b> Deliver to ' + esc(misPlace(a.to)) + (a.n > 1 && a.leg < a.n ? ' then ' + esc(misPlace(a.to2)) : '') + '</span>' : '<span class="muted">1. Collected at ' + esc(misPlace(a.from)) + '</span><br><b>2.</b> Deliver to ' + esc(misPlace(a.to)) + (a.n > 1 && a.leg < a.n ? ' then ' + esc(misPlace(a.to2)) : '')) + '</p>' +
+        '<div style="display:flex;gap:6px;flex-wrap:wrap"><span class="chip money">' + fmt(a.pay) + '</span>' + (a.kind === 'drive' ? '<span class="chip">Drive it yourself · ' + a.limit + ' s</span>' : '<span class="chip">Any transport · by day ' + a.dl + '</span>') + (a.risky ? '<span class="chip" style="background:var(--warn-bg);color:var(--warn)">Police risk</span>' : '') + misTagHtml(a) + '</div>' +
         '<div style="margin-top:10px"><button class="btn ghost" data-act="mis-drop" type="button">Drop this job (rep -1)</button></div></div>';
     } else h += '<div class="card"><p class="muted">No job right now. Keep your phone close: people call and text when they need somebody.</p></div>';
     h += '<h3 style="margin:14px 0 6px">Your contacts</h3>' + Object.keys(CITY.contacts).map(function (k) {
-      const c = CITY.contacts[k], lock = m.rep < c.rep, sub = lock ? 'Unlocks at rep ' + c.rep : (c.need && !c.need(S) ? 'Needs a car' : c.role);
+      const c = CITY.contacts[k], lock = m.rep < c.rep, sub = lock ? 'Unlocks at rep ' + c.rep : (c.need && !c.need(S) ? 'Needs a car or bike' : c.role + (c.night ? ' (calls after dark)' : ''));
       return '<div class="card" style="' + (lock ? 'opacity:.55' : '') + '"><div style="display:flex;gap:10px;align-items:center"><span style="font-size:28px">' + (lock ? '🔒' : c.ic) + '</span><div><b>' + esc(lock ? 'Not in your phone yet' : c.name) + '</b><div class="muted">' + esc(sub) + '</div></div></div></div>';
     }).join('');
     return h;
@@ -6344,7 +6442,7 @@ window.G3 = (function () {
     if (C.stage === 'ring') return '<div class="veil call"><div class="sheet callsheet" role="alertdialog" aria-modal="true" aria-label="Incoming call from ' + esc(c.name) + '"><div class="call-av ring">' + c.ic + '</div><div class="call-n">' + esc(c.name) + '</div><div class="call-s">Incoming call…</div>' +
       '<div class="call-b"><button class="btn decline" data-act="call-no" type="button">Decline</button><button class="btn answer" data-act="call-yes" type="button">Answer</button></div></div></div>';
     return '<div class="veil call"><div class="sheet callsheet" role="dialog" aria-modal="true" aria-label="On a call with ' + esc(c.name) + '"><div class="call-av">' + c.ic + '</div><div class="call-n">' + esc(c.name) + '</div><div class="call-s">On call</div>' +
-      '<p class="call-t">“' + esc(o.text) + '”</p><div class="call-m"><span class="chip money">' + fmt(o.pay) + '</span><span class="chip">' + esc(misPlace(o.from)) + ' → ' + esc(misPlace(o.to)) + '</span>' + (o.kind === 'drive' ? '<span class="chip">' + o.limit + ' s</span>' : '') + (o.risky ? '<span class="chip" style="background:var(--warn-bg);color:var(--warn)">Police risk</span>' : '') + '</div>' +
+      '<p class="call-t">“' + esc(o.text) + '”</p><div class="call-m"><span class="chip money">' + fmt(o.pay) + '</span><span class="chip">' + esc(misPlace(o.from)) + ' → ' + esc(misPlace(o.to)) + (o.to2 ? ' → ' + esc(misPlace(o.to2)) : '') + '</span>' + (o.kind === 'drive' ? '<span class="chip">' + o.limit + ' s</span>' : '') + (o.risky ? '<span class="chip" style="background:var(--warn-bg);color:var(--warn)">Police risk</span>' : '') + misTagHtml(o) + '</div>' +
       '<div class="call-b"><button class="btn ghost" data-act="call-later" type="button">Not now</button><button class="btn answer" data-act="call-acc" type="button"' + (S.mis.active ? ' disabled' : '') + '>Accept job</button></div>' + (S.mis.active ? '<p class="muted">Finish your current job first.</p>' : '') + '</div></div>';
   }
   let callT = null;
@@ -6369,12 +6467,12 @@ window.G3 = (function () {
     try {
       if (!S || S.over || !S.mis || UI.trip || UI.call || UI.sheet || UI.vitals || UI.chat || UI.person || UI.busy || S.event || UI.welcome || document.hidden || !(UI.tab === 'home' || UI.tab === 'map')) return;
       if (Auth.show || Auth.conflict || Auth.recovery || Auth.wait) return;
-      const m = misTick(S, Date.now()); if (!m) return;
+      const m = misTick(S, Date.now(), (window.G3 && G3.clockSlot) ? G3.clockSlot() : 1); if (!m) return;
       save();
       if (m.via === 'call') ringCall(m); else { showToast('💬 New message from ' + CITY.contacts[m.o.who].name); render(false); }
     } catch (e) {}
   }, 4000);
-  window.__mis = { tick: function () { const m = misTick(S, Date.now() + 1e9); if (m) { if (m.via === 'call') ringCall(m); else render(false); } return m; }, make: function (via, cid) { const m = misMake(S, via, cid); if (m) { save(); if (via === 'call') ringCall(m); else render(false); } return m; } };
+  window.__mis = { tick: function () { const m = misTick(S, Date.now() + 1e9, (window.G3 && G3.clockSlot) ? G3.clockSlot() : 1); if (m) { if (m.via === 'call') ringCall(m); else render(false); } return m; }, make: function (via, cid, slot) { const m = misMake(S, via, cid, slot == null ? ((window.G3 && G3.clockSlot) ? G3.clockSlot() : 1) : slot); if (m) { save(); if (via === 'call') ringCall(m); else render(false); } return m; } };
   const APPS = [
     ['jobs', 'Jobs', '💼', 'linear-gradient(145deg,#34d399,#059669)'],
     ['log', 'Messages', '💬', 'linear-gradient(145deg,#60a5fa,#2563eb)'],
@@ -6834,7 +6932,7 @@ window.G3 = (function () {
     const T = UI.trip, drive = T.drive;
     return '<div class="trip" role="region" aria-label="Trip"><div class="tr-top"><span class="tr-ic" id="tr-ic">⬆️</span><div><div class="tr-main" id="tr-main">Heading to ' + esc(CITY.places[T.to].name) + '</div><div class="tr-sub" id="tr-sub">' + esc(T.label) + '</div></div></div>' +
       '<canvas class="tr-mini" id="tr-map" width="260" height="260" aria-label="Minimap"></canvas>' +
-      '<div class="tr-chips"><span class="tr-chip" id="tr-spd">0 km/h</span><span class="tr-chip" id="tr-rem">…</span><span class="tr-chip warn" id="tr-warn" hidden></span><span class="tr-chip pol" id="tr-pol" hidden></span><span class="tr-chip mis" id="tr-mis" hidden></span></div><div class="pol-fx" id="pol-fx" hidden></div>' +
+      '<div class="tr-chips"><span class="tr-chip" id="tr-spd">0 km/h</span><span class="tr-chip" id="tr-rem">…</span><span class="tr-chip warn" id="tr-warn" hidden></span><span class="tr-chip pol" id="tr-pol" hidden></span><span class="tr-chip mis" id="tr-mis" hidden></span><span class="tr-chip cp" id="tr-cp" hidden></span></div><div class="pol-fx" id="pol-fx" hidden></div>' +
       (drive ? '<div class="tr-mid"><button class="tr-pill" data-act="tr-auto" type="button">🤖 Auto-drive</button><button class="tr-pill" data-act="tr-view" type="button">' + viewLabel() + '</button><button class="tr-pill" data-act="tr-park" type="button">🅿️ Park here</button></div>' +
         '<div class="tr-ctl"><div class="tr-pad"><button class="tr-btn" data-hold="left" type="button" aria-label="Steer left">◀</button><button class="tr-btn" data-hold="right" type="button" aria-label="Steer right">▶</button></div>' +
         '<div class="tr-pad"><button class="tr-btn brake" data-hold="brake" type="button" aria-label="Brake">STOP</button><button class="tr-btn gas" data-hold="gas" type="button" aria-label="Accelerate">GO</button></div></div>'
@@ -6852,6 +6950,7 @@ window.G3 = (function () {
     const t = V.trip; if (t) { line(t.route, 11, '#ffffff'); line(t.route, 7, '#2f7bff'); }
     c.font = '700 20px system-ui,sans-serif'; c.textAlign = 'center'; c.fillStyle = '#4b5563';
     for (const id in CITY.mapPos) { const m = CITY.mapPos[id], p = pt(m.x, m.z); c.beginPath(); c.arc(p[0], p[1], 9, 0, 7); c.fillStyle = id === (UI.trip && UI.trip.to) ? '#ff3b5c' : '#6b7280'; c.fill(); }
+    if (i.cp) { const p = pt(i.cp.x, i.cp.z); c.beginPath(); c.arc(p[0], p[1], 10, 0, 7); c.fillStyle = Math.floor(performance.now() / 300) % 2 ? '#2a6bff' : '#ff2a2a'; c.fill(); c.lineWidth = 3; c.strokeStyle = '#fff'; c.stroke(); }
     if (i.pol) { const p = pt(i.pol.x, i.pol.z); c.beginPath(); c.arc(p[0], p[1], 11, 0, 7); c.fillStyle = Math.floor(performance.now() / 140) % 2 ? '#2a6bff' : '#ff2a2a'; c.fill(); c.lineWidth = 3; c.strokeStyle = '#fff'; c.stroke(); }
     c.restore();
     c.save(); c.translate(W / 2, H / 2); c.fillStyle = '#ffffff'; c.beginPath(); c.moveTo(0, -17); c.lineTo(13, 14); c.lineTo(0, 7); c.lineTo(-13, 14); c.closePath(); c.fill();
@@ -6876,16 +6975,60 @@ window.G3 = (function () {
         const dt = Math.min(0.1, i.dt || 0);
         if (!M.dead) {
           if (!M.run && i.v > 0.5) M.run = true;
-          if (M.run && !document.getElementById('pol-sheet')) M.left -= dt;
+          if (M.run && !document.getElementById('pol-sheet') && !document.getElementById('cp-sheet')) M.left -= dt;
           if (i.crash && !M.cr) M.crashes++; M.cr = !!i.crash;
+          if (M.frag != null && M.crashes > M.frag) { M.dead = true; M.msg = misFail(S, 'broke'); save(); }
           if (M.left <= 0) { M.left = 0; M.dead = true; M.msg = misFail(S, 'time'); save(); }
         }
         if (me) {
-          const sec = Math.ceil(Math.max(0, M.left)), tx = M.dead ? '\u23F0 Too late: job failed' : '\u23F1 ' + Math.floor(sec / 60) + ':' + ('0' + (sec % 60)).slice(-2) + ' \u00B7 ' + CITY.places[T.to].name + (M.run ? '' : ' (starts when you move)');
+          const sec = Math.ceil(Math.max(0, M.left)), tx = M.dead ? (M.crashes > (M.frag == null ? 99 : M.frag) ? '\uD83D\uDCA5 Too many crashes: job failed' : '\u23F0 Job failed') : '\u23F1 ' + Math.floor(sec / 60) + ':' + ('0' + (sec % 60)).slice(-2) + ' \u00B7 ' + CITY.places[T.to].name + (M.run ? '' : ' (starts when you move)') + (M.frag != null && !M.dead ? ' \u00B7 ' + Math.max(0, M.frag - M.crashes) + ' bump' + (M.frag - M.crashes === 1 ? '' : 's') + ' left' : '') + (M.pax && !M.dead && M.crashes === 0 ? ' \u2B50' : '');
           me.hidden = false; if (me.textContent !== tx) me.textContent = tx; me.classList.toggle('low', M.dead || sec <= 8);
         }
       } else if (me) me.hidden = true; }
+    { const ce = document.getElementById('tr-cp'), nw2 = performance.now(); let ct = '';
+      if (T.note && T.note.until > nw2) ct = T.note.t;
+      else if (i.cp && i.cp.d < 240) ct = i.cp.st === 'hold' ? '\uD83D\uDEA7 Stopped at the checkpoint' : i.cp.d < 32 ? '\uD83D\uDEA7 Stop at the barrier!' : '\uD83D\uDEA7 Police checkpoint ahead \u00B7 ' + fmtD(i.cp.d);
+      if (ce) { ce.hidden = !ct; if (ct && ce.textContent !== ct) ce.textContent = ct; } }
     const now = performance.now(); if (now - (T.drawn || 0) > 33) { T.drawn = now; drawMini(i); }
+  }
+  const CP_SMALL = 2000, CP_BIG = 15000;
+  function cpNote(T, t) { T.note = { t: t, until: performance.now() + 6000 }; }
+  function cpSheet() {
+    const app0 = document.getElementById('app') || app; if (!app0 || document.getElementById('cp-sheet') || !UI.trip) return;
+    const M = UI.trip.mis, a = S.mis && S.mis.active, hot = !!(a && a.risky && a.stage === 'deliver' && M && !M.dead);
+    const small = Math.min(S.cash, pr(S, CP_SMALL)), big = Math.min(S.cash, pr(S, CP_BIG));
+    const body = hot ? '<p>Two officers wave you down. One of them eyes the bag on your seat: "Oga, open the boot. Let us see what you are carrying."</p>' : '<p>An officer steps up to your window: "Good afternoon. Particulars, please. Where are you coming from?"</p>';
+    const btns = hot ? '<button class="btn" data-act="cp-open" type="button">Open it up</button><button class="btn ghost" data-act="cp-bribe" type="button">Slip him something · ' + fmt(big) + ' (risky)</button><button class="btn ghost" data-act="cp-run" type="button">Floor it! (the police will chase you)</button>'
+      : '<button class="btn" data-act="cp-show" type="button">Show your papers</button><button class="btn ghost" data-act="cp-dash" type="button">Offer something small · ' + fmt(small) + '</button>';
+    app0.insertAdjacentHTML('beforeend', '<div class="veil" id="cp-sheet"><div class="sheet" role="dialog" aria-modal="true"><h2>🚧 Police checkpoint</h2>' + body + '<div class="bgs">' + btns + '</div></div></div>');
+  }
+  function cpResolve(kind) {
+    const T = UI.trip; if (!T) return; const V0 = G3.views.map, M = T.mis, r = Math.random();
+    let msg = '', cost = 0, run = false;
+    if (kind === 'show') {
+      if (r < 0.7) msg = 'He checked your papers and waved you on. "Drive safe, oga."';
+      else if (r < 0.9) { msg = 'He took his time checking everything.'; if (M && !M.dead) { M.left = Math.max(1, M.left - 8); msg += ' You lost 8 seconds.'; } }
+      else { cost = Math.min(S.cash, 3000); msg = 'He wanted "something for the weekend". You paid ' + fmt(cost) + '.'; }
+    } else if (kind === 'dash') {
+      cost = Math.min(S.cash, pr(S, CP_SMALL));
+      if (r < 0.75) msg = 'He pocketed ' + fmt(cost) + ' and waved you on.';
+      else { const f = Math.min(Math.max(0, S.cash - cost), 15000); cost += f; msg = 'He shouted: "You want to bribe an officer?" and wrote a ticket. Total ' + fmt(cost) + '.'; }
+    } else if (kind === 'open') {
+      if (M && !M.dead) { M.dead = true; M.msg = misFail(S, 'seized'); } msg = 'He found the goods and seized everything.';
+    } else if (kind === 'bribe') {
+      cost = Math.min(S.cash, pr(S, CP_BIG));
+      if (r < 0.55) msg = 'He looked at the money, then at the sky. "Move along."';
+      else { cost += Math.min(Math.max(0, S.cash - cost), 10000); if (M && !M.dead) { M.dead = true; M.msg = misFail(S, 'seized'); } msg = 'He took your money and the goods. Total lost ' + fmt(cost) + '.'; }
+    } else if (kind === 'run') {
+      cost = Math.min(S.cash, 10000); run = true; msg = 'You floored it through the barrier! Fined ' + fmt(cost) + ' and the police are on you.';
+    }
+    S.cash -= cost; T.fines = (T.fines || 0) + cost; T.cpLog = msg; cpNote(T, msg); save();
+    const el = document.getElementById('cp-sheet'); if (el) el.remove();
+    V0.cpRelease(run ? 'run' : 'ok');
+  }
+  function cpRan() {
+    const T = UI.trip; if (!T) return; const f = Math.min(Math.max(0, S.cash), 10000);
+    S.cash -= f; T.fines = (T.fines || 0) + f; T.cpLog = 'You smashed through a police checkpoint.'; cpNote(T, '🚨 You smashed the checkpoint! Fined ' + fmt(f)); save();
   }
   const POL_FINE = 20000, POL_SETTLE = 8000, POL_BAD = 35000;
   function polSheet() {
@@ -6916,13 +7059,14 @@ window.G3 = (function () {
     UI.sheet = null; UI.prompt = null; UI.toast = ''; pinsEl.innerHTML = '';
     UI.trip = { from: from, to: to, mode: mode, drive: drive, label: label, msg: msg, drawn: 0 };
     const ma = S.mis && S.mis.active, timed = !!(drive && ma && ma.stage === 'deliver' && ma.kind === 'drive' && ma.to === to);
-    if (timed) { const L = ma.left != null ? ma.left : ma.limit * (S.slow ? 1.6 : 1); UI.trip.mis = { left: L, limit: ma.limit * (S.slow ? 1.6 : 1), crashes: 0, run: false, dead: false, last: 0, risky: ma.risky }; }
+    if (timed) { const L = ma.left != null ? ma.left : ma.limit * (S.slow ? 1.6 : 1); UI.trip.mis = { left: L, limit: ma.limit * (S.slow ? 1.6 : 1), crashes: 0, run: false, dead: false, last: 0, risky: ma.risky, frag: ma.frag == null ? null : ma.frag, pax: !!ma.pax }; }
     V.polOdds = timed && ma.risky ? { redlight: 0.9, crash: 0.8 } : { redlight: 0.6, crash: 0.45 };
     app.innerHTML = renderTrip();
     V.onTrip = tripUi; V.onTripDone = function () { setTimeout(finishTrip, 150); };
-    V.onEvent = function (e) { if (e.type === 'pursuit') { UI.trip.chase = true; return; } if (e.type === 'busted') { const M = UI.trip && UI.trip.mis; if (M && M.risky && !M.dead) { M.dead = true; M.msg = misFail(S, 'seized'); save(); } polSheet(); return; } if (e.type === 'escaped') { UI.trip.chase = false; UI.trip.escaped = true; return; } if (e.type === 'redlight' && drive) { const f = Math.min(Math.max(0, S.cash), 10000); if (f > 0) { S.cash -= f; UI.trip.fines = (UI.trip.fines || 0) + f; save(); } } };
+    V.onEvent = function (e) { if (e.type === 'checkpoint') { cpSheet(); return; } if (e.type === 'cprun') { cpRan(); return; } if (e.type === 'pursuit') { UI.trip.chase = true; return; } if (e.type === 'busted') { const M = UI.trip && UI.trip.mis; if (M && M.risky && !M.dead) { M.dead = true; M.msg = misFail(S, 'seized'); save(); } polSheet(); return; } if (e.type === 'escaped') { UI.trip.chase = false; UI.trip.escaped = true; return; } if (e.type === 'redlight' && drive) { const f = Math.min(Math.max(0, S.cash), 10000); if (f > 0) { S.cash -= f; UI.trip.fines = (UI.trip.fines || 0) + f; save(); } } };
+    const cpOdds = window.__cpOdds != null ? window.__cpOdds : (timed && ma.risky ? 0.9 : 0.3 + (((window.G3 && G3.clockSlot) ? G3.clockSlot() : 1) >= 2 ? 0.1 : 0)), wantCp = !!(drive && Math.random() < cpOdds);
     if (timed && ma.risky) setTimeout(function () { const t = V.trip; if (t && Math.random() < 0.75) t.polWait = 'risky'; }, 0);
-    V.startTrip({ from: from, to: to, drive: drive, vehicle: vehicle, model: vehicle === 'car' && car ? car.shape : 'sedan', color: color, slow: !!S.slow, top: vehicle === 'bike' && bike && bike.run > 0.3 ? 18 : 0 });
+    V.startTrip({ cp: wantCp, from: from, to: to, drive: drive, vehicle: vehicle, model: vehicle === 'car' && car ? car.shape : 'sedan', color: color, slow: !!S.slow, top: vehicle === 'bike' && bike && bike.run > 0.3 ? 18 : 0 });
   }
   function finishTrip() {
     const T = UI.trip; if (!T) return; const V = G3.views.map;
@@ -6930,6 +7074,7 @@ window.G3 = (function () {
     if (T.drive) { const r = travel(S, T.to, T.mode, { mis: T.mis }); msg = r.msg; save(); }
     if (T.mis && T.mis.dead && T.mis.msg) msg = (msg ? msg + ' ' : '') + T.mis.msg;
     if (T.fines) msg = (msg ? msg + ' ' : '') + 'Traffic fines: ' + fmt(T.fines) + '.';
+    if (T.cpLog) msg = (msg ? msg + ' ' : '') + T.cpLog;
     if (T.escaped) msg = (msg ? msg + ' ' : '') + 'You shook off the police.';
     UI.trip = null; V.onTrip = null; V.onTripDone = null; V.onEvent = null; V.endTrip(T.to);
     if (msg) showToast(msg); render();
@@ -7113,8 +7258,10 @@ window.G3 = (function () {
     if (act === 'lm') { if (CITY.hangouts[id]) { UI.sheet = id; presLoad(); render(false); return; } const l = CITY.landmarks.find(function (x) { return x.id === id; }); if (l) showToast('<b>' + l.name + '</b>: ' + l.line); render(false); return; }
     if (act === 'findme') { if (G3.views.map) { G3.views.map.dist = 118; G3.views.map.focus(S.at); } return; }
     if (act === 'overview') { if (G3.views.map) G3.views.map.overview(); return; }
+    if (act === 'cp-show' || act === 'cp-dash' || act === 'cp-open' || act === 'cp-bribe' || act === 'cp-run') { cpResolve(act.slice(3)); return; }
     if (act === 'pol-pay') { polResolve('pay'); return; }
     if (act === 'pol-settle') { polResolve('settle'); return; }
+    if (act === 'tr-auto' && G3.views.map.cpPending && G3.views.map.cpPending()) { showToast('Checkpoint ahead: you must stop yourself.'); UI.trip.note = { t: '\uD83D\uDEA7 No auto-drive: checkpoint ahead', until: performance.now() + 4000 }; return; }
     if (act === 'tr-auto' && UI.trip && UI.trip.mis && !UI.trip.mis.dead) { showToast('No auto-drive on a timed job. Drive it yourself.'); render(false); return; }
     if (act === 'tr-auto' && G3.views.map.polActive()) { showToast('You cannot auto-drive with police behind you.'); return; }
     if (act === 'tr-auto') { G3.views.map.autopilot(); const bt = document.querySelector('.tr-ctl'); if (bt) bt.hidden = true; el.hidden = true; return; }
