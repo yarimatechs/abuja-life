@@ -311,7 +311,27 @@ button.hp { cursor: pointer; text-align: left; }
 @keyframes polchip { 50% { background: #b3261e; border-color: #4f86ff; } }
 .pol-fx { position: fixed; inset: 0; z-index: 3; pointer-events: none; box-shadow: inset 0 0 70px 6px rgba(255, 40, 40, .55); animation: polfx .5s steps(2) infinite; }
 @keyframes polfx { 50% { box-shadow: inset 0 0 70px 6px rgba(50, 110, 255, .6); } }
-@media (prefers-reduced-motion: reduce) { .tr-chip.pol, .pol-fx { animation: none; } }
+@media (prefers-reduced-motion: reduce) { .tr-chip.pol, .pol-fx, .tr-chip.mis.low, .call-av.ring, .pin.mis { animation: none; } }
+.tr-chip.mis { background: #7a4b00; border: 2px solid #f2b01e; }
+.tr-chip.mis.low { background: #b3261e; border-color: #fff; animation: polchip .5s steps(2) infinite; }
+.veil.call { z-index: 70; }
+.callsheet { text-align: center; }
+.call-av { width: 96px; height: 96px; margin: 6px auto 10px; border-radius: 50%; display: grid; place-items: center; font-size: 48px; background: linear-gradient(145deg, #fde68a, #f59e0b); }
+.call-av.ring { animation: callring 1s ease-in-out infinite; }
+@keyframes callring { 0%, 100% { transform: rotate(0); box-shadow: 0 0 0 0 rgba(34, 197, 94, .55); } 25% { transform: rotate(-7deg) scale(1.05); } 75% { transform: rotate(7deg) scale(1.05); box-shadow: 0 0 0 20px rgba(34, 197, 94, 0); } }
+.call-n { font-weight: 800; font-size: 22px; }
+.call-s { color: var(--muted); font-size: 14px; margin: 2px 0 14px; }
+.call-b { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.btn.decline { background: #b3261e; color: #fff; border-color: #b3261e; }
+.btn.answer { background: #1f9d55; color: #fff; border-color: #1f9d55; }
+.call-t { text-align: left; font-style: italic; margin: 6px 0 12px; }
+.call-m { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; margin-bottom: 12px; }
+.pin.mis { border-color: #f2b01e; box-shadow: 0 0 0 3px rgba(242, 176, 30, .5); animation: mispulse 1.4s ease-in-out infinite; }
+@keyframes mispulse { 50% { box-shadow: 0 0 0 8px rgba(242, 176, 30, .12); } }
+.pin-m { display: block; font-size: 11px; font-weight: 800; color: #b45309; }
+:root[data-theme="dark"] .pin-m { color: #fbbf24; }
+.gig-bar { height: 8px; border-radius: 99px; background: rgba(128, 128, 128, .25); overflow: hidden; margin: 8px 0 4px; }
+.gig-bar i { display: block; height: 100%; background: var(--accent); }
 .tr-mid { position: absolute; left: 0; right: 0; bottom: calc(130px + env(safe-area-inset-bottom, 0px)); display: flex; justify-content: center; gap: 10px; }
 .tr-pill { border: 0; border-radius: 999px; padding: 10px 16px; font: inherit; font-weight: 700; font-size: 14px; background: rgba(255,255,255,0.95); color: #0b1f17; box-shadow: 0 3px 10px rgba(0,0,0,0.25); }
 .tr-ctl { position: absolute; left: 0; right: 0; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); display: flex; justify-content: space-between; align-items: flex-end; padding: 0 16px; }
@@ -1172,6 +1192,7 @@ function ensureNeeds(s) {
   if (!Array.isArray(s.inbox)) s.inbox = [];
   if (typeof s.msgSeq !== 'number') s.msgSeq = 0;
   if (typeof s.wise !== 'number') s.wise = 0;
+  s.mis = Object.assign(misNew(), s.mis && typeof s.mis === 'object' ? s.mis : {});
   return s;
 }
 /* the need that most needs attention, or null if nothing is low */
@@ -1239,6 +1260,7 @@ function newGame(bgId, look, name) {
   };
   s.look = cleanLook(look, bg.id); s.name = String(name || '').trim().slice(0, 16); s.wardrobe = { hair: [], outfit: [], acc: [] };
   ['hair', 'outfit', 'acc'].forEach(function (k) { if (!ownsLook(s, k, s.look[k])) s.look[k] = 0; });
+  s.mis = misNew();
   deliverMsg(s, 'job');
   log(s, 'Day 1 in Abuja. You have ' + fmt(s.cash) + ' and a plan that is still forming.');
   return s;
@@ -1400,7 +1422,7 @@ function doAction(s, id) {
   log(s, m);
   return { ok: true, msg: m };
 }
-function travel(s, to, mode) {
+function travel(s, to, mode, opts) {
   if (s.over || !CITY.places[to] || to === s.at) return { ok: false, msg: 'Not possible.' };
   mode = mode || 'cab';
   const o = tripOptions(s, s.at, to).find(x => x.mode === mode);
@@ -1422,6 +1444,7 @@ function travel(s, to, mode) {
     else m = 'You drove to ' + name + (o.cost ? '. Go-slow ate ' + fmt(o.cost) + ' in fuel.' : ' and it cost nothing.');
   }
   log(s, m);
+  m += misArrive(s, to, mode, opts);
   return { ok: true, msg: m, mode: mode };
 }
 
@@ -1633,8 +1656,8 @@ function reportScam(s) {
 
 /* messages: some are real chances, some are scams. Ignore, report or fall for them. */
 function msgIsScam(m) { return !!CITY.scamMsgs[m.tpl]; }
-function msgText(s, m) { const sc = CITY.scamMsgs[m.tpl]; return sc ? sc.text(m.amt) : CITY.realMsgs[m.tpl].text(s, m); }
-function msgFrom(m) { return (CITY.scamMsgs[m.tpl] || CITY.realMsgs[m.tpl]).from; }
+function msgText(s, m) { if (m.tpl === 'mis') return m.o.text; const sc = CITY.scamMsgs[m.tpl]; return sc ? sc.text(m.amt) : CITY.realMsgs[m.tpl].text(s, m); }
+function msgFrom(m) { if (m.tpl === 'mis') { const c = CITY.contacts[m.o.who]; return c.ic + ' ' + c.name + (m.missed && m.state === 'new' ? ' · missed call' : ''); } return (CITY.scamMsgs[m.tpl] || CITY.realMsgs[m.tpl]).from; }
 function unreadCount(s) { return s.inbox.filter(m => m.state === 'new').length; }
 function deliverMsg(s, tpl) {
   const sc = CITY.scamMsgs[tpl], re = CITY.realMsgs[tpl];
@@ -1653,6 +1676,10 @@ function msgChoices(s, m) {
       run: () => { s.cash -= m.amt; scammed(s, m.amt); apply(s, { mood: -8 }); return sc.loss + ' You lost ' + fmt(m.amt) + '.'; } },
     { label: 'Ignore', block: null, run: () => { s.wise += 1; return 'You ignored it. Wise move.'; } },
     { label: 'Report as scam', block: null, run: () => { s.wise += 1; apply(s, { mood: 1 }); return 'You reported the number. It may protect someone else.'; } }
+  ];
+  if (m.tpl === 'mis') return [
+    { label: 'Accept · ' + fmt(m.o.pay), block: s.mis.active ? 'Finish your current job first' : null, run: () => misAccept(s, m) },
+    { label: 'Not now', block: null, run: () => 'You turned it down.' }
   ];
   const r = CITY.realMsgs[m.tpl];
   return [
@@ -1673,6 +1700,7 @@ function replyMsg(s, id, i) {
 }
 /* each morning old messages fade away and maybe a new one arrives */
 function dailyMessages(s) {
+  misDaily(s);
   s.inbox.forEach(function (m) { if (m.state === 'new' && s.day - m.d >= 3) { m.state = 'done'; m.res = msgIsScam(m) ? 'The message expired.' : 'You missed your chance.'; } });
   if (unreadCount(s) >= 4 || rnd() > 0.45) return;
   const pool = [];
@@ -1681,6 +1709,131 @@ function dailyMessages(s) {
   let t = pool.reduce((a, p) => a + p[1], 0) * rnd(), pickK = pool[0][0];
   for (const p of pool) { t -= p[1]; if (t <= 0) { pickK = p[0]; break; } }
   deliverMsg(s, pickK);
+}
+
+/* ---------- gigs: contacts who call or text you with jobs ---------- */
+const MIS_RANKS = [[0, 'Nobody'], [3, 'Runner'], [8, 'Courier'], [15, 'Fixer'], [30, 'Big Boy'], [60, 'Oga']];
+function misNew() { return { rep: 0, done: 0, failed: 0, earned: 0, active: null, next: 0, last: '' }; }
+function misRank(rep) { let r = 0; for (let i = 0; i < MIS_RANKS.length; i++) if (rep >= MIS_RANKS[i][0]) r = i; return r; }
+function misVeh(s) { return hasCar(s) || !!s.owned.bike; }
+CITY.contacts = {
+  ngozi: { name: 'Auntie Ngozi', ic: '👩🏾‍🍳', role: 'Sells food at Wuse Market', rep: 0, w: 1.6, from: ['wuse'], to: ['maitama', 'asokoro', 'garki', 'jabi', 'utako', 'secretariat', 'gwarinpa'],
+    base: 2500, km: 200, spd: 7.5, slack: 14,
+    ask: ['My pikin, customers dey wait for hot jollof in {to}. Collect the packs from my stall in {from} and bring am quick. I go pay you {pay}.',
+      'Good day o! I get big order for {to} and my boy no show. Carry the food from {from}. Do am well and {pay} is yours.'],
+    good: ['God bless you, my pikin! The customers are smiling. Your money don enter.', 'Ah ah, you are fast! Come back anytime.'],
+    bad: ['Hmm. The food went cold and the customer cancelled. Next time, abeg.', 'Which kind of delay be this? I will find another person.'] },
+  chidi: { name: 'Chidi Dispatch', ic: '📦', role: 'Runs a courier desk', rep: 3, w: 1.3, from: ['wuse', 'garki', 'utako', 'jabi'], to: ['maitama', 'gwarinpa', 'kubwa', 'karu', 'katampe', 'dutse', 'jahi', 'apo', 'lokogoma', 'guzape'],
+    base: 3500, km: 250, spd: 8.5, slack: 10,
+    ask: ['Boss, Chidi here. I have a parcel waiting in {from} for a client in {to}. Nobody else is free. {pay} if it gets there on time.',
+      'Parcel dey {from}, address dey {to}. My riders are stuck in go-slow. You fit help? {pay}.'],
+    good: ['Parcel delivered and the client is happy. Your {pay} has been sent. Good work.', 'Clean delivery. I will keep you in mind for the next one.'],
+    bad: ['The client said the parcel came late. I have to refund them. Be faster next time.', 'You missed the window, boss. I lost money on that one.'] },
+  tunde: { name: 'Tunde Mechanic', ic: '🔧', role: 'Garage owner', rep: 6, w: 1.1, from: ['abujacars', 'karu', 'garki'], to: ['wuse', 'utako', 'jabi', 'gwarinpa', 'katampe', 'lugbe', 'apo'],
+    base: 4500, km: 280, spd: 9, slack: 9,
+    ask: ['Oga, I need a gearbox part urgently. It is in {from}. Bring it to my customer in {to} before he loses patience. {pay}.',
+      'Tunde here. Car is on jack and the part is in {from}. Run it to {to} for me, {pay} for the trouble.'],
+    good: ['That is how to do it! The car is back on the road. Take your {pay}.', 'You saved my day. The customer even tipped me.'],
+    bad: ['By the time you came, the customer had gone to another garage. Chai.', 'Too slow, my guy. The job is gone.'] },
+  musa: { name: 'Alhaji Musa', ic: '🧔🏾', role: 'Businessman, wants a driver he can trust', rep: 12, w: 0.9, need: s => hasCar(s), from: ['maitama', 'asokoro', 'guzape'], to: ['secretariat', 'garki', 'wuse', 'jabi', 'abujacars', 'katampe'],
+    base: 7000, km: 450, spd: 9.8, slack: 7,
+    ask: ['Good afternoon. I have a meeting at {to} and my driver is sick. Pick me at {from} and drive me properly. {pay}. I do not like late.',
+      'Young man, you drive well. Come to {from} and take me to {to}. {pay}. No wahala on the road, please.'],
+    good: ['Very good. You drove like a professional. Here is your {pay}. I will call you again.', 'On time and in one piece. That is rare these days.'],
+    bad: ['I am late for my meeting. I will not call you again for a while.', 'Hmm. This is disappointing. I expected better.'] },
+  slim: { name: 'Unknown number', ic: '🕶️', role: 'Someone who says nobody should know', rep: 18, w: 0.8, risky: true, need: s => misVeh(s), from: ['utako', 'jabi', 'karu', 'lugbe', 'apo'], to: ['asokoro', 'guzape', 'maitama', 'katampe', 'gwagwalada', 'bwari'],
+    base: 12000, km: 500, spd: 10.4, slack: 5,
+    ask: ['You do not know me but I know you. Collect a bag in {from}. Do not open it. Drop it at {to}. {pay}. If police stop you, you never saw me.',
+      'Package at {from}. Destination {to}. Fast and quiet. {pay} cash. Police love to ask questions, so do not give them reasons.'],
+    good: ['Package received. {pay} as agreed. Stay quiet and stay ready.', 'Neat. You are not as green as you look.'],
+    bad: ['The package never made it. People are angry. Do not call this number.', 'You failed. Do not expect a call again soon.'] }
+};
+function misFill(t, o) { return t.replace('{from}', CITY.places[o.from].name).replace('{to}', CITY.places[o.to].name).replace('{pay}', fmt(o.pay)); }
+function misPlace(id) { return CITY.places[id].name; }
+function misManh(a, b) { const p = CITY.mapPos[a], q = CITY.mapPos[b]; return Math.abs(p.x - q.x) + Math.abs(p.z - q.z); }
+function misMake(s, via, cid) {
+  const m = s.mis, ok = Object.keys(CITY.contacts).filter(k => { const c = CITY.contacts[k]; return m.rep >= c.rep && (!c.need || c.need(s)); });
+  if (!ok.length) return null;
+  let k = cid && ok.indexOf(cid) >= 0 ? cid : null;
+  if (!k) {
+    const pool = ok.filter(x => x !== m.last).length ? ok.filter(x => x !== m.last) : ok;
+    const wt = pool.map(x => CITY.contacts[x].w * (x === 'ngozi' ? Math.max(0.4, 1 - misRank(m.rep) * 0.15) : 1));
+    let t = wt.reduce((a, b) => a + b, 0) * rnd(); k = pool[0];
+    for (let i = 0; i < pool.length; i++) { t -= wt[i]; if (t <= 0) { k = pool[i]; break; } }
+  }
+  const c = CITY.contacts[k], from = pick(c.from), to = pick(c.to.filter(x => x !== from));
+  const drive = misVeh(s) || !!c.need, km = tripKm(from, to);
+  const o = { who: k, from: from, to: to, kind: drive ? 'drive' : 'errand', risky: !!c.risky, dl: s.day + 3 };
+  o.pay = Math.max(1500, Math.round(pr(s, (c.base + km * c.km) * (drive ? 1.5 : 1)) / 500) * 500);
+  o.limit = drive ? Math.round(misManh(from, to) * 1.15 / c.spd + c.slack) : 0;
+  o.text = misFill(pick(c.ask), o) + (drive ? ' You drive it yourself and the clock starts when you set off with the goods.' : ' No clock on this one, but get it done within 3 days.');
+  const msg = { id: ++s.msgSeq, tpl: 'mis', d: s.day, state: 'new', amt: 0, res: '', via: via, o: o };
+  s.inbox.push(msg);
+  if (s.inbox.length > 16) { const i = s.inbox.findIndex(x => x.state === 'done'); s.inbox.splice(i < 0 ? 0 : i, 1); }
+  m.last = k;
+  return msg;
+}
+function misAccept(s, m) {
+  const o = m.o, c = CITY.contacts[o.who];
+  s.mis.active = { who: o.who, from: o.from, to: o.to, kind: o.kind, pay: o.pay, limit: o.limit, risky: o.risky, dl: o.dl, stage: s.at === o.from ? 'deliver' : 'pickup', left: null };
+  return 'Job accepted from ' + c.name + '. ' + misGoal(s);
+}
+function misGoal(s) {
+  const a = s.mis && s.mis.active; if (!a) return '';
+  if (a.stage === 'pickup') return 'Go to ' + misPlace(a.from) + ' and collect the goods.';
+  return 'Deliver to ' + misPlace(a.to) + ' for ' + fmt(a.pay) + (a.kind === 'drive' ? ' (drive it yourself, ' + a.limit + ' s on the clock)' : ' before day ' + a.dl + '.');
+}
+function misInfo(s, who, text, res) {
+  const msg = { id: ++s.msgSeq, tpl: 'mis', d: s.day, state: 'done', amt: 0, res: res || '', via: 'text', o: { who: who, text: text } };
+  s.inbox.push(msg);
+  if (s.inbox.length > 16) { const i = s.inbox.findIndex(x => x.state === 'done'); s.inbox.splice(i < 0 ? 0 : i, 1); }
+}
+function misFail(s, why) {
+  const a = s.mis.active; if (!a) return '';
+  const c = CITY.contacts[a.who], loss = a.risky ? 3 : 2, before = s.mis.rep;
+  s.mis.rep = Math.max(0, s.mis.rep - (why === 'drop' ? 1 : loss)); s.mis.failed += 1; s.mis.active = null;
+  const t = why === 'time' ? 'You ran out of time. ' + c.name + ' cancelled the job.' : why === 'seized' ? 'The police took the goods. The job is dead.' : why === 'late' ? c.name + ' gave the job to someone else.' : 'You dropped the job.';
+  apply(s, { mood: -3 }); log(s, t + ' Rep ' + (s.mis.rep - before) + '.');
+  if (why !== 'drop') misInfo(s, a.who, pick(c.bad), 'Rep ' + (s.mis.rep - before));
+  return t + ' Rep ' + (s.mis.rep - before) + '.';
+}
+function misDaily(s) {
+  const m = s.mis; if (!m) return;
+  if (m.active && s.day > m.active.dl) misFail(s, 'late');
+  if (!m.active && s.inbox.filter(x => x.tpl === 'mis' && x.state === 'new').length < 2 && rnd() < 0.35) misMake(s, 'text');
+}
+/* arriving somewhere: collect the goods, or hand them over and get paid. opts.mis is the timer record from a driven trip. */
+function misArrive(s, to, mode, opts) {
+  const m = s.mis, a = m && m.active; if (!a) return '';
+  if (a.stage === 'pickup' && to === a.from) { a.stage = 'deliver'; return ' 📦 You collected the goods. ' + misGoal(s); }
+  if (a.stage !== 'deliver' || to !== a.to) return '';
+  if (a.kind === 'drive') {
+    const mine = mode === 'car' || (mode === 'okada' && !!s.owned.bike);
+    if (!(mine && opts && opts.mis)) return ' This job needs you to drive it yourself in your own vehicle. Leave and come back.';
+  }
+  let pay = a.pay, note = '';
+  if (a.kind === 'drive' && opts && opts.mis) {
+    const M = opts.mis;
+    if (M.left / M.limit >= 0.4) { pay = Math.round(pay * 1.25); note = ' Fast delivery bonus.'; }
+    if (M.crashes > 0) { pay = Math.round(pay * (1 - Math.min(0.4, 0.1 * M.crashes))); note += ' Crash damage cut the pay.'; }
+  }
+  pay = Math.round(pay / 100) * 100;
+  const c = CITY.contacts[a.who], gain = a.risky ? 4 : a.kind === 'drive' ? 2 : 1, r0 = misRank(m.rep);
+  s.cash += pay; s.stats.earned += pay; m.rep += gain; m.done += 1; m.earned += pay; m.active = null;
+  apply(s, { mood: 4, energy: -3 });
+  const up = misRank(m.rep) > r0 ? ' Rank up: ' + MIS_RANKS[misRank(m.rep)][1] + '!' : '';
+  const t = 'Delivered to ' + misPlace(to) + '. You earned ' + fmt(pay) + '.' + note + ' Rep +' + gain + '.' + up;
+  log(s, t); misInfo(s, a.who, pick(c.good).replace('{pay}', fmt(pay)), '+' + fmt(pay) + ' · Rep +' + gain);
+  return ' 💰 ' + t;
+}
+/* every few minutes of real play, somebody rings or texts you with a job */
+function misTick(s, now) {
+  const m = s.mis; if (!m || s.over || m.active) return null;
+  if (!m.next) { m.next = now + 25000; return null; }
+  if (now < m.next) return null;
+  if (s.inbox.filter(x => x.tpl === 'mis' && x.state === 'new').length >= 2) { m.next = now + 60000; return null; }
+  m.next = now + 90000 + Math.random() * 120000;
+  return misMake(s, Math.random() < 0.6 ? 'call' : 'text');
 }
 
 function itemBlock(s, id) {
@@ -5015,7 +5168,7 @@ window.G3 = (function () {
     t.tailM.forEach(function (m) { m.emissive.setHex(braking ? 0xff2020 : 0x300000); });
     const dark = !!(V.env && (V.env.night || V.env.rain || V.env.slot === 2)); if (t.lights.visible !== dark) t.lights.visible = dark;
     const q = onRoute(t, t.x, t.z), turn = nextTurn(t, q.s);
-    t.info = { x: t.x, z: t.z, h: t.h, v: t.v, s: q.s, len: t.len, remain: Math.max(0, t.len - q.s), crash: (t.crashT || 0) > 0, redlight: (t.rl || 0) > 0, off: q.d > 6.5 && t.mode === 'drive', wrong: t.mode === 'drive' && t.v > 2 && q.lat < -1.9 && q.d < 6.5, offRoad: !!t.off, rough: !!t.rough, turn: turn, mode: t.mode, slow: slow, done: t.done, pol: t.pol ? { x: t.pol.x, z: t.pol.z, gap: t.pol.gap, bust: t.pol.meter, state: t.pol.state } : null };
+    t.info = { dt: dt, x: t.x, z: t.z, h: t.h, v: t.v, s: q.s, len: t.len, remain: Math.max(0, t.len - q.s), crash: (t.crashT || 0) > 0, redlight: (t.rl || 0) > 0, off: q.d > 6.5 && t.mode === 'drive', wrong: t.mode === 'drive' && t.v > 2 && q.lat < -1.9 && q.d < 6.5, offRoad: !!t.off, rough: !!t.rough, turn: turn, mode: t.mode, slow: slow, done: t.done, pol: t.pol ? { x: t.pol.x, z: t.pol.z, gap: t.pol.gap, bust: t.pol.meter, state: t.pol.state } : null };
     tripCamera(t, dt);
     if (V.onTrip) V.onTrip(t.info, t);
   }
@@ -5174,6 +5327,7 @@ window.G3 = (function () {
   function nextGoal() {
     const j = S.japa, J = CITY.japa;
     const w = worstNeed(S); if (w) return w[2] + (w[0] === 'clean' && S.at !== homePlace(S) ? ' (go home first)' : '');
+    if (S.mis && S.mis.active) return 'Job: ' + misGoal(S);
     if (S.japa.status === 'approved') return 'Visa approved. Book your flight: Phone, then Japa';
     if (S.japa.status === 'pending') return 'Visa decision around day ' + j.decideDay;
     if (!S.job) return 'Get a job: Phone, then Jobs';
@@ -5414,7 +5568,7 @@ window.G3 = (function () {
   /* ---------- phone: jobs, japa, life, log ---------- */
   /* ---------- online leaderboard (Supabase over plain REST: no library, only the public anon key) ---------- */
   const BOARD = { url: 'https://tvbnoqwyekbqrlxxnztq.supabase.co', key: 'sb_publishable_db5quqce8u5iWU7qENLltg_U4OWrfYG' };   /* public client key: safe to ship */
-  const APP_VERSION = 'v1.18 · 29 Oct 2026';
+  const APP_VERSION = 'v1.19 · 30 Oct 2026';
   const ERRS = [];
   window.addEventListener('error', function (e) { ERRS.push(String((e && e.message) || 'error').slice(0, 140) + ' @' + ((e && e.lineno) || 0)); if (ERRS.length > 5) ERRS.shift(); });
   window.addEventListener('unhandledrejection', function (e) { ERRS.push('promise: ' + String((e && e.reason && e.reason.message) || (e && e.reason) || '').slice(0, 140)); if (ERRS.length > 5) ERRS.shift(); });
@@ -6163,9 +6317,68 @@ window.G3 = (function () {
     const d = new Date(), h = d.getHours(), m = d.getMinutes(), h12 = h % 12 || 12, mm = (m < 10 ? '0' : '') + m;
     return short ? h12 + ':' + mm : h12 + ':' + mm + (h < 12 ? 'AM' : 'PM');
   }
+  /* ---------- gigs: the app, the ringing phone, and the map markers ---------- */
+  function misTarget() { const a = S && S.mis && S.mis.active; return a ? (a.stage === 'pickup' ? a.from : a.to) : null; }
+  function renderGigs() {
+    const m = S.mis, r = misRank(m.rep), nx = MIS_RANKS[r + 1], a = m.active;
+    let h = '<h2>Gigs</h2><div class="card"><div style="display:flex;justify-content:space-between;gap:8px"><b>' + MIS_RANKS[r][1] + '</b><span class="chip">Rep ' + m.rep + '</span></div>' +
+      '<div class="gig-bar"><i style="width:' + (nx ? Math.round((m.rep - MIS_RANKS[r][0]) / (nx[0] - MIS_RANKS[r][0]) * 100) : 100) + '%"></i></div>' +
+      '<p class="muted">' + (nx ? nx[0] - m.rep + ' more rep to become ' + nx[1] + '. Better rep means better people call you.' : 'You are at the top. Everyone knows your number.') + '</p>' +
+      '<div class="kv"><div><span>Jobs done</span><span>' + m.done + '</span></div><div><span>Jobs failed</span><span>' + m.failed + '</span></div><div><span>Earned from gigs</span><span class="num">' + fmt(m.earned) + '</span></div></div></div>';
+    if (a) {
+      const c = CITY.contacts[a.who];
+      h += '<div class="card"><h3>' + c.ic + ' Current job · ' + esc(c.name) + '</h3><p>' + (a.stage === 'pickup' ? '<b>1.</b> Collect at ' + esc(misPlace(a.from)) + '<br><span class="muted"><b>2.</b> Deliver to ' + esc(misPlace(a.to)) + '</span>' : '<span class="muted">1. Collected at ' + esc(misPlace(a.from)) + '</span><br><b>2.</b> Deliver to ' + esc(misPlace(a.to))) + '</p>' +
+        '<div style="display:flex;gap:6px;flex-wrap:wrap"><span class="chip money">' + fmt(a.pay) + '</span>' + (a.kind === 'drive' ? '<span class="chip">Drive it yourself · ' + a.limit + ' s</span>' : '<span class="chip">Any transport · by day ' + a.dl + '</span>') + (a.risky ? '<span class="chip" style="background:var(--warn-bg);color:var(--warn)">Police risk</span>' : '') + '</div>' +
+        '<div style="margin-top:10px"><button class="btn ghost" data-act="mis-drop" type="button">Drop this job (rep -1)</button></div></div>';
+    } else h += '<div class="card"><p class="muted">No job right now. Keep your phone close: people call and text when they need somebody.</p></div>';
+    h += '<h3 style="margin:14px 0 6px">Your contacts</h3>' + Object.keys(CITY.contacts).map(function (k) {
+      const c = CITY.contacts[k], lock = m.rep < c.rep, sub = lock ? 'Unlocks at rep ' + c.rep : (c.need && !c.need(S) ? 'Needs a car' : c.role);
+      return '<div class="card" style="' + (lock ? 'opacity:.55' : '') + '"><div style="display:flex;gap:10px;align-items:center"><span style="font-size:28px">' + (lock ? '🔒' : c.ic) + '</span><div><b>' + esc(lock ? 'Not in your phone yet' : c.name) + '</b><div class="muted">' + esc(sub) + '</div></div></div></div>';
+    }).join('');
+    return h;
+  }
+  function renderCall() {
+    const C = UI.call; if (!C || !S) return '';
+    const m = S.inbox.find(function (x) { return x.id === C.id; }); if (!m) return '';
+    const o = m.o, c = CITY.contacts[o.who];
+    if (C.stage === 'ring') return '<div class="veil call"><div class="sheet callsheet" role="alertdialog" aria-modal="true" aria-label="Incoming call from ' + esc(c.name) + '"><div class="call-av ring">' + c.ic + '</div><div class="call-n">' + esc(c.name) + '</div><div class="call-s">Incoming call…</div>' +
+      '<div class="call-b"><button class="btn decline" data-act="call-no" type="button">Decline</button><button class="btn answer" data-act="call-yes" type="button">Answer</button></div></div></div>';
+    return '<div class="veil call"><div class="sheet callsheet" role="dialog" aria-modal="true" aria-label="On a call with ' + esc(c.name) + '"><div class="call-av">' + c.ic + '</div><div class="call-n">' + esc(c.name) + '</div><div class="call-s">On call</div>' +
+      '<p class="call-t">“' + esc(o.text) + '”</p><div class="call-m"><span class="chip money">' + fmt(o.pay) + '</span><span class="chip">' + esc(misPlace(o.from)) + ' → ' + esc(misPlace(o.to)) + '</span>' + (o.kind === 'drive' ? '<span class="chip">' + o.limit + ' s</span>' : '') + (o.risky ? '<span class="chip" style="background:var(--warn-bg);color:var(--warn)">Police risk</span>' : '') + '</div>' +
+      '<div class="call-b"><button class="btn ghost" data-act="call-later" type="button">Not now</button><button class="btn answer" data-act="call-acc" type="button"' + (S.mis.active ? ' disabled' : '') + '>Accept job</button></div>' + (S.mis.active ? '<p class="muted">Finish your current job first.</p>' : '') + '</div></div>';
+  }
+  let callT = null;
+  function endCall() { clearTimeout(callT); callT = null; try { if (navigator.vibrate) navigator.vibrate(0); } catch (e) {} }
+  function ringCall(m) {
+    UI.call = { id: m.id, stage: 'ring' };
+    try { if (navigator.vibrate) navigator.vibrate([500, 300, 500, 300, 500, 300, 500, 300, 500]); } catch (e) {}
+    clearTimeout(callT); callT = setTimeout(function () { if (UI.call && UI.call.id === m.id && UI.call.stage === 'ring') callAct('call-no'); }, 20000);
+    render(false);
+  }
+  function callAct(act) {
+    const C = UI.call; if (!C || !S) return;
+    const m = S.inbox.find(function (x) { return x.id === C.id; }), id = C.id; endCall();
+    if (act === 'call-yes') { UI.call.stage = 'talk'; render(false); return; }
+    UI.call = null;
+    if (!m) { render(false); return; }
+    if (act === 'call-no') { m.missed = true; showToast('Missed call from ' + CITY.contacts[m.o.who].name + '. They sent a message.'); save(); render(false); return; }
+    if (act === 'call-acc') return after(replyMsg(S, id, 0));
+    if (act === 'call-later') return after(replyMsg(S, id, 1));
+  }
+  setInterval(function () {
+    try {
+      if (!S || S.over || !S.mis || UI.trip || UI.call || UI.sheet || UI.vitals || UI.chat || UI.person || UI.busy || S.event || UI.welcome || document.hidden || !(UI.tab === 'home' || UI.tab === 'map')) return;
+      if (Auth.show || Auth.conflict || Auth.recovery || Auth.wait) return;
+      const m = misTick(S, Date.now()); if (!m) return;
+      save();
+      if (m.via === 'call') ringCall(m); else { showToast('💬 New message from ' + CITY.contacts[m.o.who].name); render(false); }
+    } catch (e) {}
+  }, 4000);
+  window.__mis = { tick: function () { const m = misTick(S, Date.now() + 1e9); if (m) { if (m.via === 'call') ringCall(m); else render(false); } return m; }, make: function (via, cid) { const m = misMake(S, via, cid); if (m) { save(); if (via === 'call') ringCall(m); else render(false); } return m; } };
   const APPS = [
     ['jobs', 'Jobs', '💼', 'linear-gradient(145deg,#34d399,#059669)'],
     ['log', 'Messages', '💬', 'linear-gradient(145deg,#60a5fa,#2563eb)'],
+    ['gigs', 'Gigs', '📞', 'linear-gradient(145deg,#facc15,#ea580c)'],
     ['japa', 'Japa', '✈️', 'linear-gradient(145deg,#22d3ee,#0e7490)'],
     ['life', 'Me', '🙋🏾', 'linear-gradient(145deg,#a78bfa,#6d28d9)'],
     ['bank', 'Bank', '🏦', 'linear-gradient(145deg,#a78bfa,#6d28d9)'],
@@ -6186,6 +6399,7 @@ window.G3 = (function () {
   function appBadge(id) {
     if (id === 'log') return Math.min(9, unreadCount(S));
     if (id === 'chat') return Math.min(9, chatUnread());
+    if (id === 'gigs') return S.mis && S.mis.active ? 1 : 0;
     if (id === 'japa' && (S.japa.status === 'approved' || S.japa.status === 'denied')) return 1;
     if (id === 'health' && S.sick) return 1;
     if (id === 'police' && S.unreported > 0) return 1;
@@ -6357,7 +6571,7 @@ window.G3 = (function () {
       '<div class="card"><h3>Going out</h3><p class="muted">Tap Magic Land, Club Zenith, the park, the mall or the Hilton on the map to go out. Players who are there at the same time show up. Tap one to say how far, compliment them, crack a joke or flirt. Block or report anyone who is rude.</p></div>' +
       '<div class="card"><h3>Friends and feedback</h3><p class="muted">Chat lets you find a friend by username and send money. Something broken or boring? Tell the maker in the Feedback app.</p><button class="btn ghost" data-act="phone" data-id="feedback" type="button">Open Feedback</button> <button class="btn ghost" data-act="share" type="button">📲 Invite a friend</button></div>';
   }
-  const PHONE_SCREENS = { jobs: () => renderJobs(), log: () => renderMessages(), japa: () => renderJapa(), life: () => renderLife(), bank: () => renderBank(), courses: () => renderCourses(),
+  const PHONE_SCREENS = { jobs: () => renderJobs(), log: () => renderMessages(), gigs: () => renderGigs(), japa: () => renderJapa(), life: () => renderLife(), bank: () => renderBank(), courses: () => renderCourses(),
     help: () => renderHelp(), feedback: () => renderFeedback(), houses: () => renderHouses(), cars: () => renderCars(), chat: () => renderChatApp(), boutique: () => renderBoutique(), health: () => renderHealth(), chow: () => renderChow(), shops: () => renderShops(),
     forbes: () => renderForbes(), police: () => renderPolice(), ride: () => renderRide() };
   function renderPhone() {
@@ -6620,7 +6834,7 @@ window.G3 = (function () {
     const T = UI.trip, drive = T.drive;
     return '<div class="trip" role="region" aria-label="Trip"><div class="tr-top"><span class="tr-ic" id="tr-ic">⬆️</span><div><div class="tr-main" id="tr-main">Heading to ' + esc(CITY.places[T.to].name) + '</div><div class="tr-sub" id="tr-sub">' + esc(T.label) + '</div></div></div>' +
       '<canvas class="tr-mini" id="tr-map" width="260" height="260" aria-label="Minimap"></canvas>' +
-      '<div class="tr-chips"><span class="tr-chip" id="tr-spd">0 km/h</span><span class="tr-chip" id="tr-rem">…</span><span class="tr-chip warn" id="tr-warn" hidden></span><span class="tr-chip pol" id="tr-pol" hidden></span></div><div class="pol-fx" id="pol-fx" hidden></div>' +
+      '<div class="tr-chips"><span class="tr-chip" id="tr-spd">0 km/h</span><span class="tr-chip" id="tr-rem">…</span><span class="tr-chip warn" id="tr-warn" hidden></span><span class="tr-chip pol" id="tr-pol" hidden></span><span class="tr-chip mis" id="tr-mis" hidden></span></div><div class="pol-fx" id="pol-fx" hidden></div>' +
       (drive ? '<div class="tr-mid"><button class="tr-pill" data-act="tr-auto" type="button">🤖 Auto-drive</button><button class="tr-pill" data-act="tr-view" type="button">' + viewLabel() + '</button><button class="tr-pill" data-act="tr-park" type="button">🅿️ Park here</button></div>' +
         '<div class="tr-ctl"><div class="tr-pad"><button class="tr-btn" data-hold="left" type="button" aria-label="Steer left">◀</button><button class="tr-btn" data-hold="right" type="button" aria-label="Steer right">▶</button></div>' +
         '<div class="tr-pad"><button class="tr-btn brake" data-hold="brake" type="button" aria-label="Brake">STOP</button><button class="tr-btn gas" data-hold="gas" type="button" aria-label="Accelerate">GO</button></div></div>'
@@ -6657,6 +6871,20 @@ window.G3 = (function () {
     { const pe = document.getElementById('tr-pol'), fx = document.getElementById('pol-fx'), P = i.pol, on = !!(P && P.state !== 'busted');
       let pt = ''; if (P) pt = P.state === 'chase' ? (P.bust > 0.08 ? '🚨 They are closing in! ' + Math.round(P.bust * 100) + '%' : '🚨 Police chasing you: keep driving') : '🚨 Pulling over…';
       if (pe) { pe.hidden = !pt; if (pt && pe.textContent !== pt) pe.textContent = pt; } if (fx) fx.hidden = !on; }
+    { const M = T.mis, me = document.getElementById('tr-mis');
+      if (M) {
+        const dt = Math.min(0.1, i.dt || 0);
+        if (!M.dead) {
+          if (!M.run && i.v > 0.5) M.run = true;
+          if (M.run && !document.getElementById('pol-sheet')) M.left -= dt;
+          if (i.crash && !M.cr) M.crashes++; M.cr = !!i.crash;
+          if (M.left <= 0) { M.left = 0; M.dead = true; M.msg = misFail(S, 'time'); save(); }
+        }
+        if (me) {
+          const sec = Math.ceil(Math.max(0, M.left)), tx = M.dead ? '\u23F0 Too late: job failed' : '\u23F1 ' + Math.floor(sec / 60) + ':' + ('0' + (sec % 60)).slice(-2) + ' \u00B7 ' + CITY.places[T.to].name + (M.run ? '' : ' (starts when you move)');
+          me.hidden = false; if (me.textContent !== tx) me.textContent = tx; me.classList.toggle('low', M.dead || sec <= 8);
+        }
+      } else if (me) me.hidden = true; }
     const now = performance.now(); if (now - (T.drawn || 0) > 33) { T.drawn = now; drawMini(i); }
   }
   const POL_FINE = 20000, POL_SETTLE = 8000, POL_BAD = 35000;
@@ -6687,15 +6915,20 @@ window.G3 = (function () {
     if (!drive) { const r = travel(S, to, mode); if (!r.ok) { showToast(r.msg); render(false); return; } msg = r.msg; save(); }
     UI.sheet = null; UI.prompt = null; UI.toast = ''; pinsEl.innerHTML = '';
     UI.trip = { from: from, to: to, mode: mode, drive: drive, label: label, msg: msg, drawn: 0 };
+    const ma = S.mis && S.mis.active, timed = !!(drive && ma && ma.stage === 'deliver' && ma.kind === 'drive' && ma.to === to);
+    if (timed) { const L = ma.left != null ? ma.left : ma.limit * (S.slow ? 1.6 : 1); UI.trip.mis = { left: L, limit: ma.limit * (S.slow ? 1.6 : 1), crashes: 0, run: false, dead: false, last: 0, risky: ma.risky }; }
+    V.polOdds = timed && ma.risky ? { redlight: 0.9, crash: 0.8 } : { redlight: 0.6, crash: 0.45 };
     app.innerHTML = renderTrip();
     V.onTrip = tripUi; V.onTripDone = function () { setTimeout(finishTrip, 150); };
-    V.onEvent = function (e) { if (e.type === 'pursuit') { UI.trip.chase = true; return; } if (e.type === 'busted') { polSheet(); return; } if (e.type === 'escaped') { UI.trip.chase = false; UI.trip.escaped = true; return; } if (e.type === 'redlight' && drive) { const f = Math.min(Math.max(0, S.cash), 10000); if (f > 0) { S.cash -= f; UI.trip.fines = (UI.trip.fines || 0) + f; save(); } } };
+    V.onEvent = function (e) { if (e.type === 'pursuit') { UI.trip.chase = true; return; } if (e.type === 'busted') { const M = UI.trip && UI.trip.mis; if (M && M.risky && !M.dead) { M.dead = true; M.msg = misFail(S, 'seized'); save(); } polSheet(); return; } if (e.type === 'escaped') { UI.trip.chase = false; UI.trip.escaped = true; return; } if (e.type === 'redlight' && drive) { const f = Math.min(Math.max(0, S.cash), 10000); if (f > 0) { S.cash -= f; UI.trip.fines = (UI.trip.fines || 0) + f; save(); } } };
+    if (timed && ma.risky) setTimeout(function () { const t = V.trip; if (t && Math.random() < 0.75) t.polWait = 'risky'; }, 0);
     V.startTrip({ from: from, to: to, drive: drive, vehicle: vehicle, model: vehicle === 'car' && car ? car.shape : 'sedan', color: color, slow: !!S.slow, top: vehicle === 'bike' && bike && bike.run > 0.3 ? 18 : 0 });
   }
   function finishTrip() {
     const T = UI.trip; if (!T) return; const V = G3.views.map;
     let msg = T.msg;
-    if (T.drive) { const r = travel(S, T.to, T.mode); msg = r.msg; save(); }
+    if (T.drive) { const r = travel(S, T.to, T.mode, { mis: T.mis }); msg = r.msg; save(); }
+    if (T.mis && T.mis.dead && T.mis.msg) msg = (msg ? msg + ' ' : '') + T.mis.msg;
     if (T.fines) msg = (msg ? msg + ' ' : '') + 'Traffic fines: ' + fmt(T.fines) + '.';
     if (T.escaped) msg = (msg ? msg + ' ' : '') + 'You shook off the police.';
     UI.trip = null; V.onTrip = null; V.onTripDone = null; V.onEvent = null; V.endTrip(T.to);
@@ -6703,6 +6936,7 @@ window.G3 = (function () {
   }
   function cancelTrip() {
     const T = UI.trip; if (!T) return; const V = G3.views.map;
+    if (T.mis && !T.mis.dead && S.mis.active) { S.mis.active.left = Math.max(1, T.mis.left); save(); }
     UI.trip = null; V.onTrip = null; V.onTripDone = null; V.onEvent = null; V.endTrip(T.from);
     showToast('You parked and stayed in ' + CITY.places[T.from].name + '. ' + (T.fines ? 'Traffic fines: ' + fmt(T.fines) + '.' : 'Nothing was charged.')); render();
   }
@@ -6725,10 +6959,10 @@ window.G3 = (function () {
     if (!S) { pinsEl.innerHTML = ''; return; }
     if (UI.tab === 'home' && threeOk) { pinsEl.innerHTML = renderPrompt(); positionPrompt(); return; }
     if (UI.tab !== 'map' || !threeOk) { pinsEl.innerHTML = ''; return; }
-    let h = '';
+    let h = ''; const tg = misTarget(), ma = S.mis && S.mis.active;
     for (const id in CITY.places) {
       const here = id === S.at, f = here ? 0 : (hasCar(S) && !S.slow ? 0 : fare(S, S.at, id));
-      h += '<button class="pin' + (here ? ' here' : '') + '" data-act="sheet" data-id="' + id + '" data-pin="' + id + '"><span class="pin-n">' + CITY.places[id].name.replace(' Estate', '').replace(' and Nyanya', '') + pinPeople(id) + '</span>' + (here ? '<span class="pin-s">' : '<span class="pin-s" hidden>') + (here ? 'You are here' : '') + '</span></button>';
+      h += '<button class="pin' + (here ? ' here' : '') + (tg === id ? ' mis' : '') + '" data-act="sheet" data-id="' + id + '" data-pin="' + id + '"><span class="pin-n">' + CITY.places[id].name.replace(' Estate', '').replace(' and Nyanya', '') + pinPeople(id) + '</span>' + (tg === id ? '<span class="pin-m">' + (ma.stage === 'pickup' ? '📦 Pick up' : '📍 Deliver ' + cashShort(ma.pay)) + '</span>' : '') + (here ? '<span class="pin-s">' : '<span class="pin-s" hidden>') + (here ? 'You are here' : '') + '</span></button>';
     }
     let lm = '';
     CITY.landmarks.forEach(function (l) { lm += '<button class="lm" data-act="lm" data-id="' + l.id + '" data-pin="' + l.id + '" aria-label="' + l.name + '"><span class="lm-i">' + l.icon + '</span><span class="lm-n">' + l.name + pinPeople(l.id) + '</span></button>'; });
@@ -6781,6 +7015,7 @@ window.G3 = (function () {
     if (UI.chat) h += renderChatView();
     if (UI.person) h += renderPerson();
     if (S.over) h += renderOver(); else if (S.event) h += renderEvent(); else if (UI.welcome) h += renderWelcome();
+    if (UI.call) h += renderCall();
     app.innerHTML = h;
     if (resync !== false) sync3d();
   }
@@ -6880,6 +7115,7 @@ window.G3 = (function () {
     if (act === 'overview') { if (G3.views.map) G3.views.map.overview(); return; }
     if (act === 'pol-pay') { polResolve('pay'); return; }
     if (act === 'pol-settle') { polResolve('settle'); return; }
+    if (act === 'tr-auto' && UI.trip && UI.trip.mis && !UI.trip.mis.dead) { showToast('No auto-drive on a timed job. Drive it yourself.'); render(false); return; }
     if (act === 'tr-auto' && G3.views.map.polActive()) { showToast('You cannot auto-drive with police behind you.'); return; }
     if (act === 'tr-auto') { G3.views.map.autopilot(); const bt = document.querySelector('.tr-ctl'); if (bt) bt.hidden = true; el.hidden = true; return; }
     if (act === 'tr-skip') { G3.views.map.skipTrip(); return; }
@@ -6926,6 +7162,8 @@ window.G3 = (function () {
     if (act === 'chow') return after(orderChow(S, id));
     if (act === 'grocery') return after(orderGroceries(S, id));
     if (act === 'report') return after(reportScam(S));
+    if (act === 'call-yes' || act === 'call-no' || act === 'call-acc' || act === 'call-later') { callAct(act); return; }
+    if (act === 'mis-drop') { const t = misFail(S, 'drop'); save(); if (t) showToast(t); render(); return; }
     if (act === 'mtab') { UI.mt = id; render(false); return; }
     if (act === 'msg') return after(replyMsg(S, parseInt(id, 10), parseInt(el.dataset.i, 10)));
     if (act === 'fbtab') { UI.fb = id; render(false); return; }
