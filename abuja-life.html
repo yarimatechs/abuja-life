@@ -459,7 +459,7 @@ button.pip-row { background: none; border: 0; padding: 0; width: 100%; cursor: p
 .phone{width:min(100%,340px);margin-inline:auto;background:#12121a;border-radius:44px;padding:10px;box-shadow:0 10px 30px rgba(0,0,0,.35)}
 .phone-screen{position:relative;border-radius:36px;overflow:hidden;min-height:540px;padding:16px 18px 20px;color:#fff;background:linear-gradient(170deg,#3b3ac2 0%,#7c3aed 38%,#f97316 78%,#fbbf24 100%)}
 .ph-status{display:flex;justify-content:space-between;align-items:center;font-size:12.5px;font-weight:700}
-.ph-island{width:92px;height:22px;border-radius:12px;background:#0b0b10}
+.ph-island{width:13px;height:13px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#3a3f55 0,#14151c 45%,#05050a 100%);box-shadow:0 0 0 2px #0b0b10,inset 0 0 0 1px rgba(255,255,255,.08)}
 .ph-clock{font-family:var(--f-display);font-weight:800;font-size:76px;line-height:1;margin-top:22px;letter-spacing:-.03em}
 .ph-date{font-size:15px;font-weight:500;margin-top:6px;opacity:.95}
 .ph-pill{margin-top:14px;border:0;border-radius:999px;padding:8px 16px;background:rgba(255,255,255,.22);color:#fff;font-weight:700;font-size:14px}
@@ -5176,7 +5176,7 @@ window.G3 = (function () {
     camera.updateProjectionMatrix();
   }
   function tripStep(dt) {
-    const t = V.trip; if (!t || t.done) return;
+    const t = V.trip; if (!t) return; if (t.done) { if (t.hand) handStep(t, dt); return; }
     const o = t.o, slow = !!o.slow; t.time += dt;
     if (t.mode === 'ride') {
       const vmax = (o.vehicle === 'cab' ? 15 : 17) * (slow ? (o.vehicle === 'okada' ? 0.85 : 0.55) : 1), left = t.len - t.s;
@@ -5237,6 +5237,58 @@ window.G3 = (function () {
     if (V.onTrip) V.onTrip(t.info, t);
   }
 
+  /* ---------- hand-over: a client walks up to take the goods, or a runner brings them ---------- */
+  function handStart(t, kind) {
+    const L = { skin: Math.floor(Math.random() * 6), hair: Math.floor(Math.random() * 8), outfit: Math.floor(Math.random() * 10), color: Math.floor(Math.random() * 12), acc: 0 };
+    const av = G.makeAvatar(L); av.scale.setScalar(1.35); t.root.add(av);
+    const bx = new T.Mesh(new T.BoxGeometry(0.62, 0.42, 0.5), new T.MeshLambertMaterial({ color: 0xb98a52 })); const tape = new T.Mesh(new T.BoxGeometry(0.1, 0.44, 0.52), new T.MeshLambertMaterial({ color: 0xe9d3a1 })); bx.add(tape); t.root.add(bx);
+    const fx = Math.sin(t.h), fz = Math.cos(t.h), lx = Math.cos(t.h), lz = -Math.sin(t.h);   // forward and left of the vehicle
+    const at = function (f, r) { return { x: t.x + fx * f - lx * r, z: t.z + fz * f - lz * r }; };   // f ahead, r to the right
+    t.v = 0; if (t.rib) t.rib.visible = false;
+    t.hand = { kind: kind, av: av, box: bx, t: 0, total: 6.2, start: at(9, 4.4), meet: at(0.5, 2.2), away: at(-4, 5.2), fired: false, met: false, cb: null, cam: null };
+    av.position.set(t.hand.start.x, 0.26, t.hand.start.z);
+    return t.hand;
+  }
+  V.handover = function (kind, cb) {
+    const t = V.trip; if (!t || !t.done) return false;
+    const H = handStart(t, kind); H.cb = cb; return true;
+  };
+  function handStep(t, dt) {
+    const H = t.hand; if (!H) return; H.t += dt;
+    const av = H.av, u = av.userData, k = H.t, give = H.kind === 'give';
+    const lx = Math.cos(t.h), lz = -Math.sin(t.h), fx = Math.sin(t.h), fz = Math.cos(t.h);
+    const lerp = function (a, b, e) { return { x: a.x + (b.x - a.x) * e, z: a.z + (b.z - a.z) * e }; };
+    const tA = 2.6, tB = 3.9, ease = function (x) { x = Math.max(0, Math.min(1, x)); return x * x * (3 - 2 * x); };
+    let moving = false, p, face = Math.atan2(lx, lz), hold = null;
+    const carPt = { x: t.x - lx * 0.4 + fx * 0.4, z: t.z - lz * 0.4 + fz * 0.4 };
+    if (k < tA) {                                   // walks up to the passenger window
+      const e = ease(k / tA); p = lerp(H.start, H.meet, e); moving = true;
+      face = Math.atan2(H.meet.x - H.start.x, H.meet.z - H.start.z);
+      if (give) hold = { x: p.x + Math.sin(face) * 0.4, y: 1.15, z: p.z + Math.cos(face) * 0.4 };
+    } else if (k < tB) {                            // the hand-over
+      p = H.meet; const e = ease((k - tA) / (tB - tA)); face = Math.atan2(lx, lz);
+      if (!H.met) { H.met = true; if (V.onEvent) V.onEvent({ type: 'hand', phase: 'meet', kind: H.kind }); }
+      const hand = { x: p.x + lx * 0.5, y: 1.2, z: p.z + lz * 0.5 }, car = { x: carPt.x, y: 1.0, z: carPt.z };
+      const a = give ? hand : car, b = give ? car : hand;
+      hold = { x: a.x + (b.x - a.x) * e, y: a.y + (b.y - a.y) * e, z: a.z + (b.z - a.z) * e };
+    } else {                                        // walks off with it (or empty-handed)
+      const e = ease((k - tB) / (H.total - tB)); p = lerp(H.meet, H.away, e); moving = true; face = Math.atan2(H.away.x - H.meet.x, H.away.z - H.meet.z);
+      if (!give) hold = { x: p.x + Math.sin(face) * 0.4, y: 1.15, z: p.z + Math.cos(face) * 0.4 };
+    }
+    av.position.set(p.x, 0.26, p.z); av.rotation.y = face; G.walkPose(av, moving, dt * 1.3);
+    if (k >= tA && k < tB) { const e = ease((k - tA) / 0.5); u.arms[0].rotation.x = -1.35 * e; u.arms[1].rotation.x = -1.35 * e; u.elbows[0].rotation.x = -0.25; u.elbows[1].rotation.x = -0.25; }
+    else if (hold && moving) { u.arms[0].rotation.x = -1.05; u.arms[1].rotation.x = -1.05; u.elbows[0].rotation.x = -0.9; u.elbows[1].rotation.x = -0.9; }
+    H.box.visible = !!hold && !(give && k >= tB); if (hold) H.box.position.set(hold.x, hold.y, hold.z); H.box.rotation.y = face;
+    G.faceTick(av, dt);
+    /* a closer camera from the front-left, so the client is easy to see */
+    const cp = { x: t.x - lx * 6.5 + fx * 9.5, y: 3.6, z: t.z - lz * 6.5 + fz * 9.5 }, kk = 1 - Math.exp(-dt * 3);
+    if (!H.cam) H.cam = { x: camera.position.x, y: camera.position.y, z: camera.position.z };
+    H.cam.x += (cp.x - H.cam.x) * kk; H.cam.y += (cp.y - H.cam.y) * kk; H.cam.z += (cp.z - H.cam.z) * kk;
+    camera.up.set(0, 1, 0); camera.fov += (50 - camera.fov) * kk; camera.position.set(H.cam.x, H.cam.y, H.cam.z); camera.updateProjectionMatrix();
+    const tx = t.x - lx * 1.4 + fx * 0.6, tz = t.z - lz * 1.4 + fz * 0.6; camera.lookAt(tx, 1.2, tz); clearView(H.cam.x, H.cam.y, H.cam.z, tx, 1.1, tz, t.x, t.z);
+    if (t.info) { t.info.dt = 0; if (V.onTrip) V.onTrip(t.info, t); }
+    if (k >= H.total && !H.fired) { H.fired = true; const cb = H.cb; if (cb) cb(); }
+  }
   /* smoke from a badly damaged bonnet */
   function smokeStep(t, dm) {
     if (dm < 0.5) { if (t.smoke) t.smoke.visible = false; return; }
@@ -5694,7 +5746,7 @@ window.G3 = (function () {
   /* ---------- phone: jobs, japa, life, log ---------- */
   /* ---------- online leaderboard (Supabase over plain REST: no library, only the public anon key) ---------- */
   const BOARD = { url: 'https://tvbnoqwyekbqrlxxnztq.supabase.co', key: 'sb_publishable_db5quqce8u5iWU7qENLltg_U4OWrfYG' };   /* public client key: safe to ship */
-  const APP_VERSION = 'v1.23 · 30 Oct 2026';
+  const APP_VERSION = 'v1.24 · 31 Oct 2026';
   const ERRS = [];
   window.addEventListener('error', function (e) { ERRS.push(String((e && e.message) || 'error').slice(0, 140) + ' @' + ((e && e.lineno) || 0)); if (ERRS.length > 5) ERRS.shift(); });
   window.addEventListener('unhandledrejection', function (e) { ERRS.push('promise: ' + String((e && e.reason && e.reason.message) || (e && e.reason) || '').slice(0, 140)); if (ERRS.length > 5) ERRS.shift(); });
@@ -7059,6 +7111,12 @@ window.G3 = (function () {
     T.note = { t: '🚛 Towed. Paid ' + fmt(cost), until: performance.now() + 5000 }; save();
   }
   const CP_SMALL = 2000, CP_BIG = 15000;
+  function handKind() {
+    const T = UI.trip, a = S.mis && S.mis.active; if (!T || !a || !T.drive || (T.mis && T.mis.dead)) return null;
+    if (a.stage === 'deliver' && a.to === T.to && a.kind === 'drive') return 'collect';
+    if (a.stage === 'pickup' && a.from === T.to) return 'give';
+    return null;
+  }
   function cpNote(T, t) { T.note = { t: t, until: performance.now() + 6000 }; }
   function cpSheet() {
     const app0 = document.getElementById('app') || app; if (!app0 || document.getElementById('cp-sheet') || !UI.trip) return;
@@ -7129,8 +7187,16 @@ window.G3 = (function () {
     if (timed) { const L = ma.left != null ? ma.left : ma.limit * (S.slow ? 1.6 : 1); UI.trip.mis = { left: L, limit: ma.limit * (S.slow ? 1.6 : 1), crashes: 0, run: false, dead: false, last: 0, risky: ma.risky, frag: ma.frag == null ? null : ma.frag, pax: !!ma.pax }; }
     V.polOdds = timed && ma.risky ? { redlight: 0.9, crash: 0.8 } : { redlight: 0.6, crash: 0.45 };
     app.innerHTML = renderTrip();
-    V.onTrip = tripUi; V.onTripDone = function () { setTimeout(finishTrip, 150); };
-    V.onEvent = function (e) { if (e.type === 'crash') dmgAdd(Math.max(3, Math.min(14, Math.round((e.v || 5) * 0.8)))); else if (e.type === 'bump') dmgAdd(1); if (e.type === 'checkpoint') { cpSheet(); return; } if (e.type === 'cprun') { cpRan(); return; } if (e.type === 'pursuit') { UI.trip.chase = true; return; } if (e.type === 'busted') { const M = UI.trip && UI.trip.mis; if (M && M.risky && !M.dead) { M.dead = true; M.msg = misFail(S, 'seized'); save(); } polSheet(); return; } if (e.type === 'escaped') { UI.trip.chase = false; UI.trip.escaped = true; return; } if (e.type === 'redlight' && drive) { const f = Math.min(Math.max(0, S.cash), 10000); if (f > 0) { S.cash -= f; UI.trip.fines = (UI.trip.fines || 0) + f; save(); } } };
+    V.onTrip = tripUi; V.onTripDone = function () {
+      const k = handKind();
+      if (k && V.handover(k, function () { setTimeout(finishTrip, 250); })) {
+        const T = UI.trip, a = S.mis && S.mis.active; ['.tr-ctl', '.tr-mid', '#tr-gear'].forEach(function (sel) { const e = document.querySelector(sel); if (e) e.hidden = true; });
+        if (T) cpNote(T, k === 'collect' ? '\uD83D\uDE4B\uD83C\uDFFE The client is coming for the ' + (a && a.item || 'goods') : '\uD83D\uDE4B\uD83C\uDFFE Someone is bringing the ' + (a && a.item || 'goods') + ' out');
+        return;
+      }
+      setTimeout(finishTrip, 150);
+    };
+    V.onEvent = function (e) { if (e.type === 'hand') { const T = UI.trip; if (T) cpNote(T, e.kind === 'collect' ? '\uD83D\uDE4B\uD83C\uDFFE "Thank you! I will take it from here."' : '\uD83D\uDE4B\uD83C\uDFFE "Here you go. Drive safe!"'); return; } if (e.type === 'crash') dmgAdd(Math.max(3, Math.min(14, Math.round((e.v || 5) * 0.8)))); else if (e.type === 'bump') dmgAdd(1); if (e.type === 'checkpoint') { cpSheet(); return; } if (e.type === 'cprun') { cpRan(); return; } if (e.type === 'pursuit') { UI.trip.chase = true; return; } if (e.type === 'busted') { const M = UI.trip && UI.trip.mis; if (M && M.risky && !M.dead) { M.dead = true; M.msg = misFail(S, 'seized'); save(); } polSheet(); return; } if (e.type === 'escaped') { UI.trip.chase = false; UI.trip.escaped = true; return; } if (e.type === 'redlight' && drive) { const f = Math.min(Math.max(0, S.cash), 10000); if (f > 0) { S.cash -= f; UI.trip.fines = (UI.trip.fines || 0) + f; save(); } } };
     const cpOdds = window.__cpOdds != null ? window.__cpOdds : (timed && ma.risky ? 0.9 : 0.3 + (((window.G3 && G3.clockSlot) ? G3.clockSlot() : 1) >= 2 ? 0.1 : 0)), wantCp = !!(drive && Math.random() < cpOdds);
     if (timed && ma.risky) setTimeout(function () { const t = V.trip; if (t && Math.random() < 0.75) t.polWait = 'risky'; }, 0);
     V.startTrip({ dmg: drive ? (S.dmg[ownBike ? 'bike' : 'car'] || 0) : 0, cp: wantCp, from: from, to: to, drive: drive, vehicle: vehicle, model: vehicle === 'car' && car ? car.shape : 'sedan', color: color, slow: !!S.slow, top: vehicle === 'bike' && bike && bike.run > 0.3 ? 18 : 0 });
