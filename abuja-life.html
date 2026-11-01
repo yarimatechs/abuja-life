@@ -441,6 +441,42 @@ button.pip-row { background: none; border: 0; padding: 0; width: 100%; cursor: p
 .cb-amt { background: #d7efd9; color: #0b6b36; padding: 1px 8px; border-radius: 999px; font-family: var(--f-mono); }
 .chat-bar { display: flex; gap: 8px; padding: 10px 14px calc(10px + env(safe-area-inset-bottom, 0px)); border-top: 1px solid var(--line); background: var(--bg); }
 .chat-bar input { flex: 1; min-width: 0; font: inherit; font-size: 16px; padding: 11px 14px; border-radius: 999px; border: 2px solid var(--line); background: var(--surface); color: var(--ink); }
+
+/* whot */
+.whotv { z-index: 19; }
+.whot-body { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 10px; padding: 6px 14px calc(12px + env(safe-area-inset-bottom, 0px)); overflow-y: auto; }
+.wh-st { text-align: center; font-weight: 800; font-size: 15px; padding: 8px 12px; border-radius: 12px; background: var(--surface); border: 2px solid var(--line); }
+.wh-st.me { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 12%, var(--surface)); }
+.wh-st small { display: block; font-weight: 600; font-size: 12px; color: var(--muted, #6b7a72); margin-top: 2px; }
+.wh-opp { display: flex; align-items: center; gap: 8px; justify-content: center; flex-wrap: wrap; min-height: 54px; }
+.wh-opp .wc { width: 26px; height: 40px; margin-left: -14px; }
+.wh-opp .wc:first-child { margin-left: 0; }
+.wh-opp-n { font-weight: 800; font-size: 13px; width: 100%; text-align: center; }
+.wh-table { display: flex; align-items: center; justify-content: center; gap: 22px; padding: 6px 0; }
+.wh-need { display: inline-flex; align-items: center; gap: 6px; font-weight: 800; padding: 4px 10px; border-radius: 999px; background: var(--surface); border: 2px solid var(--line); font-size: 13px; }
+.wh-hand { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; padding: 4px 0; }
+.wc { position: relative; width: 62px; height: 92px; border-radius: 10px; border: 2px solid var(--wc, #333); background: #fffdf6; color: var(--wc, #333); display: grid; grid-template-rows: auto 1fr auto; align-items: center; justify-items: center; padding: 4px 3px; font: inherit; line-height: 1; box-shadow: 0 2px 6px rgba(0,0,0,.22); cursor: default; }
+.wc i { font-style: normal; font-weight: 900; font-size: 15px; justify-self: start; }
+.wc i.r { justify-self: end; transform: rotate(180deg); }
+.wc b { font-size: 30px; }
+.wc em { position: absolute; left: 0; right: 0; bottom: 18px; text-align: center; font-style: normal; font-size: 9px; font-weight: 800; letter-spacing: .02em; color: #333; }
+.wc.big { width: 92px; height: 134px; } .wc.big b { font-size: 46px; } .wc.big i { font-size: 20px; } .wc.big em { font-size: 11px; bottom: 26px; }
+.wc.wc-w { --wc: #6a2fa0; background: linear-gradient(160deg, #f4e9ff, #e0c6ff); grid-template-rows: 1fr; }
+.wc.wc-w b { font-size: 24px; } .wc.wc-w span { font-size: 9px; font-weight: 900; letter-spacing: .08em; }
+.wc.wc-w.big b { font-size: 34px; }
+.wc.back { --wc: #8f1d1d; background: repeating-linear-gradient(45deg, #b3261e 0 6px, #8f1d1d 6px 12px); color: #fff; grid-template-rows: 1fr; border-color: #fff; }
+.wc.back b { font-size: 11px; letter-spacing: .08em; }
+.wh-opp .wc.back b { font-size: 6px; letter-spacing: 0; }
+button.wc { cursor: pointer; }
+button.wc.ok { transform: translateY(-6px); box-shadow: 0 5px 12px rgba(0,0,0,.3); }
+button.wc.no { opacity: .45; }
+.wh-market { display: grid; gap: 6px; justify-items: center; }
+.wh-market small { font-weight: 800; font-size: 12px; }
+.wh-shapes { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; padding: 4px 0; }
+.wh-shapes button { width: 52px; height: 52px; border-radius: 50%; border: 2px solid var(--line); background: var(--surface); font-size: 24px; font-weight: 900; cursor: pointer; }
+.wh-over { text-align: center; padding: 14px; border-radius: 16px; background: var(--surface); border: 2px solid var(--accent); }
+.wh-over h3 { margin: 0 0 4px; font-size: 22px; }
+.wh-row { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
 .chat-bar input:focus-visible { outline: none; border-color: var(--accent); }
 .chat-money { display: grid; gap: 10px; padding: 12px 14px; background: var(--surface); border-top: 1px solid var(--line); }
 .cm-row { display: flex; justify-content: space-between; align-items: center; }
@@ -1215,6 +1251,7 @@ function ensureNeeds(s) {
   if (typeof s.wise !== 'number') s.wise = 0;
   s.mis = Object.assign(misNew(), s.mis && typeof s.mis === 'object' ? s.mis : {});
   s.dmg = Object.assign({ car: 0, bike: 0 }, s.dmg && typeof s.dmg === 'object' ? s.dmg : {});
+  s.whot = Object.assign({ w: 0, l: 0, paid: [] }, s.whot && typeof s.whot === 'object' ? s.whot : {}); if (!Array.isArray(s.whot.paid)) s.whot.paid = [];
   return s;
 }
 /* the need that most needs attention, or null if nothing is low */
@@ -6100,7 +6137,7 @@ window.G3 = (function () {
   /* ---------- phone: jobs, japa, life, log ---------- */
   /* ---------- online leaderboard (Supabase over plain REST: no library, only the public anon key) ---------- */
   const BOARD = { url: 'https://tvbnoqwyekbqrlxxnztq.supabase.co', key: 'sb_publishable_db5quqce8u5iWU7qENLltg_U4OWrfYG' };   /* public client key: safe to ship */
-  const APP_VERSION = 'v1.27 · 1 Nov 2026';
+  const APP_VERSION = 'v1.28 · 1 Nov 2026';
   const ERRS = [];
   window.addEventListener('error', function (e) { ERRS.push(String((e && e.message) || 'error').slice(0, 140) + ' @' + ((e && e.lineno) || 0)); if (ERRS.length > 5) ERRS.shift(); });
   window.addEventListener('unhandledrejection', function (e) { ERRS.push('promise: ' + String((e && e.reason && e.reason.message) || (e && e.reason) || '').slice(0, 140)); if (ERRS.length > 5) ERRS.shift(); });
@@ -6593,7 +6630,7 @@ window.G3 = (function () {
   function renderChatView() {
     const c = UI.chat, mon = UI.chatMoney;
     let h = '<div class="chatv" role="dialog" aria-modal="true" aria-label="Chat with ' + esc(c.name) + '"><div class="chat-head"><button class="chat-back" data-act="chatclose" type="button" aria-label="Back">‹</button><h2>@' + esc(c.name) + '</h2></div>' +
-      '<div class="chat-actions"><button class="cact money" data-act="chatsend" type="button">💸 Send money</button><button class="cact" data-act="chatsafe" data-id="report" type="button">🚩 Report</button><button class="cact" data-act="chatsafe" data-id="block" type="button">🚫 Block</button></div>' +
+      '<div class="chat-actions"><button class="cact money" data-act="chatsend" type="button">💸 Send money</button><button class="cact" data-act="gchallenge" data-id="' + esc(c.id) + '" type="button">🃏 Play Whot</button><button class="cact" data-act="chatsafe" data-id="report" type="button">🚩 Report</button><button class="cact" data-act="chatsafe" data-id="block" type="button">🚫 Block</button></div>' +
       '<div class="chat-msgs" id="chat-msgs">' + chatMsgsHtml() + '</div>';
     if (UI.chatSafe) h += safetyPanel(c);
     if (mon) {
@@ -6649,6 +6686,222 @@ window.G3 = (function () {
     if (Date.now() - Chat.last >= (fast ? 3800 : 24000)) chatPoll();
     presBeat(); if (UI.tab === 'map' || UI.sheet || UI.person) presLoad();
   }, 4000);
+
+
+  /* ---------- Whot: the Nigerian card game, played online against a friend ---------- */
+  const Whot = (function () {
+    const SH = ['C', 'T', 'X', 'Q', 'S'];
+    const NUMS = { C: [1, 2, 3, 4, 5, 7, 8, 10, 11, 12, 13, 14], T: [1, 2, 3, 4, 5, 7, 8, 10, 11, 12, 13, 14], X: [1, 2, 3, 5, 7, 10, 11, 13, 14], Q: [1, 2, 3, 5, 7, 10, 11, 13, 14], S: [1, 2, 3, 4, 5, 7, 8] };
+    const shape = function (c) { return c[0]; }, num = function (c) { return parseInt(c.slice(1), 10); };
+    function deck() { const d = []; SH.forEach(function (s) { NUMS[s].forEach(function (n) { d.push(s + n); }); }); for (let i = 0; i < 5; i++) d.push('W20'); return d; }
+    function shuffle(a, rf) { rf = rf || Math.random; for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(rf() * (i + 1)), t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
+    function deal(a, b, rf) {
+      const d = shuffle(deck(), rf), h1 = d.splice(0, 6), h2 = d.splice(0, 6); let top = null;
+      for (let i = 0; i < d.length; i++) { if ([1, 2, 5, 8, 14, 20].indexOf(num(d[i])) < 0) { top = d.splice(i, 1)[0]; break; } }
+      return { a: a, b: b, d: d, p: [top], h1: h1, h2: h2, need: '', pend: 0, pk: 0, turn: a, n: 0, last: null, over: false, winner: null };
+    }
+    const clone = function (st) { return JSON.parse(JSON.stringify(st)); };
+    const opp = function (st, u) { return u === st.a ? st.b : st.a; };
+    const hand = function (st, u) { return u === st.a ? st.h1 : st.h2; };
+    const top = function (st) { return st.p[st.p.length - 1]; };
+    function refill(st) { if (st.d.length || st.p.length < 2) return; const t = st.p.pop(); st.d = shuffle(st.p.splice(0)); st.p = [t]; }
+    function drawN(st, u, n) { let got = 0; for (let i = 0; i < n; i++) { refill(st); if (!st.d.length) break; hand(st, u).push(st.d.pop()); got++; } return got; }
+    function playable(st, c) {
+      if (st.pend > 0) return num(c) === st.pk;
+      if (c === 'W20') return true;
+      if (st.need) return shape(c) === st.need;
+      const t = top(st); return shape(c) === shape(t) || num(c) === num(t);
+    }
+    function play(st, u, c, want) {
+      if (st.over || st.turn !== u) return null;
+      if (hand(st, u).indexOf(c) < 0 || !playable(st, c)) return null;
+      if (c === 'W20' && SH.indexOf(want) < 0) return null;
+      const s = clone(st), h = hand(s, u), o = opp(s, u), n = num(c);
+      h.splice(h.indexOf(c), 1); s.p.push(c); s.n++; s.need = c === 'W20' ? want : '';
+      s.last = { u: u, c: c, sh: s.need };
+      if (!h.length) { s.over = true; s.winner = u; return s; }
+      if (n === 1 || n === 8) s.turn = u;
+      else if (n === 14) { drawN(s, o, 1); s.turn = u; }
+      else if (n === 2) { s.pend += 2; s.pk = 2; s.turn = o; }
+      else if (n === 5) { s.pend += 3; s.pk = 5; s.turn = o; }
+      else s.turn = o;
+      return s;
+    }
+    function draw(st, u) {
+      if (st.over || st.turn !== u) return null;
+      const s = clone(st), n = s.pend > 0 ? s.pend : 1, got = drawN(s, u, n);
+      s.pend = 0; s.pk = 0; s.turn = opp(s, u); s.n++; s.last = { u: u, d: got };
+      return s;
+    }
+    return { deck: deck, shuffle: shuffle, deal: deal, play: play, draw: draw, playable: playable, hand: hand, opp: opp, top: top, num: num, shape: shape };
+  })();
+  window.__whot = Whot;
+
+  const Games = { list: [], at: 0, loading: false, err: '', cur: null, busy: false, seen: {}, ready: false, sig: '', curAt: 0, shapePick: false, pending: null };
+  const WSHAPE = { C: ['●', '#d9302a', 'Circle'], T: ['▲', '#2a6fb0', 'Triangle'], X: ['✚', '#2f8a4a', 'Cross'], Q: ['■', '#d9a21b', 'Square'], S: ['★', '#7a3fa0', 'Star'] };
+  const WSPECIAL = { 1: 'Hold on', 2: 'Pick two', 5: 'Pick three', 8: 'Suspension', 14: 'Market' };
+  const gMe = function () { return Auth.session ? Auth.session.user.id : ''; };
+  const gOther = function (g) { return g.p1 === gMe() ? g.p2 : g.p1; };
+  const gName = function (id) { return Chat.names[id] || 'player'; };
+  function gNames(ids) {
+    const need = ids.filter(function (x) { return x && !Chat.names[x]; }); if (!need.length) return Promise.resolve();
+    return chatApi('/rest/v1/profiles?select=user_id,username&user_id=in.(' + need.map(enc).join(',') + ')').then(function (pr) { (pr || []).forEach(function (x) { Chat.names[x.user_id] = x.username; }); }, function () {});
+  }
+  function gErr(e) { return e && (e.status === 404 || /games/i.test(e.message || '') && /find|exist|relation/i.test(e.message || '')) ? 'setup' : (e && e.message || 'Something went wrong.'); }
+  function gamesTurnCount() { return Games.list.filter(function (g) { return (g.status === 'invited' && g.p2 === gMe()) || (g.status === 'active' && g.turn === gMe()); }).length; }
+  function gamesLoad(force) {
+    if (!chatOn() || !Chat.me || Games.loading) return;
+    if (!force && Date.now() - Games.at < 4000) return;
+    Games.loading = true; Games.at = Date.now();
+    chatApi('/rest/v1/games?select=id,kind,p1,p2,status,turn,winner,rev,updated_at&or=(p1.eq.' + enc(Chat.uid) + ',p2.eq.' + enc(Chat.uid) + ')&status=in.(invited,active)&order=updated_at.desc&limit=20').then(function (rows) {
+      rows = Array.isArray(rows) ? rows : [];
+      return gNames(rows.map(gOther)).then(function () {
+        const first = !Games.ready; Games.ready = true; Games.err = '';
+        rows.forEach(function (g) { if (g.status === 'invited' && g.p2 === Chat.uid && !Games.seen[g.id]) { Games.seen[g.id] = 1; if (!first) showToast('🃏 @' + gName(g.p1) + ' challenged you to Whot. Open Games on your phone.'); } });
+        Games.list = rows;
+        const sg = rows.map(function (g) { return g.id + g.status + g.rev + g.turn; }).join('|');
+        if (sg !== Games.sig) { Games.sig = sg; if (!UI.game && UI.tab === 'phone' && (UI.phone === 'games' || UI.phone === 'home')) render(false); }
+      });
+    }, function (e) { Games.err = gErr(e); Games.ready = true; }).then(function () { Games.loading = false; });
+  }
+  function gameLoad(id) {
+    if (!chatOn() || Games.busy) return Promise.resolve();
+    return chatApi('/rest/v1/games?select=*&id=eq.' + enc(id)).then(function (rows) {
+      const g = rows && rows[0];
+      if (!UI.game || UI.game.id !== id) return;
+      if (!g) { UI.game = null; Games.cur = null; showToast('That game is gone.'); render(); return; }
+      return gNames([g.p1, g.p2]).then(function () { if (Games.busy) return; const c = Games.cur; if (!c || g.rev > c.rev || g.status !== c.status) { Games.cur = g; Games.shapePick = false; paintWhot(); } });
+    }, function (e) { Games.err = gErr(e); paintWhot(); });
+  }
+  function whotPaid(g) {
+    if (!S || g.status !== 'finished' || !g.winner) return;
+    if (!S.whot || !Array.isArray(S.whot.paid)) S.whot = { w: 0, l: 0, paid: [] };
+    const w = S.whot; if (w.paid.indexOf(g.id) >= 0) return;
+    w.paid.push(g.id); if (w.paid.length > 30) w.paid.shift();
+    if (g.winner === gMe()) { w.w++; apply(S, { mood: 4, fun: 6 }); log(S, 'You beat @' + gName(gOther(g)) + ' at Whot.'); } else { w.l++; apply(S, { mood: -1, fun: 3 }); log(S, 'You lost a game of Whot to @' + gName(gOther(g)) + '.'); }
+    save();
+  }
+  function wcard(c, cls, attrs, tag) {
+    tag = tag || 'div'; cls = cls || ''; attrs = attrs || '';
+    if (c === 'back') return '<' + tag + ' class="wc back ' + cls + '" ' + attrs + ' aria-label="Card"><b>WHOT</b></' + tag + '>';
+    if (c === 'W20') return '<' + tag + ' class="wc wc-w ' + cls + '" ' + attrs + ' aria-label="Whot, 20"><b>20</b><span>WHOT</span></' + tag + '>';
+    const sh = WSHAPE[c[0]], n = parseInt(c.slice(1), 10), sp = WSPECIAL[n];
+    return '<' + tag + ' class="wc ' + cls + '" style="--wc:' + sh[1] + '" ' + attrs + ' aria-label="' + n + ' ' + sh[2] + '"><i>' + n + '</i><b>' + sh[0] + '</b><i class="r">' + n + '</i>' + (sp ? '<em>' + sp + '</em>' : '') + '</' + tag + '>';
+  }
+  function whotBody() {
+    const g = Games.cur, me = gMe();
+    if (Games.err === 'setup') return '<div class="card"><h3>Games are not switched on yet</h3><p class="muted">The maker still has to run the games script in Supabase. Try again later.</p></div>';
+    if (!g) return '<p class="muted" style="text-align:center">Loading the game…</p>' + (Games.err ? '<p class="auth-err">' + esc(Games.err) + '</p>' : '');
+    const oname = gName(gOther(g));
+    if (g.status === 'invited') {
+      return g.p2 === me
+        ? '<div class="card"><h3>@' + esc(oname) + ' challenged you to Whot</h3><p class="muted">Two players, six cards each. First to empty their hand wins.</p><div class="wh-row"><button class="btn" data-act="gaccept" data-id="' + esc(g.id) + '" type="button">Accept and play</button><button class="btn ghost" data-act="gdecline" data-id="' + esc(g.id) + '" type="button">No thanks</button></div></div>'
+        : '<div class="card"><h3>Waiting for @' + esc(oname) + '</h3><p class="muted">They will see your challenge next time they open the game. This page updates by itself.</p><button class="btn ghost" data-act="gdecline" data-id="' + esc(g.id) + '" type="button">Cancel challenge</button></div>';
+    }
+    if (g.status === 'declined') return '<div class="card"><h3>This game was cancelled</h3><button class="btn" data-act="gclose" type="button">Back</button></div>';
+    const st = g.state; if (!st) return '<p class="muted" style="text-align:center">Loading the game…</p>';
+    const mine = Whot.hand(st, me), theirs = Whot.hand(st, Whot.opp(st, me)), myTurn = g.status === 'active' && st.turn === me && !st.over, t = Whot.top(st);
+    let h = '';
+    if (g.status === 'finished') {
+      const won = g.winner === me;
+      h += '<div class="wh-over"><h3>' + (won ? '🎉 You won!' : '@' + esc(oname) + ' won') + '</h3><p class="muted" style="margin:0 0 10px">' + (st.over ? (won ? 'You played your last card.' : 'They played their last card.') : (won ? '@' + esc(oname) + ' gave up.' : 'You gave up.')) + '</p><div class="wh-row"><button class="btn" data-act="gagain" data-id="' + esc(gOther(g)) + '" type="button">Play again</button><button class="btn ghost" data-act="gclose" type="button">Back</button></div></div>';
+    } else {
+      const lc = theirs.length === 1 ? ' · 🔔 Last card!' : '';
+      let st1 = myTurn ? (st.pend > 0 ? 'Your turn: play a ' + st.pk + ' or pick ' + st.pend : 'Your turn') : '@' + esc(oname) + ' is playing…';
+      let sub = '';
+      if (st.last) { const lu = st.last.u === me ? 'You' : '@' + esc(oname); sub = st.last.c ? lu + ' played ' + (st.last.c === 'W20' ? 'Whot' : st.last.c.slice(1) + ' of ' + WSHAPE[st.last.c[0]][2].toLowerCase() + 's') : lu + ' picked ' + st.last.d + ' card' + (st.last.d === 1 ? '' : 's'); }
+      h += '<div class="wh-st' + (myTurn ? ' me' : '') + '">' + st1 + lc + (sub ? '<small>' + sub + '</small>' : '') + '</div>';
+    }
+    h += '<div class="wh-opp"><div class="wh-opp-n">@' + esc(oname) + ' · ' + theirs.length + ' card' + (theirs.length === 1 ? '' : 's') + '</div>' + theirs.slice(0, 12).map(function () { return wcard('back'); }).join('') + '</div>';
+    h += '<div class="wh-table"><div class="wh-market">' + (g.status === 'active' ? '<button class="wc back" data-act="gdraw" type="button" ' + (myTurn ? '' : 'disabled style="opacity:.5"') + ' aria-label="Pick from the market"><b>MARKET</b></button><small>' + (st.pend > 0 && myTurn ? 'Pick ' + st.pend : 'Market · ' + st.d.length) + '</small>' : wcard('back')) + '</div><div class="wh-market">' + wcard(t, 'big') + (st.need ? '<span class="wh-need" style="color:' + WSHAPE[st.need][1] + '">' + WSHAPE[st.need][0] + ' ' + WSHAPE[st.need][2] + ' wanted</span>' : '<small>&nbsp;</small>') + '</div></div>';
+    if (Games.shapePick && myTurn) h += '<div class="wh-st me">Which shape do you want?</div><div class="wh-shapes">' + Object.keys(WSHAPE).map(function (k) { return '<button type="button" data-act="gshape" data-id="' + k + '" style="color:' + WSHAPE[k][1] + '" aria-label="' + WSHAPE[k][2] + '">' + WSHAPE[k][0] + '</button>'; }).join('') + '</div>';
+    h += '<div class="wh-hand">' + mine.map(function (c, i) {
+      const ok = myTurn && Whot.playable(st, c) && !Games.busy;
+      return wcard(c, ok ? 'ok' : (myTurn ? 'no' : ''), ok ? 'data-act="gplay" data-id="' + c + '"' : (g.status === 'active' ? 'disabled' : 'disabled'), 'button');
+    }).join('') + '</div>';
+    if (g.status === 'active') h += '<div class="wh-row"><button class="btn ghost" data-act="gresign" data-id="' + esc(g.id) + '" type="button">Give up</button></div>';
+    if (Games.err && Games.err !== 'setup') h += '<p class="auth-err" role="alert">' + esc(Games.err) + '</p>';
+    return h;
+  }
+  function renderWhotView() {
+    const g = Games.cur, nm = g ? gName(gOther(g)) : (UI.game && UI.game.name || 'friend');
+    return '<div class="chatv whotv" role="dialog" aria-modal="true" aria-label="Whot"><div class="chat-head"><button class="chat-back" data-act="gclose" type="button" aria-label="Back">‹</button><h2>🃏 Whot · @' + esc(nm) + '</h2></div><div class="whot-body" id="whot-body">' + whotBody() + '</div></div>';
+  }
+  function paintWhot() {
+    const el = document.getElementById('whot-body'); if (!el || !UI.game) return;
+    const g = Games.cur; if (g && g.status === 'finished') whotPaid(g);
+    el.innerHTML = whotBody();
+    const hd = document.querySelector('.whotv .chat-head h2'); if (hd && g) hd.textContent = '🃏 Whot · @' + gName(gOther(g));
+  }
+  function gRpc(name, body) { return chatApi('/rest/v1/rpc/' + name, { method: 'POST', body: body }); }
+  function gOpen(id, name) { UI.game = { id: id, name: name || '' }; Games.cur = null; Games.err = ''; Games.shapePick = false; render(false); gameLoad(id); }
+  function gSubmit(next) {
+    const g = Games.cur; if (!g || Games.busy) return;
+    Games.busy = true; Games.err = '';
+    const old = Games.cur;
+    Games.cur = Object.assign({}, g, { state: next, turn: next.turn, rev: g.rev + 1 }); Games.shapePick = false; paintWhot();
+    gRpc('game_move', { p_id: g.id, p_rev: g.rev, p_state: next, p_turn: next.over ? next.winner : next.turn, p_status: next.over ? 'finished' : 'active', p_winner: next.over ? next.winner : null }).then(function (row) {
+      Games.busy = false; if (row && row.id === g.id && UI.game && UI.game.id === g.id) { Games.cur = row; } paintWhot();
+    }, function (e) {
+      Games.busy = false; Games.cur = old; Games.err = e.message; paintWhot(); gameLoad(g.id);
+    });
+  }
+  function gAct(act, id) {
+    const g = Games.cur;
+    if (act === 'gclose') { UI.game = null; Games.cur = null; render(); gamesLoad(true); return true; }
+    if (act === 'gopen') { const x = Games.list.find(function (q) { return q.id === id; }); gOpen(id, x ? gName(gOther(x)) : ''); return true; }
+    if (act === 'gaccept') {
+      if (!g || Games.busy) return true; Games.busy = true;
+      gRpc('game_accept', { p_id: g.id, p_state: Whot.deal(g.p1, g.p2) }).then(function (row) { Games.busy = false; if (row && UI.game) { Games.cur = row; } paintWhot(); }, function (e) { Games.busy = false; Games.err = e.message; paintWhot(); gameLoad(g.id); });
+      return true;
+    }
+    if (act === 'gdecline') {
+      gRpc('game_decline', { p_id: id }).then(function () { UI.game = null; Games.cur = null; render(); gamesLoad(true); }, function (e) { Games.err = e.message; paintWhot(); });
+      return true;
+    }
+    if (act === 'gresign') {
+      if (!g) return true; Games.busy = true;
+      gRpc('game_resign', { p_id: g.id }).then(function (row) { Games.busy = false; if (row && UI.game) { Games.cur = row; } paintWhot(); }, function (e) { Games.busy = false; Games.err = e.message; paintWhot(); });
+      return true;
+    }
+    if (act === 'gdraw') { if (g && g.state) { const n = Whot.draw(g.state, gMe()); if (n) gSubmit(n); } return true; }
+    if (act === 'gplay') {
+      if (!g || !g.state) return true;
+      if (id === 'W20') { if (Whot.playable(g.state, id) && g.state.turn === gMe()) { Games.shapePick = true; Games.pending = id; paintWhot(); } return true; }
+      const n = Whot.play(g.state, gMe(), id); if (n) gSubmit(n); return true;
+    }
+    if (act === 'gshape') { if (g && g.state && Games.pending) { const n = Whot.play(g.state, gMe(), Games.pending, id); Games.pending = null; if (n) gSubmit(n); } return true; }
+    if (act === 'gchallenge' || act === 'gagain') {
+      const to = id, nm = gName(to);
+      gRpc('game_invite', { p_to: to }).then(function (row) { if (row && row.id) { UI.chat = null; Games.seen[row.id] = 1; gOpen(row.id, nm); } }, function (e) { const m = gErr(e); showToast(m === 'setup' ? 'Games are not switched on yet.' : e.message); render(false); });
+      return true;
+    }
+    return false;
+  }
+  function renderGamesApp() {
+    let h = '<h2>Games</h2>';
+    if (!Auth.session) return h + '<div class="card"><p class="muted">Play Whot against your friends online. You need an account so they can find you.</p><button class="btn" data-act="aopen" type="button">Create account or log in</button></div>';
+    chatSync();
+    if (!Chat.meLoaded) { if (!Chat.loadingMe) setTimeout(loadMe, 0); return h + '<p class="muted">Loading…</p>'; }
+    if (!Chat.me) return h + '<div class="card"><p class="muted">Pick a username in Chat first, so friends can challenge you.</p><button class="btn" data-act="phone" data-id="chat" type="button">Open Chat</button></div>';
+    gamesLoad(true);
+    if (Games.err === 'setup') return h + '<div class="card"><h3>Games are not switched on yet</h3><p class="muted">The maker still has to run the games script in Supabase. Try again later.</p></div>';
+    const me = Chat.uid, inv = Games.list.filter(function (g) { return g.status === 'invited' && g.p2 === me; }), act = Games.list.filter(function (g) { return g.status === 'active'; }), out = Games.list.filter(function (g) { return g.status === 'invited' && g.p1 === me; });
+    const w = S.whot || { w: 0, l: 0 };
+    h += '<div class="card"><h3>🃏 Whot</h3><p class="muted">Two players, six cards each. Match the shape or the number. <b>1</b> hold on, <b>2</b> pick two, <b>5</b> pick three, <b>8</b> suspension, <b>14</b> general market, <b>20</b> Whot (pick any shape). First to empty their hand wins.</p><p class="muted" style="margin:0">Record: ' + w.w + ' won, ' + w.l + ' lost.</p></div>';
+    const rowG = function (g, label, tone) { return row('data-act="gopen" data-id="' + esc(g.id) + '"', '@' + esc(gName(gOther(g))), label, '<span class="chip' + (tone ? ' ' + tone : '') + '">Open</span>', false, ''); };
+    if (inv.length) h += '<h3>Challenges for you</h3><div class="list">' + inv.map(function (g) { return rowG(g, 'wants to play Whot', 'good'); }).join('') + '</div>';
+    if (act.length) h += '<h3>Your games</h3><div class="list">' + act.map(function (g) { return rowG(g, g.turn === me ? 'Your turn' : 'Waiting for them', g.turn === me ? 'good' : ''); }).join('') + '</div>';
+    if (out.length) h += '<h3>Waiting for a reply</h3><div class="list">' + out.map(function (g) { return rowG(g, 'Challenge sent', ''); }).join('') + '</div>';
+    if (!inv.length && !act.length && !out.length) h += '<p class="muted">No games yet. Open a chat with a friend and tap <b>🃏 Play Whot</b>.</p>';
+    return h + '<button class="btn ghost" data-act="phone" data-id="chat" type="button" style="margin-top:10px">Find a friend in Chat</button>';
+  }
+  setInterval(function () {
+    if (document.hidden || !chatOn() || !Chat.me) return;
+    if (UI.game && Games.cur && Games.cur.status !== 'finished' && Games.cur.status !== 'declined') { if (!Games.busy) gameLoad(UI.game.id); return; }
+    if (UI.game) return;
+    if (Date.now() - Games.at >= ((UI.tab === 'phone' && UI.phone === 'games') ? 5000 : 20000)) gamesLoad();
+  }, 2400);
 
   /* ---------- going out: seeing other players and saying hello ---------- */
   const Pres = { rows: [], at: 0, loading: false, sent: '', sentAt: 0, backoff: 0, err: '', lastVibe: 0, vibeTo: {} };
@@ -6930,6 +7183,7 @@ window.G3 = (function () {
     ['houses', 'Houses', '🔑', 'linear-gradient(145deg,#fdba74,#c2410c)'],
     ['cars', 'Cars', '🚗', 'linear-gradient(145deg,#38bdf8,#1d4ed8)'],
     ['chat', 'Chat', '💭', 'linear-gradient(145deg,#4ade80,#0d9488)'],
+    ['games', 'Games', '🃏', 'linear-gradient(145deg,#f87171,#b91c1c)'],
     ['boutique', 'Boutique', '👗', 'linear-gradient(145deg,#f9a8d4,#be185d)'],
     ['health', 'Health', '💊', 'linear-gradient(145deg,#fb7185,#be123c)'],
     ['forbes', 'Forbes', '👑', 'linear-gradient(145deg,#14532d,#052e16)'],
@@ -6940,6 +7194,7 @@ window.G3 = (function () {
   function appBadge(id) {
     if (id === 'log') return Math.min(9, unreadCount(S));
     if (id === 'chat') return Math.min(9, chatUnread());
+    if (id === 'games') return Math.min(9, gamesTurnCount());
     if (id === 'gigs') return S.mis && S.mis.active ? 1 : 0;
     if (id === 'japa' && (S.japa.status === 'approved' || S.japa.status === 'denied')) return 1;
     if (id === 'health' && S.sick) return 1;
@@ -7121,7 +7376,7 @@ window.G3 = (function () {
       '<div class="card"><h3>Friends and feedback</h3><p class="muted">Chat lets you find a friend by username and send money. Something broken or boring? Tell the maker in the Feedback app.</p><button class="btn ghost" data-act="phone" data-id="feedback" type="button">Open Feedback</button> <button class="btn ghost" data-act="share" type="button">📲 Invite a friend</button></div>';
   }
   const PHONE_SCREENS = { jobs: () => renderJobs(), log: () => renderMessages(), gigs: () => renderGigs(), japa: () => renderJapa(), life: () => renderLife(), bank: () => renderBank(), courses: () => renderCourses(),
-    help: () => renderHelp(), feedback: () => renderFeedback(), houses: () => renderHouses(), cars: () => renderCars(), chat: () => renderChatApp(), boutique: () => renderBoutique(), health: () => renderHealth(), chow: () => renderChow(), shops: () => renderShops(),
+    help: () => renderHelp(), feedback: () => renderFeedback(), houses: () => renderHouses(), cars: () => renderCars(), chat: () => renderChatApp(), games: () => renderGamesApp(), boutique: () => renderBoutique(), health: () => renderHealth(), chow: () => renderChow(), shops: () => renderShops(),
     forbes: () => renderForbes(), police: () => renderPolice(), ride: () => renderRide() };
   function renderPhone() {
     const f = PHONE_SCREENS[UI.phone];
@@ -7692,6 +7947,7 @@ window.G3 = (function () {
     if (UI.busy && UI.busyKind === 'nap' && UI.tab === 'home') h += '<div class="nap-veil" aria-hidden="true"></div><div class="busy-pill" role="status"><b>\uD83D\uDE34 Napping...</b><span>Tap anywhere to wake up early</span></div>';
     if (UI.vitals) h += renderVitals();
     if (UI.chat) h += renderChatView();
+    if (UI.game) h += renderWhotView();
     if (UI.person) h += renderPerson();
     if (S.over) h += renderOver(); else if (S.event) h += renderEvent(); else if (UI.welcome) h += renderWelcome();
     if (UI.call) h += renderCall();
@@ -7880,6 +8136,7 @@ window.G3 = (function () {
       return;
     }
     if (act === 'chatopen') { UI.chat = { id: id, name: el.dataset.n || (Chat.names[id] || 'player') }; Chat.names[id] = UI.chat.name; UI.chatMoney = false; UI.chatSafe = null; Chat.draft = ''; render(false); paintChat(true); const ci = document.getElementById('chat-input'); if (ci) ci.focus(); return; }
+    if (gAct(act, id)) return;
     if (act === 'chatclose') { UI.chat = null; UI.chatMoney = false; UI.chatSafe = null; render(); return; }
     if (act === 'chatsend') { UI.chatMoney = !UI.chatMoney; render(false); paintChat(true); const ca = document.getElementById('c-amt'); if (ca) ca.focus(); return; }
     if (act === 'camt') { const ca = document.getElementById('c-amt'); if (ca) { ca.value = parseInt(id, 10).toLocaleString('en-US'); Chat.amt = ca.value; } return; }
