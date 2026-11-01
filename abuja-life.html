@@ -312,7 +312,7 @@ button.hp { cursor: pointer; text-align: left; }
 .pol-fx { position: fixed; inset: 0; z-index: 3; pointer-events: none; box-shadow: inset 0 0 70px 6px rgba(255, 40, 40, .55); animation: polfx .5s steps(2) infinite; }
 @keyframes polfx { 50% { box-shadow: inset 0 0 70px 6px rgba(50, 110, 255, .6); } }
 @media (prefers-reduced-motion: reduce) { .tr-chip.pol, .pol-fx, .tr-chip.mis.low, .call-av.ring, .pin.mis { animation: none; } }
-#cp-sheet, #br-sheet { z-index: 60; }
+#cp-sheet, #br-sheet, #ev-sheet { z-index: 60; }
 .tr-chip.cp { background: #1b3fae; border: 2px solid #fff; }
 .tr-chip.mis { background: #7a4b00; border: 2px solid #f2b01e; }
 .tr-chip.mis.low { background: #b3261e; border-color: #fff; animation: polchip .5s steps(2) infinite; }
@@ -338,6 +338,8 @@ button.hp { cursor: pointer; text-align: left; }
 .tr-pill { border: 0; border-radius: 999px; padding: 10px 16px; font: inherit; font-weight: 700; font-size: 14px; background: rgba(255,255,255,0.95); color: #0b1f17; box-shadow: 0 3px 10px rgba(0,0,0,0.25); }
 .tr-gear { position: absolute; right: 16px; bottom: calc(184px + env(safe-area-inset-bottom, 0px)); width: 58px; height: 58px; border-radius: 50%; border: 0; display: grid; place-items: center; align-content: center; background: rgba(255,255,255,.95); color: #0b1f17; box-shadow: 0 3px 10px rgba(0,0,0,.3); font: inherit; line-height: 1; }
 .tr-gear b { font-size: 22px; } .tr-gear small { font-size: 9px; font-weight: 700; }
+.tr-honk { position: absolute; left: 16px; bottom: calc(184px + env(safe-area-inset-bottom, 0px)); width: 58px; height: 58px; border-radius: 50%; border: 0; display: grid; place-items: center; align-content: center; background: rgba(255,255,255,.95); color: #0b1f17; box-shadow: 0 3px 10px rgba(0,0,0,.3); font: inherit; line-height: 1; touch-action: none; user-select: none; -webkit-user-select: none; }
+.tr-honk b { font-size: 22px; } .tr-honk small { font-size: 9px; font-weight: 700; } .tr-honk.on { background: #d9a21b; transform: scale(.94); }
 .tr-gear.rev { background: #b3261e; color: #fff; }
 .tr-ctl { position: absolute; left: 0; right: 0; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); display: flex; justify-content: space-between; align-items: flex-end; padding: 0 16px; }
 .tr-pad { display: flex; gap: 12px; align-items: flex-end; }
@@ -659,7 +661,17 @@ const CITY = {
     fridge: { name: 'Fridge', cost: 180000, cat: 'kitchen', size: '1×1', stars: 3, desc: 'Every meal you cook at home costs \u20A6300 less.' },
     cooker: { name: 'Gas cooker', cost: 60000, cat: 'kitchen', size: '1×1', stars: 2, desc: 'Every meal you cook at home costs \u20A6200 less.' },
     generator: { name: 'Generator', cost: 120000, cat: 'power', size: '1×1', stars: 2, desc: 'NEPA wahala costs less. Lights stay on.' },
-    inverter: { name: 'Inverter and solar panels', cost: 450000, cat: 'power', size: '2×1', stars: 3, desc: 'No more light problems.' }
+    inverter: { name: 'Inverter and solar panels', cost: 450000, cat: 'power', size: '2×1', stars: 3, desc: 'No more light problems.' },
+    shoes: { name: 'Shoe rack', cost: 12000, cat: 'decor', size: '1×1', stars: 1, desc: 'Shoes off the floor and out of sight. Pure tidiness.' },
+    palm: { name: 'Big indoor palm', cost: 25000, cat: 'decor', size: '1×1', stars: 1, desc: 'A proper tall plant. Makes the corner look expensive.' },
+    floorlamp: { name: 'Floor lamp', cost: 22000, cat: 'decor', size: '1×1', stars: 1, desc: 'Warm light at night. It glows when the lights come on.' },
+    sidelamp: { name: 'Side table and lamp', cost: 28000, cat: 'decor', size: '1×1', stars: 1, desc: 'A neat little table with a lamp that glows at night.' },
+    mirror: { name: 'Standing mirror', cost: 30000, cat: 'decor', size: '1×1', stars: 2, desc: 'Gold frame. Check the outfit before you step out.' },
+    dispenser: { name: 'Water dispenser', cost: 65000, cat: 'decor', size: '1×1', stars: 2, desc: 'Hot and cold water, as the Lord intended.' },
+    shelf: { name: 'Bookshelf', cost: 45000, cat: 'decor', size: '2×1', stars: 2, desc: 'Books, a few ornaments, and the look of someone who reads.' },
+    speakers: { name: 'Sound system', cost: 140000, cat: 'decor', size: '2×1', stars: 3, desc: 'Two tall speakers and an amplifier. The neighbours will know.' },
+    aquarium: { name: 'Aquarium', cost: 120000, cat: 'decor', size: '2×1', stars: 3, desc: 'Glass tank with fish and a little plant. Very calming.' },
+    cabinet: { name: 'Display cabinet', cost: 160000, cat: 'decor', size: '2×1', stars: 3, desc: 'Glass doors and gold trophies. Visitors will ask about them.' }
   },
   comfortItems: ['fan', 'tv', 'sofa', 'rug', 'plant', 'inverter'],
   japa: {
@@ -2812,6 +2824,112 @@ window.G3 = (function () {
     [[-wx, wz], [wx, wz], [-wx, -wz], [wx, -wz]].forEach(function (q) { const w = cyl(g, wr, wr, 0.28, 0x1c1c1c, q[0], 0, q[1], 14); w.rotation.z = P / 2; w.position.y = wr; });
     return g;
   };
+
+  /* ---------- decor: look-only pieces that find a free spot along the walls ---------- */
+  F.shoes = function () {
+    const g = new T.Group();
+    box(g, 0.9, 0.04, 0.32, 0x6e5238, 0, 0, 0); box(g, 0.04, 0.55, 0.32, 0x6e5238, -0.43, 0, 0); box(g, 0.04, 0.55, 0.32, 0x6e5238, 0.43, 0, 0);
+    [0.16, 0.34, 0.52].forEach(function (y, k) { box(g, 0.9, 0.03, 0.32, 0x7a5a3c, 0, y, 0); [[-0.28, 0x2b2b30], [0.0, 0xb5482f], [0.26, 0xe9e4d6]].forEach(function (q) { if ((k + (q[0] > 0 ? 1 : 0)) % 3 !== 2) { box(g, 0.2, 0.08, 0.1, q[1], q[0], y + 0.03, 0.02); box(g, 0.2, 0.08, 0.1, q[1], q[0], y + 0.03, -0.1); } }); });
+    return g;
+  };
+  F.palm = function () {
+    const g = new T.Group();
+    cyl(g, 0.3, 0.22, 0.5, 0x9a5a2e, 0, 0, 0, 14); cyl(g, 0.28, 0.28, 0.04, 0x3a2a1c, 0, 0.5, 0, 14);
+    cyl(g, 0.04, 0.05, 0.9, 0x6a5a3a, 0, 0.5, 0, 6);
+    for (let i = 0; i < 7; i++) { const a = i * 0.898, lf = new T.Group(); lf.position.set(0, 1.35, 0); lf.rotation.y = a; g.add(lf); const b = box(lf, 0.8, 0.035, 0.2, i % 2 ? 0x3f8a55 : 0x4a9a60, 0.4, 0, 0); b.rotation.z = -0.5 + (i % 3) * 0.12; }
+    sph(g, 0.1, 0x3f8a55, 0, 1.38, 0); return g;
+  };
+  F.floorlamp = function (o, ctx) {
+    const g = new T.Group();
+    cyl(g, 0.16, 0.18, 0.04, 0x222222, 0, 0, 0, 12); cyl(g, 0.02, 0.02, 1.45, 0x555555, 0, 0.04, 0, 6);
+    G.glow(ctx.bulbs, 0xe8e2d0, 0.34, 0.3, 0.34, g, 0, 1.45, 0, 0xfff1a8); return g;
+  };
+  F.sidelamp = function (o, ctx) {
+    const g = new T.Group();
+    box(g, 0.5, 0.04, 0.5, 0x7a5a3c, 0, 0.5, 0); [[-1, -1], [1, -1], [-1, 1], [1, 1]].forEach(function (q) { box(g, 0.04, 0.5, 0.04, 0x5a3d26, q[0] * 0.21, 0, q[1] * 0.21); });
+    box(g, 0.44, 0.03, 0.44, 0x7a5a3c, 0, 0.18, 0); cyl(g, 0.07, 0.09, 0.2, 0xc9a24a, 0, 0.54, 0, 10);
+    G.glow(ctx.bulbs, 0xe8e2d0, 0.3, 0.26, 0.3, g, 0, 0.74, 0, 0xfff1a8); return g;
+  };
+  F.mirror = function () {
+    const g = new T.Group();
+    box(g, 0.74, 1.62, 0.05, 0xc9a24a, 0, 0.12, 0); box(g, 0.62, 1.5, 0.02, 0xcfe6f2, 0, 0.18, 0.03);
+    box(g, 0.05, 0.12, 0.3, 0x6e5238, -0.3, 0, -0.1); box(g, 0.05, 0.12, 0.3, 0x6e5238, 0.3, 0, -0.1); return g;
+  };
+  F.dispenser = function () {
+    const g = new T.Group();
+    box(g, 0.34, 0.9, 0.34, 0xe9eef2, 0, 0, 0); box(g, 0.1, 0.05, 0.04, 0x2a6fb0, -0.07, 0.62, 0.18); box(g, 0.1, 0.05, 0.04, 0xc23a2a, 0.07, 0.62, 0.18);
+    box(g, 0.2, 0.06, 0.1, 0x9aa5ad, 0, 0.44, 0.17);
+    cyl(g, 0.13, 0.13, 0.42, 0x5ea9d8, 0, 0.9, 0, 12, { transparent: true, opacity: 0.7 }); cyl(g, 0.06, 0.13, 0.08, 0x5ea9d8, 0, 1.32, 0, 12); return g;
+  };
+  F.shelf = function () {
+    const g = new T.Group(), cols = [0xb5482f, 0x2a6fb0, 0xd9a21b, 0x3f8a55, 0x6a4a7a, 0xe9e4d6];
+    box(g, 1.1, 1.85, 0.04, 0x5a3d26, 0, 0, -0.17); box(g, 0.05, 1.85, 0.38, 0x6e5238, -0.525, 0, 0); box(g, 0.05, 1.85, 0.38, 0x6e5238, 0.525, 0, 0);
+    [0, 0.46, 0.92, 1.38, 1.82].forEach(function (y, k) {
+      box(g, 1.1, 0.04, 0.38, 0x7a5a3c, 0, y, 0);
+      if (k < 4) { let x = -0.45; for (let i = 0; i < 7; i++) { const w = 0.07 + ((i * 7 + k * 3) % 4) * 0.02, h = 0.26 + ((i * 5 + k) % 3) * 0.06; if (x + w > 0.45 || (k === 2 && i > 3)) break; box(g, w, h, 0.24, cols[(i + k) % cols.length], x + w / 2, y + 0.04, 0); x += w + 0.01; } if (k === 2) { cyl(g, 0.07, 0.09, 0.2, 0xc9a24a, 0.2, y + 0.04, 0, 10); sph(g, 0.1, 0xb5651d, -0.1 + 0.55, y + 0.14, 0); } }
+    });
+    return g;
+  };
+  F.speakers = function () {
+    const g = new T.Group();
+    [-0.62, 0.62].forEach(function (x) { box(g, 0.34, 1.05, 0.32, 0x1c1c20, x, 0, 0); cyl(g, 0.12, 0.12, 0.03, 0x555a62, x, 0.7, 0.16, 14).rotation.x = P / 2; cyl(g, 0.07, 0.07, 0.03, 0x555a62, x, 0.34, 0.16, 12).rotation.x = P / 2; });
+    box(g, 0.7, 0.2, 0.3, 0x2a2a30, 0, 0, 0); box(g, 0.5, 0.04, 0.02, 0x7bd3a6, 0, 0.12, 0.16); sph(g, 0.03, 0xd0302a, 0.28, 0.08, 0.16); return g;
+  };
+  F.aquarium = function () {
+    const g = new T.Group();
+    box(g, 1.1, 0.7, 0.46, 0x4a3320, 0, 0, 0); box(g, 1.04, 0.05, 0.4, 0x2a2a30, 0, 0.7, 0);
+    box(g, 1.0, 0.52, 0.38, 0x7fc6e6, 0, 0.75, 0, { transparent: true, opacity: 0.45 }); box(g, 1.0, 0.08, 0.38, 0xd9c79a, 0, 0.75, 0);
+    [[-0.25, 1.1, 0.0, 0xf08a2a], [0.2, 1.2, 0.05, 0xf4d03a], [0.0, 0.95, -0.05, 0xe85a5a]].forEach(function (f) { box(g, 0.1, 0.06, 0.04, f[3], f[0], f[1], f[2]); box(g, 0.05, 0.06, 0.02, f[3], f[0] - 0.07, f[1], f[2]); });
+    [[-0.38, 0.22], [0.36, 0.3]].forEach(function (q) { box(g, 0.03, q[1], 0.03, 0x2f8a4a, q[0], 0.83, -0.08); box(g, 0.1, q[1] * 0.7, 0.02, 0x3f9a55, q[0] + 0.04, 0.85, -0.08); });
+    box(g, 1.04, 0.05, 0.4, 0x2a2a30, 0, 1.27, 0); return g;
+  };
+  F.cabinet = function () {
+    const g = new T.Group();
+    box(g, 1.15, 1.75, 0.04, 0x3a2a1c, 0, 0, -0.19); box(g, 0.05, 1.75, 0.42, 0x4a3320, -0.55, 0, 0); box(g, 0.05, 1.75, 0.42, 0x4a3320, 0.55, 0, 0);
+    box(g, 1.15, 0.5, 0.42, 0x4a3320, 0, 0, 0); box(g, 1.15, 0.05, 0.42, 0x4a3320, 0, 1.7, 0);
+    [0.5, 0.98, 1.34].forEach(function (y) { box(g, 1.05, 0.03, 0.38, 0x7a5a3c, 0, y, 0); });
+    [[-0.3, 0.53], [0.3, 0.53], [0.0, 1.01], [-0.32, 1.37], [0.32, 1.37]].forEach(function (q, i) { cyl(g, 0.06, 0.04, 0.16 + (i % 2) * 0.08, 0xe0b43a, q[0], q[1], 0, 10); sph(g, 0.07, 0xe0b43a, q[0], q[1] + 0.22 + (i % 2) * 0.08, 0); });
+    box(g, 0.5, 0.04, 0.02, 0xc9a24a, 0, 0.2, 0.22);
+    box(g, 1.05, 1.15, 0.02, 0x9bc9e6, 0, 0.52, 0.215, { transparent: true, opacity: 0.25 });
+    return g;
+  };
+  /* where the decor goes: size on the floor (width along the wall, depth out from it), checked against everything already in the house */
+  const DECO = { shoes: [0.9, 0.34], palm: [0.7, 0.7], floorlamp: [0.4, 0.4], sidelamp: [0.5, 0.5], mirror: [0.8, 0.4], dispenser: [0.4, 0.4], shelf: [1.1, 0.4], speakers: [1.6, 0.4], aquarium: [1.1, 0.5], cabinet: [1.15, 0.44] };
+  const DECO_ORDER = ['shelf', 'floorlamp', 'aquarium', 'palm', 'cabinet', 'mirror', 'speakers', 'dispenser', 'sidelamp', 'shoes'];
+  function decoPlan(def, fixed) {
+    const W = def.W / 2, D = def.D / 2, out = {}, taken = [];
+    const hit = function (a, b, m) { return a[0] < b[1] + m && a[1] > b[0] - m && a[2] < b[3] + m && a[3] > b[2] - m; };
+    const near = function (r, x, z, d) { const cx = Math.max(r[0], Math.min(x, r[1])), cz = Math.max(r[2], Math.min(z, r[3])); return Math.hypot(cx - x, cz - z) < d; };
+    const wet = fixed.filter(function (f) { return f.kind === 'toilet' || f.kind === 'sink' || f.kind === 'tub'; });
+    const pts = [].concat(def.way || [], Object.keys(def.st || {}).map(function (k) { return [def.st[k][0], def.st[k][1]]; }));
+    if (def.desk) pts.push([def.desk[0], def.desk[1] + 1.5]);
+    DECO_ORDER.forEach(function (id, idx) {
+      const sz = DECO[id], fw = sz[0], fd = sz[1], walls = ['back', 'left', 'right', 'front'];
+      const order = walls.slice(idx % 4).concat(walls.slice(0, idx % 4));
+      for (let wi = 0; wi < order.length && !out[id]; wi++) {
+        const wl = order[wi], horiz = wl === 'back' || wl === 'front', len = horiz ? W : D;
+        for (let c = -len + 0.35 + fw / 2; c <= len - 0.35 - fw / 2 && !out[id]; c += 0.2) {
+          let x, z, r, w, d;
+          if (wl === 'back') { x = c; z = -D + 0.2 + fd / 2; r = 0; w = fw; d = fd; }
+          else if (wl === 'front') { x = c; z = D - 0.25 - fd / 2; r = P; w = fw; d = fd; }
+          else if (wl === 'left') { x = -W + 0.2 + fd / 2; z = c; r = P / 2; w = fd; d = fw; }
+          else { x = W - 0.2 - fd / 2; z = c; r = -P / 2; w = fd; d = fw; }
+          const rc = [x - w / 2, x + w / 2, z - d / 2, z + d / 2];
+          if (rc[1] > W - 0.1 || rc[0] < -W + 0.1 || rc[3] > D - 0.1 || rc[2] < -D + 0.1) continue;
+          if (rc[3] > D - 2.0 && rc[0] < 1.5 && rc[1] > -1.5) continue;
+          let bad = false;
+          for (let k = 0; k < fixed.length && !bad; k++) if (hit(rc, fixed[k].r, 0.22)) bad = true;
+          for (let k = 0; k < def.parts.length && !bad; k++) { const q = def.parts[k]; if (hit(rc, [Math.min(q[0], q[2]), Math.max(q[0], q[2]), Math.min(q[1], q[3]), Math.max(q[1], q[3])], 0.4)) bad = true; }
+          for (let k = 0; k < wet.length && !bad; k++) { const f = wet[k]; if (hit(rc, f.r, 0.9)) bad = true; }
+          for (let k = 0; k < pts.length && !bad; k++) if (near(rc, pts[k][0], pts[k][1], 0.7)) bad = true;
+          for (let k = 0; k < taken.length && !bad; k++) if (hit(rc, taken[k], 0.2)) bad = true;
+          if (bad) continue;
+          out[id] = [x, z, r]; taken.push(rc);
+        }
+      }
+    });
+    return out;
+  }
   /* small pictures of things for the Buy catalogue: drawn once with the same models the house uses */
   const THUMBS = {};
   G.thumb = function (id) {
@@ -2823,7 +2941,8 @@ window.G3 = (function () {
       const make = {
         mattress: function () { return F.bed({ mattress: true }); }, fan: function () { return F.fan({}, ctx); }, tv: function () { return F.tv({}, ctx); }, sofa: function () { return F.sofa({}); },
         rug: function () { return F.rug({}); }, plant: function () { return F.plant(); }, fridge: function () { return F.fridge(); }, cooker: function () { return F.cooker(); },
-        generator: function () { return F.generator({}, ctx); }, inverter: function () { return F.solar(); }
+        generator: function () { return F.generator({}, ctx); }, inverter: function () { return F.solar(); },
+        shoes: function () { return F.shoes(); }, palm: function () { return F.palm(); }, floorlamp: function () { return F.floorlamp({}, ctx); }, sidelamp: function () { return F.sidelamp({}, ctx); }, mirror: function () { return F.mirror(); }, dispenser: function () { return F.dispenser(); }, shelf: function () { return F.shelf(); }, speakers: function () { return F.speakers(); }, aquarium: function () { return F.aquarium(); }, cabinet: function () { return F.cabinet(); }
       }[id] || (CITY.cars[id] ? function () { return F.carc({ c: CITY.cars[id].col, shape: CITY.cars[id].shape }); } : CITY.bikes[id] ? function () { return F.bike({ c: CITY.bikes[id].col }); } : null);
       if (!make) { THUMBS[id] = null; return null; }
       const obj = make(), sc = new T.Scene(), S = 256;
@@ -2930,7 +3049,7 @@ window.G3 = (function () {
   }
 
   /* ---------- moving around: what blocks you, what you can tap, and how to get from A to B ---------- */
-  const SOLID = { carc: 1, bed: 1, bunk: 1, sofa: 1, tv: 1, fridge: 1, cooker: 1, counter: 1, table: 1, desk: 1, wardrobe: 1, toilet: 1, sink: 1, tub: 1, pool: 1, generator: 1, solar: 1, car: 1, bike: 1, grill: 1, plant: 1, fan: 1 };
+  const SOLID = { carc: 1, bed: 1, bunk: 1, sofa: 1, tv: 1, fridge: 1, cooker: 1, counter: 1, table: 1, desk: 1, wardrobe: 1, toilet: 1, sink: 1, tub: 1, pool: 1, generator: 1, solar: 1, car: 1, bike: 1, grill: 1, plant: 1, fan: 1, shoes: 1, palm: 1, floorlamp: 1, sidelamp: 1, mirror: 1, dispenser: 1, shelf: 1, speakers: 1, aquarium: 1, cabinet: 1 };
   const PICK = { bed: 'bed', bunk: 'bed', fridge: 'kitchen', cooker: 'kitchen', counter: 'kitchen', table: 'kitchen', toilet: 'bath', sink: 'bath', tub: 'bath', stall: 'bath', tv: 'relax', sofa: 'relax', desk: 'desk' };
 
   function makeNav(def, placed) {
@@ -3080,6 +3199,7 @@ window.G3 = (function () {
     G.dispose(V.root);
     const ctx = V.ctx = { tvs: [], bulbs: [], glass: [], lamps: [], fans: [], gen: null, smoke: null, own: s.owned || {}, items: s.items || {} };
     const root = V.root, own = ctx.own, it = ctx.items;
+    V.vehObj = {}; V.arr = null;
     // ground and compound
     G.plane(root, 160, 160, 0x76805c, 0, -0.02, 0);
     const cw = def.fence.w, cd = def.fence.d;
@@ -3156,11 +3276,16 @@ window.G3 = (function () {
     if (it.cooker) put('cooker', S.cooker[0], S.cooker[1], S.cooker[2]);
     if (it.generator) { const g = put('generator', S.generator[0], S.generator[1], S.generator[2]); g.position.y = 0; ctx.gen.world = g.position.clone(); }
     if (it.inverter) { const g = put('solar', S.solar[0], S.solar[1], S.solar[2]); g.position.y = 0; }
-    if (own.car) { const cid = own.carId || 'corolla', cm = CITY.cars[cid] || CITY.cars.corolla, g = put('carc', S.car[0], S.car[1], S.car[2], { c: cm.col, shape: cm.shape }); g.position.y = 0; }
-    else if (own.ride) { const g = put('car', S.car[0], S.car[1], S.car[2]); g.position.y = 0; }
-    if (own.bike) { const bm = CITY.bikes[own.bikeId], g = put('bike', S.bike[0], S.bike[1], S.bike[2], { c: bm ? bm.col : 0xd9a21b }); g.position.y = 0; }
+    if (own.car) { const cid = own.carId || 'corolla', cm = CITY.cars[cid] || CITY.cars.corolla, g = put('carc', S.car[0], S.car[1], S.car[2], { c: cm.col, shape: cm.shape }); g.position.y = 0; V.vehObj.car = g; }
+    else if (own.ride) { const g = put('car', S.car[0], S.car[1], S.car[2]); g.position.y = 0; V.vehObj.car = g; }
+    if (own.bike) { const bm = CITY.bikes[own.bikeId], g = put('bike', S.bike[0], S.bike[1], S.bike[2], { c: bm ? bm.col : 0xd9a21b }); g.position.y = 0; V.vehObj.bike = g; }
     if (own.grill) { const g = put('grill', S.grill[0], S.grill[1], 0); g.position.y = 0; ctx.smoke.world = g.position.clone(); }
     if (def.stall) { const g = put('stall', def.stall[0], def.stall[1], def.stall[2]); g.position.y = 0; }
+    // decor: only the pieces you own are drawn, but every piece has a fixed reserved spot so nothing jumps around when you buy more
+    { const fixed = [];
+      placed.forEach(function (p) { if (p[0] === 'rug' || p[0] === 'stall') return; p[1].updateMatrixWorld(true); const b = new T.Box3().setFromObject(p[1]); fixed.push({ kind: p[0], r: [b.min.x, b.max.x, b.min.z, b.max.z] }); });
+      const plan = decoPlan(def, fixed); V.decoPlan = plan;
+      DECO_ORDER.forEach(function (id) { if (it[id] && plan[id]) put(id, plan[id][0], plan[id][1], plan[id][2]); }); }
     // lamps
     def.lamps.forEach(function (l) { const g = F.lamp({}, ctx, 3.0); g.position.set(l[0], 0.14, l[1]); root.add(g); });
     // person
@@ -3294,7 +3419,8 @@ window.G3 = (function () {
     V.rain.visible = env.rain;
     V.away = s.at !== CITY.homes[s.home].place;
     V.sleeping = false;
-    V.avatar.visible = !V.away;
+    V.avatar.visible = !V.away && !V.arr;
+    if (V.pendingArr) { const pk = V.pendingArr; V.pendingArr = null; if (!V.away) arriveStart(pk); }
     if (!V.job) {
       if (V.sleeping) { lieDown(); }
       else { V.avatar.rotation.set(0, V.A.face, 0); if (V.avatar.position.y > 0.5 || V.avatar.position.y < 0.1) V.avatar.position.set(V.A.x, 0.14, V.A.z); G.walkPose(V.avatar, false, 0); }
@@ -3303,8 +3429,45 @@ window.G3 = (function () {
     G.once();
   };
 
+
+  /* ---------- coming home: your vehicle drives in through the gate and parks, then you step out ---------- */
+  V.pendingArr = null; V.arr = null;
+  function arriveStart(kind) {
+    const o = V.vehObj && V.vehObj[kind]; if (!o || !V.def) return false;
+    const cd = V.def.fence.d, fin = { x: o.position.x, z: o.position.z, r: o.rotation.y };
+    const pts = [{ x: 0, z: cd / 2 + 13 }, { x: 0, z: cd / 2 - 1.8 }, fin], L = [0, 0];
+    for (let i = 1; i < pts.length; i++) L[i] = L[i - 1] + Math.hypot(pts[i].x - pts[i - 1].x, pts[i].z - pts[i - 1].z);
+    V.arr = { o: o, fin: fin, pts: pts, L: L, total: L[2], t: 0, dur: 3.3, kind: kind, out: 0 };
+    o.position.set(pts[0].x, 0, pts[0].z); o.rotation.y = P; if (V.avatar) V.avatar.visible = false;
+    return true;
+  }
+  function arriveStep(dt) {
+    const A = V.arr; if (!A) return;
+    const wrap = function (a) { while (a > P) a -= 2 * P; while (a < -P) a += 2 * P; return a; };
+    if (V.avatar) V.avatar.visible = false;
+    if (A.t < A.dur) {
+      A.t += dt; const u = Math.min(1, A.t / A.dur), s = 1 - Math.pow(1 - u, 2.2), d = s * A.total;
+      const i = d < A.L[1] ? 1 : 2, a = A.pts[i - 1], b = A.pts[i], sl = (A.L[i] - A.L[i - 1]) || 1, k = Math.max(0, Math.min(1, (d - A.L[i - 1]) / sl));
+      A.o.position.set(a.x + (b.x - a.x) * k, 0, a.z + (b.z - a.z) * k);
+      let tgt = Math.atan2(b.x - a.x, b.z - a.z);
+      const fk = Math.max(0, Math.min(1, (d - (A.total - 4.5)) / 4.5)), ff = fk * fk * (3 - 2 * fk);
+      tgt = tgt + wrap(A.fin.r - tgt) * ff;
+      A.o.rotation.y += wrap(tgt - A.o.rotation.y) * Math.min(1, dt * 6);
+      A.o.rotation.x = -0.025 * Math.max(0, Math.min(1, (u - 0.7) / 0.3)) * (1 - u) * 4;
+      if (u >= 1) { A.o.position.set(A.fin.x, 0, A.fin.z); A.o.rotation.set(0, A.fin.r, 0); }
+      return;
+    }
+    A.out += dt;
+    if (A.out > 0.45) {
+      const r = A.fin.r, lx = Math.cos(r), lz = -Math.sin(r), q = V.nav ? V.nav.free(A.fin.x + lx * (A.kind === 'bike' ? 1.0 : 1.7), A.fin.z + lz * (A.kind === 'bike' ? 1.0 : 1.7)) : [A.fin.x, A.fin.z];
+      V.A.x = q[0]; V.A.z = q[1]; V.A.mode = 'idle'; V.A.path = []; V.A.wait = 1.4; V.A.face = Math.atan2(-lx, -lz);
+      if (V.avatar) { V.avatar.position.set(q[0], 0.14, q[1]); V.avatar.rotation.set(0, V.A.face, 0); G.walkPose(V.avatar, false, 0); V.avatar.visible = !V.away; }
+      V.arr = null;
+    }
+  }
   V.tick = function (dt, t) {
     const ctx = V.ctx; if (!ctx) return;
+    if (V.arr) arriveStep(dt);
     if (V.azBase !== V.azGoal) {
       const d = V.azGoal - V.azBase; V.azBase = Math.abs(d) < 0.003 ? V.azGoal : V.azBase + d * Math.min(1, dt * 8);
       V.az = V.azBase + V.azOff; frame();
@@ -5067,7 +5230,7 @@ window.G3 = (function () {
     }
     return null;
   }
-  V.input = { left: false, right: false, gas: false, brake: false };
+  V.input = { left: false, right: false, gas: false, brake: false, honk: false };
   V.startTrip = function (o) {
     if (!V.built) build();
     V.endTrip(null, true);
@@ -5102,11 +5265,14 @@ window.G3 = (function () {
     V.trip = { o: o, route: route, cum: cum, len: len, mode: o.drive ? 'drive' : 'ride', s: 0, v: 0, x: p0.x, z: p0.z, h: Math.atan2(p0.dx, p0.dz), camH: Math.atan2(p0.dx, p0.dz), veh: veh, root: root, rib: rib, ring: ring, bike: bike, halo: halo, lights: lights, tailM: tailM,
       saved: { dist: V.dist, el: V.el, tx: V.target.x, tz: V.target.z }, time: 0, done: false, info: null, bump: 0, dir: 1, rev: false };
     if (o.cp && o.drive) cpPlan(V.trip);
-    V.goal = null; V.anim = null; V.input.left = V.input.right = V.input.gas = V.input.brake = false;
+    if (o.evo && o.drive) evPlan(V.trip, o.evo);
+    V.goal = null; V.anim = null; V.input.left = V.input.right = V.input.gas = V.input.brake = V.input.honk = false;
     tripStep(0.001);
+    if (o.enter && o.drive) enterStart(V.trip);
   };
   V.endTrip = function (at, quiet) {
-    const t = V.trip; if (!t) return; V.trip = null;
+    const t = V.trip; if (!t) return; V.trip = null; V.input.honk = false; hornSet(false);
+    if (t.ev && t.ev.obst.length && V.obst) V.obst = V.obst.filter(function (o) { return t.ev.obst.indexOf(o) < 0; });
     t.root.parent && t.root.parent.remove(t.root); t.rib.parent && t.rib.parent.remove(t.rib); G.dispose(t.root); G.dispose(t.rib);
     V.blocks.forEach(function (b) { b.hid = false; b.g.visible = true; }); restoreView(t);
     V.marker.visible = true; V.dist = 118; V.el = 0.98; camera.fov = 42; camera.far = 1300; scene.fog.near = 340; scene.fog.far = 780; camera.updateProjectionMatrix();
@@ -5177,6 +5343,7 @@ window.G3 = (function () {
   }
   function tripStep(dt) {
     const t = V.trip; if (!t) return; if (t.done) { if (t.hand) handStep(t, dt); return; }
+    if (t.enter) { enterStep(t, dt); return; }
     const o = t.o, slow = !!o.slow; t.time += dt;
     if (t.mode === 'ride') {
       const vmax = (o.vehicle === 'cab' ? 15 : 17) * (slow ? (o.vehicle === 'okada' ? 0.85 : 0.55) : 1), left = t.len - t.s;
@@ -5193,7 +5360,7 @@ window.G3 = (function () {
       t.x = q.x; t.z = q.z; const th = Math.atan2(q2.dx, q2.dz); t.h += wrapA(th - t.h) * Math.min(1, dt * 9);
       if (t.s >= t.len - 0.01) { finishTrip(t); }
     } else {
-      const I = ((t.pol && (t.pol.state === 'busting' || t.pol.state === 'busted')) || (t.cp && t.cp.state === 'hold')) ? { brake: true } : V.input, car = o.vehicle !== 'bike', base = o.top || (car ? 16 : 15);
+      const I = ((t.pol && (t.pol.state === 'busting' || t.pol.state === 'busted')) || (t.cp && t.cp.state === 'hold') || t.hold) ? { brake: true } : V.input, car = o.vehicle !== 'bike', base = o.top || (car ? 16 : 15);
       const rd = roadDist(t.x, t.z), nearDistrict = Object.keys(CITY.mapPos).some(function (k) { const m = CITY.mapPos[k]; return Math.abs(t.x - m.x) < 11 && Math.abs(t.z - m.z) < 11; });
       const off = rd > HR + 1.1 && !nearDistrict, rough = rd > HR + 1.1 && nearDistrict;
       const dm = Math.min(1, (o.dmg || 0) / 100);
@@ -5220,7 +5387,7 @@ window.G3 = (function () {
         if (inJ >= 0 && t.jin !== inJ && t.v > 3 && lightAxis(Math.abs(Math.sin(t.h)) > Math.abs(Math.cos(t.h))) === 'r') { t.rl = 3; if (V.onEvent) V.onEvent({ type: 'redlight' }); polMaybe(t, 'redlight'); }
         t.jin = inJ;
       }
-      polStep(t, dt); cpStep(t, dt);
+      polStep(t, dt); cpStep(t, dt); evStep(t, dt); hornStep(t, dt);
       t.off = off; t.rough = rough;
       const dest = t.route[t.route.length - 1]; if (Math.hypot(t.x - dest[0], t.z - dest[1]) < 6.5) finishTrip(t);
     }
@@ -5232,9 +5399,68 @@ window.G3 = (function () {
     const dark = !!(V.env && (V.env.night || V.env.rain || V.env.slot === 2)); if (t.lights.visible !== dark) t.lights.visible = dark;
     const q = onRoute(t, t.x, t.z), turn = nextTurn(t, q.s);
     t.info = { dt: dt, x: t.x, z: t.z, h: t.h, v: t.v, s: q.s, len: t.len, remain: Math.max(0, t.len - q.s), crash: (t.crashT || 0) > 0, redlight: (t.rl || 0) > 0, off: q.d > HR + 3 && t.mode === 'drive', rev: !!t.rev, wrong: t.mode === 'drive' && t.v > 2 && !t.rev && q.lat < -(LANE + 0.15) && q.d < HR + 3, offRoad: !!t.off, rough: !!t.rough, turn: turn, mode: t.mode, slow: slow, done: t.done, pol: t.pol ? { x: t.pol.x, z: t.pol.z, gap: t.pol.gap, bust: t.pol.meter, state: t.pol.state } : null };
-    t.info.cp = cpInfo(t, q);
+    t.info.cp = cpInfo(t, q); t.info.ev = evInfo(t, q);
     tripCamera(t, dt);
     if (V.onTrip) V.onTrip(t.info, t);
+  }
+
+  /* ---------- getting in: you walk up to your own vehicle, climb in and start it ---------- */
+  const EN = { walk: 1.5, inn: 0.6, start: 0.95, blend: 0.65 };
+  function enterStart(t) {
+    let av; try { av = G.makeAvatar(t.o.look || { skin: 2, hair: 1, outfit: 1, color: 1, acc: 0 }); } catch (e) { return false; }
+    const sc = t.bike ? 1.2 : 1.35; av.scale.setScalar(sc); t.root.add(av);
+    const fx = Math.sin(t.h), fz = Math.cos(t.h), lx = Math.cos(t.h), lz = -Math.sin(t.h), side = t.bike ? 1.15 : 1.75;
+    const door = { x: t.x + lx * side + fx * 0.25, z: t.z + lz * side + fz * 0.25 };
+    const from = { x: door.x + lx * 3.2 - fx * 2.4, z: door.z + lz * 3.2 - fz * 2.4 };
+    const seat = { x: t.x + lx * (t.bike ? 0.1 : 0.45) + fx * 0.2, z: t.z + lz * (t.bike ? 0.1 : 0.45) + fz * 0.2 };
+    av.position.set(from.x, 0.2, from.z);
+    t.v = 0; t.enter = { av: av, k: 0, door: door, from: from, seat: seat, sc: sc, skip: false, blinked: false };
+    if (t.info) t.info.enter = true;
+    return true;
+  }
+  V.enterSkip = function () { const t = V.trip; if (t && t.enter) t.enter.skip = true; };
+  function enterStep(t, dt) {
+    const E = t.enter; if (!E) return;
+    const total = EN.walk + EN.inn + EN.start + EN.blend, kIn = EN.walk, kStart = EN.walk + EN.inn, kBlend = total - EN.blend;
+    if (E.skip && E.k < kStart) E.k = kStart;
+    E.k += dt; const k = E.k, av = E.av;
+    const fx = Math.sin(t.h), fz = Math.cos(t.h), lx = Math.cos(t.h), lz = -Math.sin(t.h);
+    const ease = function (x) { x = Math.max(0, Math.min(1, x)); return x * x * (3 - 2 * x); };
+    t.v = 0;
+    if (k < kIn) {
+      const e = ease(k / EN.walk);
+      av.position.set(E.from.x + (E.door.x - E.from.x) * e, 0.2, E.from.z + (E.door.z - E.from.z) * e);
+      av.rotation.y = Math.atan2(E.door.x - E.from.x, E.door.z - E.from.z); G.walkPose(av, true, dt * 1.3); av.visible = true;
+    } else if (k < kStart) {
+      const e = ease((k - kIn) / EN.inn);
+      av.position.set(E.door.x + (E.seat.x - E.door.x) * e, 0.2 + e * 0.55, E.door.z + (E.seat.z - E.door.z) * e);
+      av.rotation.y = Math.atan2(-lx, -lz); av.scale.setScalar(E.sc * (1 - 0.8 * e)); G.walkPose(av, false, dt);
+    } else av.visible = false;
+    G.faceTick(av, dt);
+    /* engine starting: a small shudder, the lights blink twice, the brake lights glow */
+    const ks = k - kStart;
+    if (ks > 0 && ks < EN.start) {
+      t.veh.position.set(t.x, ROAD_Y + Math.sin(ks * 55) * 0.018 * (1 - ks / EN.start), t.z);
+      if (!t.bike) t.veh.rotation.z = Math.sin(ks * 47) * 0.01 * (1 - ks / EN.start);
+      t.lights.visible = Math.floor(ks * 5) % 2 === 0 && ks < 0.8;
+      t.tailM.forEach(function (m) { m.emissive.setHex(0xff2020); });
+    } else if (ks >= EN.start) { t.veh.position.set(t.x, ROAD_Y, t.z); t.veh.rotation.z = 0; }
+    /* camera: a side view of the car, easing into the usual chase view for the last moment */
+    const sideP = { x: t.x + lx * 12 + fx * 9, y: 4.2, z: t.z + lz * 12 + fz * 9 }, sideT = { x: t.x + lx * 0.3 + fx * 0.3, y: 0.9, z: t.z + lz * 0.3 + fz * 0.3 };
+    let cp = sideP, ct = sideT, fov = 50;
+    if (k > kBlend) {
+      const e = ease((k - kBlend) / EN.blend), fxc = Math.sin(t.camH), fzc = Math.cos(t.camH), back = t.bike ? 12 : 15, up = t.bike ? 6.5 : 8;
+      const chP = { x: t.x - fxc * back, y: up, z: t.z - fzc * back }, chT = { x: t.x + fxc * 10, y: 0.8, z: t.z + fzc * 10 };
+      cp = { x: sideP.x + (chP.x - sideP.x) * e, y: sideP.y + (chP.y - sideP.y) * e, z: sideP.z + (chP.z - sideP.z) * e };
+      ct = { x: sideT.x + (chT.x - sideT.x) * e, y: sideT.y + (chT.y - sideT.y) * e, z: sideT.z + (chT.z - sideT.z) * e }; fov = 50 + 6 * e;
+    }
+    camera.up.set(0, 1, 0); camera.fov = fov; camera.far = 380; scene.fog.near = 120; scene.fog.far = 360;
+    camera.position.set(cp.x, cp.y, cp.z); camera.lookAt(ct.x, ct.y, ct.z); camera.updateProjectionMatrix(); clearView(cp.x, cp.y, cp.z, ct.x, ct.y, ct.z, t.x, t.z);
+    if (t.info) { t.info.dt = 0; t.info.enter = true; if (V.onTrip) V.onTrip(t.info, t); }
+    if (k >= total) {
+      t.root.remove(av); G.dispose(av); t.enter = null; t.veh.position.set(t.x, ROAD_Y, t.z); t.veh.rotation.z = 0;
+      if (t.info) t.info.enter = false;
+    }
   }
 
   /* ---------- hand-over: a client walks up to take the goods, or a runner brings them ---------- */
@@ -5289,6 +5515,134 @@ window.G3 = (function () {
     if (t.info) { t.info.dt = 0; if (V.onTrip) V.onTrip(t.info, t); }
     if (k >= H.total && !H.fired) { H.fired = true; const cb = H.cb; if (cb) cb(); }
   }
+  /* ---------- street events: potholes, a goat that will not move, a stranded motorist, hawkers when you are stuck ---------- */
+  function evPickS(t, lo, hi, used, gap) {
+    const J = V.junctions || [];
+    for (let k = 0; k < 90; k++) {
+      const s = t.len * (lo + Math.random() * (hi - lo)); if (s < 40 || t.len - s < 40) continue;
+      if (used.some(function (u) { return Math.abs(u - s) < gap; })) continue;
+      const a = routeAtS(t, s - 8), b = routeAtS(t, s + 8); if (a.dx * b.dx + a.dz * b.dz < 0.985) continue;
+      const q = routeAtS(t, s); let bad = false;
+      for (let j = 0; j < J.length; j++) if (Math.hypot(q.x - J[j].x, q.z - J[j].z) < 15) { bad = true; break; }
+      if (!bad) return s;
+    }
+    return null;
+  }
+  function evAt(t, s, r) { const q = routeAtS(t, s); return { x: q.x - q.dz * r, z: q.z + q.dx * r, dx: q.dx, dz: q.dz }; }   // r metres to the right of the lane centre
+  function randLook() { return { skin: Math.floor(Math.random() * 6), hair: Math.floor(Math.random() * 8), outfit: Math.floor(Math.random() * 10), color: Math.floor(Math.random() * 12), acc: 0 }; }
+  function evPlan(t, o) {
+    const E = t.ev = { holes: [], goat: null, moto: null, time: 0, obst: [], hawk: !!o.hawk }, used = t.cp ? [t.cp.s] : [];
+    const rain = !!(V.env && V.env.rain);
+    if (o.goat) {
+      const s = evPickS(t, 0.2, 0.85, used, 26);
+      if (s != null) {
+        used.push(s); const p0 = evAt(t, s, 0), g = new T.Group();
+        const wh = new T.MeshLambertMaterial({ color: 0xe6dfd0 }), br = new T.MeshLambertMaterial({ color: 0x6a4a30 }), dk = new T.MeshLambertMaterial({ color: 0x2a2018 });
+        const mk = function (geo, m, x, y, z) { const q = new T.Mesh(geo, m); q.position.set(x, y, z); g.add(q); return q; };
+        mk(new T.BoxGeometry(0.5, 0.5, 1.0), wh, 0, 0.78, 0); mk(new T.BoxGeometry(0.34, 0.34, 0.4), wh, 0, 1.12, 0.62); mk(new T.BoxGeometry(0.2, 0.18, 0.22), br, 0, 1.04, 0.86);
+        mk(new T.ConeGeometry(0.06, 0.3, 5), dk, -0.1, 1.42, 0.6); mk(new T.ConeGeometry(0.06, 0.3, 5), dk, 0.1, 1.42, 0.6);
+        [[-0.17, 0.4], [0.17, 0.4], [-0.17, -0.4], [0.17, -0.4]].forEach(function (l) { mk(new T.BoxGeometry(0.1, 0.56, 0.1), br, l[0], 0.28, l[1]); });
+        mk(new T.BoxGeometry(0.08, 0.08, 0.3), wh, 0, 0.95, -0.62);
+        g.scale.setScalar(1.45); t.root.add(g);
+        E.goat = { s: s, g: g, r: 5.4, state: 'wait', t: 0, hit: false, dir: 1 };
+        const a = evAt(t, s, 5.4); g.position.set(a.x, 0.2, a.z);
+      }
+    }
+    if (o.moto) {
+      const s = evPickS(t, 0.2, 0.85, used, 30);
+      if (s != null) {
+        used.push(s); const p = evAt(t, s, 2.9), h = Math.atan2(p.dx, p.dz), g = new T.Group();
+        const car = carMesh(pickc([0x8a8f98, 0xb8bcc4, 0x2b4f86, 0xb5382f, 0xd9d3c0]), 'sedan'); car.scale.setScalar(1.2); car.position.set(p.x, ROAD_Y, p.z); car.rotation.y = h + 0.12; g.add(car);
+        const blink = []; [[-0.85, 2.0], [0.85, 2.0], [-0.85, -2.0], [0.85, -2.0]].forEach(function (c) { const m = new T.Mesh(new T.BoxGeometry(0.22, 0.16, 0.12), new T.MeshBasicMaterial({ color: 0xffa21a })); m.position.set(c[0], 0.85, c[1]); car.add(m); blink.push(m); });
+        const tri = new T.Mesh(new T.ConeGeometry(0.5, 0.8, 3), new T.MeshLambertMaterial({ color: 0xd32f2f })); const tp = evAt(t, s - 7, 1.6); tri.position.set(tp.x, 0.4, tp.z); g.add(tri);
+        const av = G.makeAvatar(randLook()); av.scale.setScalar(1.35); const ap = evAt(t, s + 3.4, 4.6); av.position.set(ap.x, 0.26, ap.z); av.rotation.y = Math.atan2(-p.dx, -p.dz); g.add(av);
+        t.root.add(g);
+        const hw = Math.abs(p.dx) > Math.abs(p.dz) ? 2.6 : 1.3, hd = Math.abs(p.dx) > Math.abs(p.dz) ? 1.3 : 2.6, ob = { x: p.x, z: p.z, hw: hw, hd: hd };
+        if (V.obst) { V.obst.push(ob); E.obst.push(ob); }
+        E.moto = { s: s, car: car, blink: blink, av: av, state: 'ahead' };
+      }
+    }
+    for (let i = 0; i < (o.holes || 0); i++) {
+      const s = evPickS(t, 0.2, 0.9, used, 24); if (s == null) break; used.push(s);
+      const r = (Math.random() - 0.5) * 1.4, p = evAt(t, s, r), g = new T.Group();
+      const rim = new T.Mesh(new T.RingGeometry(0.85, 1.2, 20), new T.MeshBasicMaterial({ color: rain ? 0x5d7e94 : 0x8a7a62, side: T.DoubleSide })); rim.rotation.x = -P; g.add(rim);
+      const hole = new T.Mesh(new T.CircleGeometry(0.9, 20), new T.MeshBasicMaterial({ color: rain ? 0x2d4a60 : 0x0c0c0e, side: T.DoubleSide })); hole.rotation.x = -P; hole.position.y = 0.01; g.add(hole);
+      g.scale.set(1, 1, 0.8 + Math.random() * 0.5); g.position.set(p.x, ROAD_Y + 0.04, p.z); g.rotation.y = Math.atan2(p.dx, p.dz); t.root.add(g);
+      E.holes.push({ s: s, x: p.x, z: p.z, hit: false });
+    }
+  }
+  /* ---------- the horn: a real two-note car horn (higher peep for a bike), and goats get out of the way ---------- */
+  const horn = { ctx: null, os: null, g: null, on: false, t0: 0 };
+  V.hornPrime = function () {
+    try { if (!horn.ctx) { const AC = window.AudioContext || window.webkitAudioContext; if (!AC) return; horn.ctx = new AC(); } if (horn.ctx.state === 'suspended') horn.ctx.resume(); } catch (e) {}
+  };
+  function hornSet(on, bike) {
+    if (on === horn.on) return;
+    const c = horn.ctx;
+    if (on) {
+      horn.on = true; horn.t0 = Date.now();
+      if (!c) return;
+      try {
+        const g = c.createGain(), f = c.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = 1900;
+        g.gain.setValueAtTime(0.0001, c.currentTime); g.gain.exponentialRampToValueAtTime(0.16, c.currentTime + 0.02);
+        horn.os = (bike ? [760, 950] : [392, 494]).map(function (hz) { const o = c.createOscillator(); o.type = 'sawtooth'; o.frequency.value = hz; o.connect(f); o.start(); return o; });
+        f.connect(g); g.connect(c.destination); horn.g = g;
+      } catch (e) {}
+    } else {
+      horn.on = false;
+      const os = horn.os, g = horn.g; horn.os = null; if (!os || !c) return;
+      const wait = Math.max(0, 230 - (Date.now() - horn.t0));
+      setTimeout(function () { try { g.gain.setTargetAtTime(0.0001, c.currentTime, 0.03); } catch (e) {} setTimeout(function () { os.forEach(function (o) { try { o.stop(); } catch (e) {} }); }, 220); }, wait);
+    }
+  }
+  V.hornOn = function () { return horn.on; };
+  function hornStep(t, dt) {
+    const on = !!V.input.honk && !t.done;
+    hornSet(on, !!t.bike);
+    if (!on) { t.honkT = 0; return; }
+    t.honkT = (t.honkT || 0) + dt;
+    const E = t.ev, gt = E && E.goat;
+    if (gt && !gt.hit && t.honkT > 0.18 && (gt.state === 'wait' || gt.state === 'cross' || gt.state === 'graze')) {
+      const gp = gt.g.position; if (Math.hypot(t.x - gp.x, t.z - gp.z) < 45) { gt.state = 'leave'; gt.t = 0; gt.scared = true; if (V.onEvent) V.onEvent({ type: 'scare' }); }
+    }
+  }
+  function evStep(t, dt) {
+    const E = t.ev;
+    if (E) {
+      E.time += dt;
+      for (let i = 0; i < E.holes.length; i++) { const h = E.holes[i]; if (!h.hit && t.v > 1 && Math.hypot(t.x - h.x, t.z - h.z) < 1.75) { h.hit = true; t.v *= 0.55; t.shake = Math.max(t.shake || 0, 0.9); if (V.onEvent) V.onEvent({ type: 'pothole' }); } }
+      const gt = E.goat;
+      if (gt) {
+        const q = onRoute(t, t.x, t.z), ahead = gt.s - q.s; gt.t += dt;
+        if (gt.state === 'wait' && ahead < 50 && ahead > -4) { gt.state = 'cross'; gt.t = 0; }
+        else if (gt.state === 'cross') { gt.r -= 2.3 * dt; if (gt.r <= 0.2) { gt.r = 0.2; gt.state = 'graze'; gt.t = 0; } }
+        else if (gt.state === 'graze') { if (ahead < 7 || gt.t > 4.5 || ahead < -3) { gt.state = 'leave'; gt.t = 0; } }
+        else if (gt.state === 'leave') { gt.r -= (gt.hit ? 6 : gt.scared ? 4.8 : 2.6) * dt; if (gt.r < -6) gt.state = 'gone'; }
+        const gp = evAt(t, gt.s, gt.r); gt.g.position.set(gp.x, 0.2 + Math.abs(Math.sin(E.time * 6)) * (gt.state === 'cross' || gt.state === 'leave' ? 0.06 : 0), gp.z);
+        gt.g.rotation.y = Math.atan2(gp.dz, -gp.dx) + (gt.state === 'wait' ? 0.6 : 0); gt.g.visible = gt.state !== 'gone';
+        if (!gt.hit && gt.state !== 'gone' && gt.state !== 'wait' && Math.hypot(t.x - gp.x, t.z - gp.z) < 2.0) { gt.hit = true; gt.state = 'leave'; t.v *= 0.3; t.shake = Math.max(t.shake || 0, 1); t.hold = true; if (V.onEvent) V.onEvent({ type: 'goat' }); }
+      }
+      const m = E.moto;
+      if (m) {
+        const on = Math.floor(E.time * 2) % 2 === 0; m.blink.forEach(function (b) { b.visible = on; });
+        if (m.state !== 'gone') { const u = m.av.userData; G.walkPose(m.av, false, 0); u.arms[0].rotation.x = -2.5 + Math.sin(E.time * 6) * 0.5; u.arms[0].rotation.z = -0.3; G.faceTick(m.av, dt); }
+        const q = onRoute(t, t.x, t.z), ahead = m.s - q.s;
+        if (m.state === 'ahead' && ahead < 15 && ahead > 1 && t.v < 1.6 && q.d < 9) { m.state = 'asked'; t.hold = true; if (V.onEvent) V.onEvent({ type: 'motorist' }); }
+      }
+    }
+    if (t.ev && t.ev.hawk && !t.hawkUsed && t.mode === 'drive' && t.v < 0.8 && !t.hold && !t.pol && !(t.cp && t.cp.state === 'hold') && t.time > 4) {
+      t.still = (t.still || 0) + dt; if (t.still > 2.4) { t.hawkUsed = true; t.hold = true; if (V.onEvent) V.onEvent({ type: 'hawker' }); }
+    } else if (t.v >= 0.8) t.still = 0;
+  }
+  function evInfo(t, q) {
+    const E = t.ev; if (!E) return null; let best = null;
+    const add = function (k, s0) { const d = s0 - q.s; if (d > -2 && d < 75 && (!best || d < best.d)) best = { k: k, d: d }; };
+    E.holes.forEach(function (h) { if (!h.hit) add('pothole', h.s); });
+    if (E.goat && E.goat.state !== 'gone' && !E.goat.hit) add('goat', E.goat.s);
+    if (E.moto && E.moto.state === 'ahead') add('motorist', E.moto.s);
+    return best;
+  }
+  V.evRelease = function (kind) { const t = V.trip; if (!t) return; t.hold = false; t.still = 0; const m = t.ev && t.ev.moto; if (kind === 'moto' && m) m.state = 'done'; };
   /* smoke from a badly damaged bonnet */
   function smokeStep(t, dm) {
     if (dm < 0.5) { if (t.smoke) t.smoke.visible = false; return; }
@@ -5704,7 +6058,7 @@ window.G3 = (function () {
   }
 
   /* ---------- shop ---------- */
-  const BCATS = [['sleep', 'Sleep', '🛏️'], ['kitchen', 'Kitchen', '🍳'], ['comfort', 'Comfort', '🛋️'], ['power', 'Power', '⚡'], ['wheels', 'Wheels', '🚗']];
+  const BCATS = [['sleep', 'Sleep', '🛏️'], ['kitchen', 'Kitchen', '🍳'], ['comfort', 'Comfort', '🛋️'], ['decor', 'Decor', '🖼️'], ['power', 'Power', '⚡'], ['wheels', 'Wheels', '🚗']];
   const SHAPE_SIZE = { small: '2×3', sedan: '2×4', big: '2×5', boxy: '2×5' };
   const CAT_EMOJI = { mattress: '🛏️', fan: '🌀', tv: '📺', sofa: '🛋️', rug: '🟥', plant: '🪴', fridge: '🧊', cooker: '🍳', generator: '⛽', inverter: '☀️', corolla: '🚗', camry: '🚘', suv: '🚙', boxer: '🏍️', cg125: '🏍️', vespa: '🛵', sport: '🏍️' };
   function catalogEntries(cat) {
@@ -5723,7 +6077,7 @@ window.G3 = (function () {
       }
       return out;
     }
-    for (const id in CITY.items) { const it = CITY.items[id]; if (it.cat !== cat) continue; const why = itemBlock(S, id); out.push({ id: id, act: 'buy', name: it.name, cost: it.cost, desc: it.desc, size: it.size, stars: it.stars, own: !!S.items[id], why: why }); }
+    for (const id in CITY.items) { const it = CITY.items[id]; if (it.cat !== cat) continue; const why = itemBlock(S, id); const hv = threeOk && G3.views.home && G3.views.home.decoPlan; out.push({ id: id, act: 'buy', name: it.name, cost: it.cost, desc: it.desc + (cat === 'decor' && hv && !hv[id] ? ' There is no free wall space in this home right now, so it will not show until you move somewhere bigger.' : ''), size: it.size, stars: it.stars, own: !!S.items[id], why: why }); }
     return out;
   }
   function renderBuy() {
@@ -5746,7 +6100,7 @@ window.G3 = (function () {
   /* ---------- phone: jobs, japa, life, log ---------- */
   /* ---------- online leaderboard (Supabase over plain REST: no library, only the public anon key) ---------- */
   const BOARD = { url: 'https://tvbnoqwyekbqrlxxnztq.supabase.co', key: 'sb_publishable_db5quqce8u5iWU7qENLltg_U4OWrfYG' };   /* public client key: safe to ship */
-  const APP_VERSION = 'v1.24 · 31 Oct 2026';
+  const APP_VERSION = 'v1.27 · 1 Nov 2026';
   const ERRS = [];
   window.addEventListener('error', function (e) { ERRS.push(String((e && e.message) || 'error').slice(0, 140) + ' @' + ((e && e.lineno) || 0)); if (ERRS.length > 5) ERRS.shift(); });
   window.addEventListener('unhandledrejection', function (e) { ERRS.push('promise: ' + String((e && e.reason && e.reason.message) || (e && e.reason) || '').slice(0, 140)); if (ERRS.length > 5) ERRS.shift(); });
@@ -7030,7 +7384,7 @@ window.G3 = (function () {
     return '<div class="trip" role="region" aria-label="Trip"><div class="tr-top"><span class="tr-ic" id="tr-ic">⬆️</span><div><div class="tr-main" id="tr-main">Heading to ' + esc(CITY.places[T.to].name) + '</div><div class="tr-sub" id="tr-sub">' + esc(T.label) + '</div></div></div>' +
       '<canvas class="tr-mini" id="tr-map" width="260" height="260" aria-label="Minimap"></canvas>' +
       '<div class="tr-chips"><span class="tr-chip" id="tr-spd">0 km/h</span><span class="tr-chip" id="tr-rem">…</span><span class="tr-chip warn" id="tr-warn" hidden></span><span class="tr-chip pol" id="tr-pol" hidden></span><span class="tr-chip mis" id="tr-mis" hidden></span><span class="tr-chip cp" id="tr-cp" hidden></span><span class="tr-chip" id="tr-dmg" hidden></span></div><div class="pol-fx" id="pol-fx" hidden></div>' +
-      (drive ? '<button class="tr-gear" id="tr-gear" data-act="tr-gear" type="button" aria-label="Switch between drive and reverse"><b>D</b><small>Drive</small></button><div class="tr-mid"><button class="tr-pill" data-act="tr-auto" type="button">🤖 Auto-drive</button><button class="tr-pill" data-act="tr-view" type="button">' + viewLabel() + '</button><button class="tr-pill" data-act="tr-park" type="button">🅿️ Park here</button></div>' +
+      (drive ? '<button class="tr-honk" id="tr-honk" data-hold="honk" type="button" aria-label="Honk the horn"><b>\uD83D\uDCE2</b><small>Honk</small></button><button class="tr-gear" id="tr-gear" data-act="tr-gear" type="button" aria-label="Switch between drive and reverse"><b>D</b><small>Drive</small></button><div class="tr-mid"><button class="tr-pill" data-act="tr-auto" type="button">🤖 Auto-drive</button><button class="tr-pill" data-act="tr-view" type="button">' + viewLabel() + '</button><button class="tr-pill" data-act="tr-park" type="button">🅿️ Park here</button></div>' +
         '<div class="tr-ctl"><div class="tr-pad"><button class="tr-btn" data-hold="left" type="button" aria-label="Steer left">◀</button><button class="tr-btn" data-hold="right" type="button" aria-label="Steer right">▶</button></div>' +
         '<div class="tr-pad"><button class="tr-btn brake" data-hold="brake" type="button" aria-label="Brake">STOP</button><button class="tr-btn gas" data-hold="gas" type="button" aria-label="Accelerate">GO</button></div></div>'
         : '<div class="tr-mid"><button class="tr-pill" data-act="tr-view" type="button">' + viewLabel() + '</button><button class="tr-pill" data-act="tr-skip" type="button">Skip ›</button></div>') + '</div>';
@@ -7061,7 +7415,8 @@ window.G3 = (function () {
     else if (i.remain < 14) { ic = TRIP_ICON.arrive; main = 'Arriving at ' + dest; sub = fmtD(i.remain); }
     else if (i.turn && i.turn.dist < 90) { ic = TRIP_ICON[i.turn.dir]; main = (i.turn.dist < 14 ? 'Turn ' : 'Turn ') + i.turn.dir + (i.turn.dist < 14 ? ' now' : ' in ' + fmtD(i.turn.dist)); sub = 'Then continue to ' + dest; }
     else { sub = 'Continue for ' + fmtD(i.turn ? i.turn.dist : i.remain); }
-    { const ge = document.getElementById('tr-gear'); if (ge) { ge.hidden = i.mode !== 'drive'; const rv = !!i.rev; if (ge.classList.contains('rev') !== rv) { ge.classList.toggle('rev', rv); ge.innerHTML = rv ? '<b>R</b><small>Reverse</small>' : '<b>D</b><small>Drive</small>'; const gs = document.querySelector('.tr-btn.gas'); if (gs) gs.textContent = rv ? 'BACK' : 'GO'; } } }
+    { const hk = document.getElementById('tr-honk'); if (hk) hk.hidden = i.mode !== 'drive' || !!i.enter; }
+    { const ge = document.getElementById('tr-gear'); if (ge) { ge.hidden = i.mode !== 'drive' || !!i.enter; const rv = !!i.rev; if (ge.classList.contains('rev') !== rv) { ge.classList.toggle('rev', rv); ge.innerHTML = rv ? '<b>R</b><small>Reverse</small>' : '<b>D</b><small>Drive</small>'; const gs = document.querySelector('.tr-btn.gas'); if (gs) gs.textContent = rv ? 'BACK' : 'GO'; } } }
     set('tr-ic', ic); set('tr-main', main); set('tr-sub', sub); set('tr-spd', (i.rev ? 'R \u00B7 ' : '') + Math.round(i.v * 3.6) + ' km/h'); set('tr-rem', fmtD(i.remain) + ' left');
     const w = document.getElementById('tr-warn'), wt = i.crash ? '💥 Crash! Watch where you drive' : i.redlight ? '📸 Red light! Fined ' + fmt(Math.min(10000, T.fines || 10000)) : i.offRoad ? 'Off the road! Slow down' : i.wrong ? 'Wrong side! Keep to the right' : i.slow ? '🚦 Go-slow traffic' : '';
     if (w) { w.hidden = !wt; if (wt && w.textContent !== wt) w.textContent = wt; }
@@ -7073,7 +7428,7 @@ window.G3 = (function () {
         const dt = Math.min(0.1, i.dt || 0);
         if (!M.dead) {
           if (!M.run && i.v > 0.5) M.run = true;
-          if (M.run && !document.getElementById('pol-sheet') && !document.getElementById('cp-sheet') && !document.getElementById('br-sheet')) M.left -= dt;
+          if (M.run && !document.getElementById('pol-sheet') && !document.getElementById('cp-sheet') && !document.getElementById('br-sheet') && !document.getElementById('ev-sheet')) M.left -= dt;
           if (i.crash && !M.cr) M.crashes++; M.cr = !!i.crash;
           if (M.frag != null && M.crashes > M.frag) { M.dead = true; M.msg = misFail(S, 'broke'); save(); }
           if (M.left <= 0) { M.left = 0; M.dead = true; M.msg = misFail(S, 'time'); save(); }
@@ -7083,13 +7438,54 @@ window.G3 = (function () {
           me.hidden = false; if (me.textContent !== tx) me.textContent = tx; me.classList.toggle('low', M.dead || sec <= 8);
         }
       } else if (me) me.hidden = true; }
+    { const en = !!i.enter; if (en !== !!T.enHide) { T.enHide = en; ['.tr-ctl', '.tr-mid'].forEach(function (sel) { const e = document.querySelector(sel); if (e) e.hidden = en; }); } }
     { const de = document.getElementById('tr-dmg'), dv = T.dkey ? Math.round(S.dmg[T.dkey] || 0) : 0;
       if (de) { de.hidden = !dv; if (dv) { const tx = '\uD83D\uDD27 Damage ' + dv + '%'; if (de.textContent !== tx) de.textContent = tx; de.classList.toggle('warn', dv >= 60); } } }
     { const ce = document.getElementById('tr-cp'), nw2 = performance.now(); let ct = '';
-      if (T.note && T.note.until > nw2) ct = T.note.t;
+      if (i.enter) ct = '\uD83D\uDEAA Getting in \u00B7 tap to skip';
+      else if (T.note && T.note.until > nw2) ct = T.note.t;
+      else if (!(i.cp && i.cp.d < 240) && i.ev) ct = i.ev.k === 'pothole' ? '\uD83D\uDD73\uFE0F Pothole ahead' : i.ev.k === 'goat' ? '\uD83D\uDC10 Animals on the road' : '\uD83D\uDE97 Broken-down car ahead';
       else if (i.cp && i.cp.d < 240) ct = i.cp.st === 'hold' ? '\uD83D\uDEA7 Stopped at the checkpoint' : i.cp.d < 32 ? '\uD83D\uDEA7 Stop at the barrier!' : '\uD83D\uDEA7 Police checkpoint ahead \u00B7 ' + fmtD(i.cp.d);
       if (ce) { ce.hidden = !ct; if (ct && ce.textContent !== ct) ce.textContent = ct; } }
     const now = performance.now(); if (now - (T.drawn || 0) > 33) { T.drawn = now; drawMini(i); }
+  }
+  /* ---------- street events ---------- */
+  function evSheet(kind) {
+    const app0 = document.getElementById('app') || app; if (!app0 || document.getElementById('ev-sheet') || !UI.trip) return;
+    let h;
+    if (kind === 'goat') {
+      const f = Math.min(S.cash, pr(S, 6000));
+      h = '<h2>🐐 You nudged a goat!</h2><p>Gently. The goat is fine, only offended. Its owner storms over: "Who go pay for my goat\'s stress? Do you know how much this goat cost?"</p><div class="bgs"><button class="btn" data-act="ev-goatpay" type="button">Pay ' + fmt(f) + '</button><button class="btn ghost" data-act="ev-goatarg" type="button">Argue your case (risky)</button></div>';
+    } else if (kind === 'motorist') {
+      h = '<h2>🚗 Broken-down car</h2><p>A man waves you down beside his dead car, hazard lights blinking: "Oga, please, the battery is finished. Help me push to the side?"</p><div class="bgs"><button class="btn" data-act="ev-help" type="button">Help him push (about 12 seconds)</button><button class="btn ghost" data-act="ev-skip" type="button">Drive on</button></div>';
+    } else {
+      const op = function (act, label, cost, extra) { return '<button class="btn' + (act === 'ev-no' ? ' ghost' : '') + '" data-act="' + act + '" type="button"' + (cost > S.cash ? ' disabled' : '') + '>' + label + (cost ? ' · ' + fmt(cost) : '') + '</button>'; };
+      h = '<h2>🧋 A hawker at your window</h2><p>You are not moving, so the hawkers move in. "Oga, buy something! Cold, cold!"</p><div class="bgs">' + op('ev-water', 'Pure water', pr(S, 200)) + op('ev-chips', 'Plantain chips', pr(S, 500)) + op('ev-charger', 'Phone charger', pr(S, 3500)) + op('ev-no', 'No, thank you', 0) + '</div>';
+    }
+    app0.insertAdjacentHTML('beforeend', '<div class="veil" id="ev-sheet" data-kind="' + kind + '"><div class="sheet" role="dialog" aria-modal="true">' + h + '</div></div>');
+  }
+  function evDone(kind, msg, cost) {
+    const T = UI.trip; if (!T) return; cost = Math.min(Math.max(0, S.cash), cost || 0);
+    S.cash -= cost; if (cost) T.fines = (T.fines || 0) + cost; T.evLog = (T.evLog ? T.evLog + ' ' : '') + msg; cpNote(T, msg); save();
+    const el = document.getElementById('ev-sheet'); if (el) el.remove(); G3.views.map.evRelease(kind === 'moto' ? 'moto' : '');
+  }
+  function evAct(act) {
+    const T = UI.trip; if (!T) return; const M = T.mis, r = Math.random();
+    if (act === 'ev-goatpay') evDone('goat', 'You paid the goat owner ' + fmt(Math.min(S.cash, pr(S, 6000))) + '.', pr(S, 6000));
+    else if (act === 'ev-goatarg') { if (r < 0.5) evDone('goat', 'The crowd laughed at the owner and he gave up. Free!', 0); else evDone('goat', 'The crowd sided with the owner. Ouch: ' + fmt(Math.min(S.cash, pr(S, 9000))) + '.', pr(S, 9000)); }
+    else if (act === 'ev-help') {
+      if (M && !M.dead) M.left = Math.max(1, M.left - 12);
+      apply(S, { mood: 5 }); let msg = 'You helped push the car. ';
+      if (r < 0.6) { const t = pr(S, 3000); apply(S, { cash: t }); msg += 'He insisted on giving you ' + fmt(t) + '.'; }
+      else if (r < 0.85) msg += 'He thanked you warmly.';
+      else { if (S.mis) S.mis.rep += 1; msg += 'He is a well-connected man and will recommend you. Rep +1.'; }
+      evDone('moto', msg, 0);
+    }
+    else if (act === 'ev-skip') evDone('moto', 'You drove past the stranded man.', 0);
+    else if (act === 'ev-water') { apply(S, { food: 2, mood: 1 }); evDone('hawk', 'Cold water. Refreshing.', pr(S, 200)); }
+    else if (act === 'ev-chips') { apply(S, { food: 8, mood: 2 }); evDone('hawk', 'Crunchy plantain chips. Food +8.', pr(S, 500)); }
+    else if (act === 'ev-charger') { apply(S, { mood: 4 }); evDone('hawk', 'A phone charger. It works, mostly.', pr(S, 3500)); }
+    else if (act === 'ev-no') evDone('hawk', '"Next time, oga!"', 0);
   }
   /* ---------- damage ---------- */
   function dmgAdd(n) {
@@ -7190,16 +7586,17 @@ window.G3 = (function () {
     V.onTrip = tripUi; V.onTripDone = function () {
       const k = handKind();
       if (k && V.handover(k, function () { setTimeout(finishTrip, 250); })) {
-        const T = UI.trip, a = S.mis && S.mis.active; ['.tr-ctl', '.tr-mid', '#tr-gear'].forEach(function (sel) { const e = document.querySelector(sel); if (e) e.hidden = true; });
+        const T = UI.trip, a = S.mis && S.mis.active; ['.tr-ctl', '.tr-mid', '#tr-gear', '#tr-honk'].forEach(function (sel) { const e = document.querySelector(sel); if (e) e.hidden = true; });
         if (T) cpNote(T, k === 'collect' ? '\uD83D\uDE4B\uD83C\uDFFE The client is coming for the ' + (a && a.item || 'goods') : '\uD83D\uDE4B\uD83C\uDFFE Someone is bringing the ' + (a && a.item || 'goods') + ' out');
         return;
       }
       setTimeout(finishTrip, 150);
     };
-    V.onEvent = function (e) { if (e.type === 'hand') { const T = UI.trip; if (T) cpNote(T, e.kind === 'collect' ? '\uD83D\uDE4B\uD83C\uDFFE "Thank you! I will take it from here."' : '\uD83D\uDE4B\uD83C\uDFFE "Here you go. Drive safe!"'); return; } if (e.type === 'crash') dmgAdd(Math.max(3, Math.min(14, Math.round((e.v || 5) * 0.8)))); else if (e.type === 'bump') dmgAdd(1); if (e.type === 'checkpoint') { cpSheet(); return; } if (e.type === 'cprun') { cpRan(); return; } if (e.type === 'pursuit') { UI.trip.chase = true; return; } if (e.type === 'busted') { const M = UI.trip && UI.trip.mis; if (M && M.risky && !M.dead) { M.dead = true; M.msg = misFail(S, 'seized'); save(); } polSheet(); return; } if (e.type === 'escaped') { UI.trip.chase = false; UI.trip.escaped = true; return; } if (e.type === 'redlight' && drive) { const f = Math.min(Math.max(0, S.cash), 10000); if (f > 0) { S.cash -= f; UI.trip.fines = (UI.trip.fines || 0) + f; save(); } } };
+    V.onEvent = function (e) { if (e.type === 'scare') { const T0 = UI.trip; if (T0) cpNote(T0, '\uD83D\uDC10 The goat bolts. Good honk!'); return; } if (e.type === 'pothole') { dmgAdd(4); const T = UI.trip; if (T) cpNote(T, '\uD83D\uDD73\uFE0F Pothole!'); return; } if (e.type === 'goat') { dmgAdd(3); evSheet('goat'); return; } if (e.type === 'motorist') { evSheet('motorist'); return; } if (e.type === 'hawker') { evSheet('hawk'); return; } if (e.type === 'hand') { const T = UI.trip; if (T) cpNote(T, e.kind === 'collect' ? '\uD83D\uDE4B\uD83C\uDFFE "Thank you! I will take it from here."' : '\uD83D\uDE4B\uD83C\uDFFE "Here you go. Drive safe!"'); return; } if (e.type === 'crash') dmgAdd(Math.max(3, Math.min(14, Math.round((e.v || 5) * 0.8)))); else if (e.type === 'bump') dmgAdd(1); if (e.type === 'checkpoint') { cpSheet(); return; } if (e.type === 'cprun') { cpRan(); return; } if (e.type === 'pursuit') { UI.trip.chase = true; return; } if (e.type === 'busted') { const M = UI.trip && UI.trip.mis; if (M && M.risky && !M.dead) { M.dead = true; M.msg = misFail(S, 'seized'); save(); } polSheet(); return; } if (e.type === 'escaped') { UI.trip.chase = false; UI.trip.escaped = true; return; } if (e.type === 'redlight' && drive) { const f = Math.min(Math.max(0, S.cash), 10000); if (f > 0) { S.cash -= f; UI.trip.fines = (UI.trip.fines || 0) + f; save(); } } };
     const cpOdds = window.__cpOdds != null ? window.__cpOdds : (timed && ma.risky ? 0.9 : 0.3 + (((window.G3 && G3.clockSlot) ? G3.clockSlot() : 1) >= 2 ? 0.1 : 0)), wantCp = !!(drive && Math.random() < cpOdds);
     if (timed && ma.risky) setTimeout(function () { const t = V.trip; if (t && Math.random() < 0.75) t.polWait = 'risky'; }, 0);
-    V.startTrip({ dmg: drive ? (S.dmg[ownBike ? 'bike' : 'car'] || 0) : 0, cp: wantCp, from: from, to: to, drive: drive, vehicle: vehicle, model: vehicle === 'car' && car ? car.shape : 'sedan', color: color, slow: !!S.slow, top: vehicle === 'bike' && bike && bike.run > 0.3 ? 18 : 0 });
+    const eo = window.__evOdds || {}, evo = drive ? { holes: eo.holes != null ? eo.holes : 1 + Math.floor(Math.random() * 3) + (S.rain ? 1 : 0), goat: eo.goat != null ? !!eo.goat : Math.random() < 0.3, moto: eo.moto != null ? !!eo.moto : Math.random() < 0.25, hawk: eo.hawk != null ? !!eo.hawk : Math.random() < 0.5 } : null;
+    V.startTrip({ evo: evo, dmg: drive ? (S.dmg[ownBike ? 'bike' : 'car'] || 0) : 0, cp: wantCp, from: from, to: to, drive: drive, enter: drive && !window.__enterOff, look: S.look, vehicle: vehicle, model: vehicle === 'car' && car ? car.shape : 'sedan', color: color, slow: !!S.slow, top: vehicle === 'bike' && bike && bike.run > 0.3 ? 18 : 0 });
   }
   function finishTrip() {
     const T = UI.trip; if (!T) return; const V = G3.views.map;
@@ -7208,9 +7605,11 @@ window.G3 = (function () {
     if (T.mis && T.mis.dead && T.mis.msg) msg = (msg ? msg + ' ' : '') + T.mis.msg;
     if (T.fines) msg = (msg ? msg + ' ' : '') + 'Traffic fines: ' + fmt(T.fines) + '.';
     if (T.cpLog) msg = (msg ? msg + ' ' : '') + T.cpLog;
+    if (T.evLog) msg = (msg ? msg + ' ' : '') + T.evLog;
     if (T.dkey && T.dmgNew > 0) { const d = Math.round(S.dmg[T.dkey] || 0); msg = (msg ? msg + ' ' : '') + 'Your ' + (T.dkey === 'bike' ? 'bike' : 'car') + ' took damage: now ' + d + '%.' + (d >= 60 ? ' Repair it at AbujaCars.' : ''); }
     if (T.escaped) msg = (msg ? msg + ' ' : '') + 'You shook off the police.';
     UI.trip = null; V.onTrip = null; V.onTripDone = null; V.onEvent = null; V.endTrip(T.to);
+    if (T.drive && T.dkey && T.to === homePlace(S) && threeOk && G3.views.home && !window.__enterOff) { G3.views.home.pendingArr = T.dkey; UI.tab = 'home'; }
     if (msg) showToast(msg); render();
   }
   function cancelTrip() {
@@ -7222,11 +7621,12 @@ window.G3 = (function () {
   /* hold-to-steer buttons and arrow keys */
   (function () {
     const set = function (k, v) { if (G3.views.map && G3.views.map.input) G3.views.map.input[k] = v; };
-    document.addEventListener('pointerdown', function (e) { const b = e.target.closest && e.target.closest('[data-hold]'); if (!b) return; e.preventDefault(); try { b.setPointerCapture(e.pointerId); } catch (x) {} b.classList.add('on'); set(b.dataset.hold, true); });
+    document.addEventListener('pointerdown', function (e) { const b = e.target.closest && e.target.closest('[data-hold]'); if (!b) return; e.preventDefault(); try { b.setPointerCapture(e.pointerId); } catch (x) {} b.classList.add('on'); if (b.dataset.hold === 'honk' && G3.views.map.hornPrime) G3.views.map.hornPrime(); set(b.dataset.hold, true); });
     const up = function (e) { const b = e.target.closest && e.target.closest('[data-hold]'); if (!b) return; b.classList.remove('on'); set(b.dataset.hold, false); };
     document.addEventListener('pointerup', up); document.addEventListener('pointercancel', up); document.addEventListener('lostpointercapture', up);
     document.addEventListener('contextmenu', function (e) { if (e.target.closest && e.target.closest('.trip')) e.preventDefault(); });
-    const KM = { ArrowLeft: 'left', ArrowRight: 'right', ArrowUp: 'gas', ArrowDown: 'brake', a: 'left', d: 'right', w: 'gas', s: 'brake' };
+    document.addEventListener('pointerdown', function () { const m = G3.views.map; if (UI.trip && m && m.trip && m.trip.enter) m.enterSkip(); }, true);
+    const KM = { ArrowLeft: 'left', ArrowRight: 'right', ArrowUp: 'gas', ArrowDown: 'brake', a: 'left', d: 'right', w: 'gas', s: 'brake', h: 'honk', H: 'honk' };
     document.addEventListener('keydown', function (e) { if (UI.trip && (e.key === 'r' || e.key === 'R') && !e.repeat) { const g = document.getElementById('tr-gear'); if (g) g.click(); return; } if (UI.trip && KM[e.key]) { set(KM[e.key], true); e.preventDefault(); } });
     document.addEventListener('keyup', function (e) { if (KM[e.key]) set(KM[e.key], false); });
   })();
@@ -7393,6 +7793,7 @@ window.G3 = (function () {
     if (act === 'findme') { if (G3.views.map) { G3.views.map.dist = 118; G3.views.map.focus(S.at); } return; }
     if (act === 'overview') { if (G3.views.map) G3.views.map.overview(); return; }
     if (act === 'br-tow') { brTow(); return; }
+    if (/^ev-/.test(act)) { evAct(act); return; }
     if (act === 'tr-gear') { const V0 = G3.views.map, t0 = V0.trip; if (!t0 || !UI.trip) return; if (!V0.setGear(!t0.rev)) cpNote(UI.trip, 'Stop the car first to change gear'); return; }
     if (act === 'cp-show' || act === 'cp-dash' || act === 'cp-open' || act === 'cp-bribe' || act === 'cp-run') { cpResolve(act.slice(3)); return; }
     if (act === 'pol-pay') { polResolve('pay'); return; }
