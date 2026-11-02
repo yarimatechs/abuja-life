@@ -506,6 +506,14 @@ button.wc.no { opacity: .45; }
 .ldock { display: flex; align-items: center; justify-content: center; gap: 14px; min-height: 64px; } .ldock .btn { padding: 12px 20px; } .ldie { width: 52px; height: 52px; flex: none; } .ldie.dim { opacity: .55; } .ldie.pop { animation: ldpop .35s ease-out; }
 @keyframes ldpop { 0% { transform: rotate(-200deg) scale(.4); } 70% { transform: rotate(12deg) scale(1.15); } 100% { transform: none; } }
 .lring { animation: lpulse .9s ease-in-out infinite; transform-box: fill-box; transform-origin: center; } @keyframes lpulse { 50% { transform: scale(1.18); opacity: .5; } }
+.ayboard { display: grid; gap: 8px; padding: 12px 10px; margin: 6px 0; border-radius: 22px; background: linear-gradient(160deg, #a8672e, #6e3d17); box-shadow: inset 0 2px 8px rgba(0,0,0,.4), 0 4px 12px rgba(0,0,0,.25); }
+.ayrow { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; }
+.aypit { aspect-ratio: 1 / 1.15; min-width: 0; border: 0; padding: 4px 2px 2px; border-radius: 50% / 46%; background: radial-gradient(circle at 50% 35%, #3b1f0a, #522a0e); box-shadow: inset 0 3px 7px rgba(0,0,0,.65); display: grid; grid-template-rows: 1fr auto; justify-items: center; color: #f7e3c3; font: inherit; }
+.aypit.mine { background: radial-gradient(circle at 50% 35%, #2c1706, #4a2609); } .aypit b { font-size: 13px; line-height: 1; padding-bottom: 3px; }
+.aypit.can { cursor: pointer; box-shadow: inset 0 3px 7px rgba(0,0,0,.65), 0 0 0 3px #f6c453; animation: aypulse 1.1s ease-in-out infinite; } .aypit.hi { box-shadow: inset 0 3px 7px rgba(0,0,0,.65), 0 0 0 3px #7ee08b; }
+@keyframes aypulse { 50% { box-shadow: inset 0 3px 7px rgba(0,0,0,.65), 0 0 0 5px rgba(246,196,83,.45); } }
+.aydots { display: flex; flex-wrap: wrap; gap: 2px; justify-content: center; align-content: center; width: 80%; } .aydots i { width: 7px; height: 7px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #fff3d6, #d9b273 60%, #a8742f); }
+.aytag { display: flex; align-items: center; gap: 8px; padding: 6px 10px; border-radius: 14px; border: 2px solid transparent; } .aytag.on { border-color: var(--accent); background: var(--surface); } .aytag b { flex: 1; } .ayscore { font-weight: 900; font-size: 20px; font-variant-numeric: tabular-nums; } .ayscore small { font-size: 12px; opacity: .6; }
 .gpot { text-align: center; font-weight: 800; font-size: 13px; color: #8a6a0a; }
 
 .chat-bar input:focus-visible { outline: none; border-color: var(--accent); }
@@ -6168,7 +6176,7 @@ window.G3 = (function () {
   /* ---------- phone: jobs, japa, life, log ---------- */
   /* ---------- online leaderboard (Supabase over plain REST: no library, only the public anon key) ---------- */
   const BOARD = { url: 'https://tvbnoqwyekbqrlxxnztq.supabase.co', key: 'sb_publishable_db5quqce8u5iWU7qENLltg_U4OWrfYG' };   /* public client key: safe to ship */
-  const APP_VERSION = 'v1.30 · 2 Nov 2026';
+  const APP_VERSION = 'v1.31 · 2 Nov 2026';
   const ERRS = [];
   window.addEventListener('error', function (e) { ERRS.push(String((e && e.message) || 'error').slice(0, 140) + ' @' + ((e && e.lineno) || 0)); if (ERRS.length > 5) ERRS.shift(); });
   window.addEventListener('unhandledrejection', function (e) { ERRS.push('promise: ' + String((e && e.reason && e.reason.message) || (e && e.reason) || '').slice(0, 140)); if (ERRS.length > 5) ERRS.shift(); });
@@ -6859,11 +6867,65 @@ window.G3 = (function () {
   })();
   window.__ludo = Ludo;
 
+  /* ---------- Ayo: seeds round twelve pits, two players ---------- */
+  const Ayo = (function () {
+    const DEFA = { cap: 3 };
+    const mx = function (st) { return st.rules && st.rules.cap === 4 ? 4 : 3; };
+    function deal(pl, rules) {
+      rules = Object.assign({}, DEFA, rules || {});
+      return { pl: pl.slice(0, 2), b: [4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4], s: [0, 0], turn: pl[0], out: [], miss: {}, rules: rules, n: 0, last: null, over: false, winner: null, draw: false };
+    }
+    const clone = function (st) { return JSON.parse(JSON.stringify(st)); };
+    const sideSum = function (b, i) { let t = 0; for (let k = i * 6; k < i * 6 + 6; k++) t += b[k]; return t; };
+    function sow(b, p) { const nb = b.slice(); let n = nb[p], i = p; nb[p] = 0; while (n > 0) { i = (i + 1) % 12; if (i === p) continue; nb[i]++; n--; } return { b: nb, last: i }; }
+    function capsOf(nb, last, i, m) {
+      const lo = (1 - i) * 6, hi = lo + 5; if (last < lo || last > hi) return [];
+      const cap = []; let k = last, tot = 0; while (k >= lo && nb[k] >= 2 && nb[k] <= m) { cap.push(k); tot += nb[k]; k--; }
+      if (cap.length && tot >= sideSum(nb, 1 - i)) return [];   // taking everything is not allowed
+      return cap;
+    }
+    function legal(st, u) {
+      const i = st.pl.indexOf(u); if (i < 0) return [];
+      const o = []; for (let p = i * 6; p < i * 6 + 6; p++) if (st.b[p] > 0) o.push(p);
+      if (sideSum(st.b, 1 - i) === 0) return o.filter(function (p) { return sideSum(sow(st.b, p).b, 1 - i) > 0; });
+      return o;
+    }
+    function finish(s) {
+      s.s[0] += sideSum(s.b, 0); s.s[1] += sideSum(s.b, 1); s.b = s.b.map(function () { return 0; }); s.over = true;
+      if (s.s[0] === s.s[1]) { s.draw = true; s.winner = null; } else s.winner = s.pl[s.s[0] > s.s[1] ? 0 : 1];
+      return s;
+    }
+    function move(st, u, p) {
+      if (st.over || st.turn !== u || st.out.indexOf(u) >= 0 || legal(st, u).indexOf(p) < 0) return null;
+      const s = clone(st), i = s.pl.indexOf(u), r = sow(s.b, p); s.b = r.b; s.n++;
+      const cap = capsOf(s.b, r.last, i, mx(s)); let got = 0;
+      cap.forEach(function (k) { got += s.b[k]; s.b[k] = 0; }); s.s[i] += got;
+      s.last = { u: u, mv: p, end: r.last, cap: cap, got: got };
+      if (s.s[i] >= 25) { s.over = true; s.winner = u; return s; }
+      const nx = s.pl[1 - i]; s.turn = nx;
+      if (s.n >= 400 || !legal(s, nx).length) { s.turn = nx; return finish(s); }
+      return s;
+    }
+    function leave(st, u, why) {
+      if (st.over || st.out.indexOf(u) >= 0 || st.pl.indexOf(u) < 0) return null;
+      const s = clone(st); s.out.push(u); s.n++; s.last = { u: u, out: why || 'left' }; s.over = true; s.winner = s.pl[0] === u ? s.pl[1] : s.pl[0]; return s;
+    }
+    function timeout(st, u) {
+      if (st.over || st.turn !== u) return null;
+      const m = (st.miss[u] || 0) + 1;
+      if (m >= 2) { const s = leave(st, u, 'idle'); if (s) s.miss[u] = m; return s; }
+      const lg = legal(st, u); if (!lg.length) return null;
+      const s = move(st, u, lg[0]); if (s) { s.miss[u] = m; if (s.last) s.last.idle = true; } return s;
+    }
+    return { deal: deal, move: move, legal: legal, leave: leave, timeout: timeout, sow: sow, capsOf: capsOf, sideSum: sideSum, DEF: DEFA };
+  })();
+  window.__ayo = Ayo;
+
   const Games = { rows: [], lobby: [], at: 0, loading: false, err: '', cur: null, busy: false, seen: {}, ready: false, sig: '', shapePick: false, pending: null, toast: '', skipRev: -1, watch: false,
-    cfg: { kind: 'whot', start6: true, safe: true, seats: 4, stake: 5000, stack: true, pick3: true, whot: true, market: 'reshuffle', vis: 'open', invited: [], sheet: false } };
-  const GKIND = { whot: ['Whot', '🃏'], ludo: ['Ludo', '🎲'] };
+    cfg: { kind: 'whot', cap: 3, start6: true, safe: true, seats: 4, stake: 5000, stack: true, pick3: true, whot: true, market: 'reshuffle', vis: 'open', invited: [], sheet: false } };
+  const GKIND = { whot: ['Whot', '🃏'], ludo: ['Ludo', '🎲'], ayo: ['Ayo', '🟤'] };
   const gk = function (g) { return (GKIND[g && g.kind] || GKIND.whot)[0]; };
-  const gEng = function (g) { return g && g.kind === 'ludo' ? Ludo : Whot; };
+  const gEng = function (g) { return g && g.kind === 'ludo' ? Ludo : g && g.kind === 'ayo' ? Ayo : Whot; };
   const STAKES = [0, 1000, 5000, 20000, 50000, 100000, 500000, 1000000, 5000000, 10000000];
   const stakeTxt = function (n) { return n ? (n >= 1000000 ? '₦' + (n / 1000000) + 'm' : n >= 1000 ? '₦' + (n / 1000) + 'k' : '₦' + n) : 'Friendly'; };
   const WSHAPE = { C: ['●', '#d9302a', 'Circle'], T: ['▲', '#2a6fb0', 'Triangle'], X: ['✚', '#2f8a4a', 'Cross'], Q: ['■', '#d9a21b', 'Square'], S: ['★', '#7a3fa0', 'Star'] };
@@ -7035,7 +7097,66 @@ window.G3 = (function () {
     if (Games.err && Games.err !== 'setup') h += '<p class="auth-err" role="alert">' + esc(Games.err) + '</p>';
     return h;
   }
+  /* the Ayo board: sowing is animated, one seed at a time */
+  const AY = { gid: '', rev: -1, board: null, anim: null, timer: 0 };
+  function ayoFrames(prev, st) {
+    const l = st.last, fr = []; let b = prev.slice(), n = b[l.mv], i = l.mv; b[l.mv] = 0; fr.push(b.slice());
+    while (n > 0) { i = (i + 1) % 12; if (i === l.mv) continue; b[i]++; n--; fr.push(b.slice()); }
+    if (l.cap && l.cap.length) { l.cap.forEach(function (k) { b[k] = 0; }); fr.push(b.slice()); }
+    return { frames: fr, i: 0, hi: l.end };
+  }
+  function ayoPits(st, b, me, canPick, lg, hi) {
+    const vi = Math.max(0, st.pl.indexOf(me)), top = [], bot = [];
+    for (let j = 0; j < 6; j++) { bot.push(vi * 6 + j); top.push((1 - vi) * 6 + (5 - j)); }
+    const pit = function (k) {
+      const mine = Math.floor(k / 6) === vi, n = b[k], can = canPick && mine && lg.indexOf(k) >= 0, dots = Math.min(n, 14);
+      return '<' + (can ? 'button type="button" data-act="gamove" data-id="' + k + '"' : 'div') + ' class="aypit' + (mine ? ' mine' : '') + (can ? ' can' : '') + (hi === k ? ' hi' : '') + '" aria-label="Pit with ' + n + ' seeds"><span class="aydots">' + Array(dots + 1).join('<i></i>') + '</span><b>' + n + '</b></' + (can ? 'button' : 'div') + '>';
+    };
+    return '<div class="ayrow">' + top.map(pit).join('') + '</div><div class="ayrow">' + bot.map(pit).join('') + '</div>';
+  }
+  function ayoTick() {
+    const a = AY.anim, el = document.getElementById('ay-pits'), g = Games.cur;
+    if (!a || !el || !g || !g.state || g.id !== AY.gid) { clearInterval(AY.timer); AY.timer = 0; AY.anim = null; return; }
+    a.i++;
+    if (a.i >= a.frames.length) { clearInterval(AY.timer); AY.timer = 0; AY.anim = null; paintWhot(); return; }
+    el.innerHTML = ayoPits(g.state, a.frames[a.i], gMe(), false, [], a.i === a.frames.length - 1 ? a.hi : -1);
+  }
+  function ayoPlay(g, st) {
+    const me = gMe(), inn = gIn(g), pot = g.stake * Math.max(g.players.length, 1), meOut = st.out.indexOf(me) >= 0;
+    if (AY.gid !== g.id) { AY.gid = g.id; AY.rev = g.rev; AY.board = st.b.slice(); AY.anim = null; if (AY.timer) { clearInterval(AY.timer); AY.timer = 0; } }
+    else if (AY.rev !== g.rev) {
+      const prev = AY.board; AY.rev = g.rev; AY.board = st.b.slice();
+      if (prev && st.last && st.last.mv !== undefined) {
+        const an = ayoFrames(prev, st);
+        if (st.over || an.frames[an.frames.length - 1].join() === st.b.join()) { AY.anim = an; if (AY.timer) clearInterval(AY.timer); AY.timer = setInterval(ayoTick, 230); }
+      }
+    }
+    const animating = !!AY.anim, myTurn = g.status === 'active' && st.turn === me && !st.over && inn && !meOut && !animating;
+    const nm = function (u) { return u === me ? 'You' : '@' + esc(gName(u)); };
+    const lg = myTurn ? Ayo.legal(st, me) : [];
+    let h = '';
+    if (g.status === 'finished') {
+      const won = g.winner === me, draw = !g.winner, tip = g.stake ? (draw ? ' Your stake comes back.' : won ? ' You take ' + fmt(Math.round(pot * 0.95)) + '.' : inn ? ' You lost ' + fmt(g.stake) + '.' : '') : '';
+      const mi = inn ? st.pl.indexOf(me) : 0, sc = st.s[mi] + ' – ' + st.s[1 - mi];
+      h += '<div class="wh-over"><h3>' + (draw ? '🤝 A draw' : won ? '🎉 You won!' : '@' + esc(gName(g.winner)) + ' won') + '</h3><p class="muted" style="margin:0 0 10px">' + (st.out.length ? 'Your opponent left the game.' : 'Final count ' + sc + '.') + tip + '</p><div class="wh-row"><button class="btn" data-act="gagain" type="button">New table</button><button class="btn ghost" data-act="gclose" type="button">Back</button></div></div>';
+    } else {
+      const left = Math.max(0, 45 - Math.floor((Date.now() - gSyncWhen(g)) / 1000));
+      const st1 = !inn ? '👀 Watching: @' + esc(gName(st.turn)) + ' to play' : meOut ? 'You are out of this game' : myTurn ? 'Your turn · pick a pit' : '@' + esc(gName(st.turn)) + ' is thinking…';
+      let sub = ''; const l = st.last;
+      if (l) { if (l.out) sub = nm(l.u) + (l.out === 'idle' ? ' timed out and is out' : ' left the game'); else if (l.mv !== undefined) sub = nm(l.u) + (l.idle ? ' missed a turn, a pit was played' : ' played') + (l.got ? ' and captured ' + l.got : ''); }
+      h += '<div class="wh-st' + (myTurn ? ' me' : '') + '">' + st1 + (sub ? '<small>' + sub + '</small>' : '') + '<small><span id="wh-t">⏱ ' + left + 's</span>' + (st.miss[st.turn] ? ' · one missed turn already' : '') + '</small></div>';
+    }
+    const vi = Math.max(0, st.pl.indexOf(me)), oi = 1 - vi;
+    const tag = function (i) { const u = st.pl[i], on = st.turn === u && !st.over; return '<div class="aytag' + (on ? ' on' : '') + '">' + gAvatar(u) + '<b>' + (u === me ? 'You' : '@' + esc(gName(u))) + '</b><span class="ayscore">' + st.s[i] + '<small> / 25</small></span></div>'; };
+    h += tag(oi) + '<div class="ayboard" id="ay-pits">' + ayoPits(st, animating ? AY.anim.frames[AY.anim.i] : st.b, me, myTurn && !Games.busy, lg, -1) + '</div>' + tag(vi);
+    if (g.stake && g.status === 'active') h += '<div class="gpot">Pot ' + fmt(g.pot || pot) + ' · winner takes ' + fmt(Math.round((g.pot || pot) * 0.95)) + '</div>';
+    if (g.status === 'active' && inn && !meOut) h += '<div class="wh-row"><button class="btn ghost" data-act="gforfeit" type="button">Leave game' + (g.stake ? ' (stake is lost)' : '') + '</button></div>';
+    if (g.status === 'active' && !inn) h += '<p class="muted" style="text-align:center">You are watching.</p>';
+    if (Games.err && Games.err !== 'setup') h += '<p class="auth-err" role="alert">' + esc(Games.err) + '</p>';
+    return h;
+  }
   function rulesPills(r, kind) {
+    if (kind === 'ayo') { r = Object.assign({}, Ayo.DEF, r || {}); return '<span class="gr-pill">🎯 Capture 2–' + (r.cap === 4 ? 4 : 3) + '</span>'; }
     if (kind === 'ludo') { r = Object.assign({}, Ludo.DEF, r || {}); return [r.start6 ? '🎲 Need a 6' : '🏁 Start out', r.safe ? '⭐ Safe stars' : '⚔️ No safe squares'].map(function (t) { return '<span class="gr-pill">' + t + '</span>'; }).join(''); }
     r = Object.assign({}, Whot.DEF, r || {});
     return [r.stack ? '🔥 Stacking' : '✋ No stacking', r.market === 'count' ? '🛒 Count' : '🔁 Reshuffle'].concat(r.pick3 ? [] : ['No pick 3']).concat(r.whot ? [] : ['No Whot'])
@@ -7066,6 +7187,7 @@ window.G3 = (function () {
     }
     const st = g.state; if (!st) return '<p class="muted" style="text-align:center">Loading the game…</p>';
     if (g.kind === 'ludo') return ludoPlay(g, st);
+    if (g.kind === 'ayo') return ayoPlay(g, st);
     const myTurn = g.status === 'active' && st.turn === me && !st.over && inn && st.out.indexOf(me) < 0, t = Whot.top(st), mine = Whot.hand(st, me), meOut = st.out.indexOf(me) >= 0;
     let h = '';
     if (g.status === 'finished') {
@@ -7120,7 +7242,7 @@ window.G3 = (function () {
   }
   function gCreate(cfg, invited) {
     if (cfg.stake > S.cash) { showToast('You need ' + fmt(cfg.stake) + ' to open this table.'); render(false); return; }
-    gRpc('game_create', { p_kind: cfg.kind || 'whot', p_seats: cfg.seats, p_stake: cfg.stake, p_rules: cfg.kind === 'ludo' ? { start6: cfg.start6 !== false, safe: cfg.safe !== false } : { stack: cfg.stack, pick3: cfg.pick3, whot: cfg.whot, market: cfg.market }, p_vis: cfg.vis, p_invited: invited || [] }).then(function (row) {
+    gRpc('game_create', { p_kind: cfg.kind || 'whot', p_seats: cfg.kind === 'ayo' ? 2 : cfg.seats, p_stake: cfg.stake, p_rules: cfg.kind === 'ayo' ? { cap: cfg.cap === 4 ? 4 : 3 } : cfg.kind === 'ludo' ? { start6: cfg.start6 !== false, safe: cfg.safe !== false } : { stack: cfg.stack, pick3: cfg.pick3, whot: cfg.whot, market: cfg.market }, p_vis: cfg.vis, p_invited: invited || [] }).then(function (row) {
       if (row && row.id) { gTake(row); Games.cfg.sheet = false; Games.seen[row.id] = 1; UI.chat = null; UI.phone = 'games'; UI.tab = 'phone'; gOpen(row.id); gamesLoad(true); }
     }, function (e) { const m = gErr(e); showToast(m === 'setup' ? 'Games are not switched on yet.' : e.message); render(false); });
   }
@@ -7128,8 +7250,8 @@ window.G3 = (function () {
     const g = Games.cur, C = Games.cfg;
     if (act === 'gclose') { UI.game = null; Games.cur = null; render(); gamesLoad(true); return true; }
     if (act === 'gopen' || act === 'gwatch') { gOpen(id); return true; }
-    if (act === 'gnew') { if (id && id !== C.kind) { C.kind = id; C.sheet = true; } else C.sheet = !C.sheet; render(false); return true; }
-    if (act === 'gcfg') { const k = el.dataset.k, v = el.dataset.v; if (k === 'seats' || k === 'stake') C[k] = parseInt(v, 10); else if (k === 'market' || k === 'vis') C[k] = v; else C[k] = v === '1'; if (C.vis === 'friends' && !C.invited.length) { const cs = chatConvs(); if (cs[0]) C.invited = [cs[0].id]; } render(false); return true; }
+    if (act === 'gnew') { if (id && id !== C.kind) { C.kind = id; C.sheet = true; if (id === 'ayo') C.seats = 2; } else C.sheet = !C.sheet; render(false); return true; }
+    if (act === 'gcfg') { const k = el.dataset.k, v = el.dataset.v; if (k === 'seats' || k === 'stake' || k === 'cap') C[k] = parseInt(v, 10); else if (k === 'market' || k === 'vis') C[k] = v; else C[k] = v === '1'; if (C.vis === 'friends' && !C.invited.length) { const cs = chatConvs(); if (cs[0]) C.invited = [cs[0].id]; } render(false); return true; }
     if (act === 'ginv') { const i = C.invited.indexOf(id); if (i >= 0) C.invited.splice(i, 1); else if (C.invited.length < 3) C.invited.push(id); render(false); return true; }
     if (act === 'gcreate') { gCreate(C, C.vis === 'friends' ? C.invited : []); return true; }
     if (act === 'gchallenge') { gCreate({ kind: 'whot', seats: 2, stake: 0, stack: true, pick3: true, whot: true, market: 'reshuffle', vis: 'friends' }, [id]); return true; }
@@ -7151,6 +7273,7 @@ window.G3 = (function () {
     if (act === 'gforfeit') { if (g && g.state && !Games.busy) { const n = gEng(g).leave(g.state, gMe(), 'left'); if (n) gSubmit(n); } return true; }
     if (act === 'glroll') { if (g && g.state && g.kind === 'ludo' && !Games.busy) { const n = Ludo.roll(g.state, gMe()); if (n) gSubmit(n); } return true; }
     if (act === 'glmove') { if (g && g.state && g.kind === 'ludo' && !Games.busy) { const n = Ludo.move(g.state, gMe(), parseInt(id, 10)); if (n) gSubmit(n); } return true; }
+    if (act === 'gamove') { if (g && g.state && g.kind === 'ayo' && !Games.busy && !AY.anim) { const n = Ayo.move(g.state, gMe(), parseInt(id, 10)); if (n) gSubmit(n); } return true; }
     if (act === 'gdraw') { if (g && g.state) { const n = Whot.draw(g.state, gMe()); if (n) gSubmit(n); } return true; }
     if (act === 'gplay') {
       if (!g || !g.state) return true;
@@ -7162,7 +7285,7 @@ window.G3 = (function () {
     if (act === 'gsoon') { showToast('🚧 ' + (el.dataset.n || 'This game') + ' is coming soon.'); return true; }
     return false;
   }
-  const GAME_TILES = [['whot', 'Whot!', '🃏', 'linear-gradient(150deg,#e11d48,#7c1d3a)', true], ['ayo', 'Ayo', '🟤', 'linear-gradient(150deg,#b45309,#78350f)', false], ['ludo', 'Ludo', '🎲', 'linear-gradient(150deg,#2563eb,#1e3a8a)', true], ['pool', '8-ball pool', '🎱', 'linear-gradient(150deg,#15803d,#14532d)', false], ['chess', 'Chess', '♟️', 'linear-gradient(150deg,#475569,#1e293b)', false]];
+  const GAME_TILES = [['whot', 'Whot!', '🃏', 'linear-gradient(150deg,#e11d48,#7c1d3a)', true], ['ayo', 'Ayo', '🟤', 'linear-gradient(150deg,#b45309,#78350f)', true], ['ludo', 'Ludo', '🎲', 'linear-gradient(150deg,#2563eb,#1e3a8a)', true], ['pool', '8-ball pool', '🎱', 'linear-gradient(150deg,#15803d,#14532d)', false], ['chess', 'Chess', '♟️', 'linear-gradient(150deg,#475569,#1e293b)', false]];
   function tableCard(g, mode) {
     const host = gName(g.host), open = g.seats - g.players.length, inn = gIn(g), inv = g.invited.indexOf(gMe()) >= 0;
     let btn;
@@ -7173,7 +7296,7 @@ window.G3 = (function () {
   }
   function renderGamesApp() {
     let h = '<h2>Game Room</h2>';
-    if (!Auth.session) return h + '<div class="card"><p class="muted">Play Whot and Ludo with other players online. You need an account so they can find you.</p><button class="btn" data-act="aopen" type="button">Create account or log in</button></div>';
+    if (!Auth.session) return h + '<div class="card"><p class="muted">Play Whot, Ludo and Ayo with other players online. You need an account so they can find you.</p><button class="btn" data-act="aopen" type="button">Create account or log in</button></div>';
     chatSync();
     if (!Chat.meLoaded) { if (!Chat.loadingMe) setTimeout(loadMe, 0); return h + '<p class="muted">Loading…</p>'; }
     if (!Chat.me) return h + '<div class="card"><p class="muted">Pick a username in Chat first, so other players can see who they are playing.</p><button class="btn" data-act="phone" data-id="chat" type="button">Open Chat</button></div>';
@@ -7181,13 +7304,14 @@ window.G3 = (function () {
     if (Games.err === 'setup') return h + '<div class="card"><h3>Games are not switched on yet</h3><p class="muted">The maker still has to run the games script in Supabase. Try again later.</p></div>';
     const me = Chat.uid, C = Games.cfg, w = gStk();
     h += '<div class="groom"><div class="gwallet"><span>Wallet</span><b>' + fmt(S.cash) + '</b></div><div class="grec">' + w.w + ' won · ' + w.l + ' lost</div></div>';
-    h += '<div class="gtiles">' + GAME_TILES.map(function (t) { return '<button class="gtile' + (t[4] ? ' live' : '') + (t[4] && t[0] === C.kind && C.sheet ? ' sel' : '') + '" style="background:' + t[3] + '" data-act="' + (t[4] ? 'gnew' : 'gsoon') + '" data-id="' + t[0] + '" data-n="' + t[1] + '" type="button"><span class="gt-ic">' + t[2] + '</span><b>' + t[1] + '</b><small>' + (t[4] ? '2–4 players' : 'Soon') + '</small></button>'; }).join('') + '</div>';
+    h += '<div class="gtiles">' + GAME_TILES.map(function (t) { return '<button class="gtile' + (t[4] ? ' live' : '') + (t[4] && t[0] === C.kind && C.sheet ? ' sel' : '') + '" style="background:' + t[3] + '" data-act="' + (t[4] ? 'gnew' : 'gsoon') + '" data-id="' + t[0] + '" data-n="' + t[1] + '" type="button"><span class="gt-ic">' + t[2] + '</span><b>' + t[1] + '</b><small>' + (t[4] ? (t[0] === 'ayo' ? '2 players' : '2–4 players') : 'Soon') + '</small></button>'; }).join('') + '</div>';
     if (C.sheet) {
       const opt = function (k, v, label, on, desc) { return '<button type="button" class="gopt' + (on ? ' on' : '') + '" data-act="gcfg" data-k="' + k + '" data-v="' + v + '">' + label + (desc ? '<small>' + desc + '</small>' : '') + '</button>'; };
-      h += '<div class="gsheet"><h3>Start a ' + (GKIND[C.kind] || GKIND.whot)[0] + ' table</h3><div class="glab">Seats</div><div class="gopts">' + [2, 3, 4].map(function (n) { return opt('seats', n, '👤 ' + n, C.seats === n); }).join('') + '</div>' +
+      h += '<div class="gsheet"><h3>Start ' + (C.kind === 'ayo' ? 'an' : 'a') + ' ' + (GKIND[C.kind] || GKIND.whot)[0] + ' table</h3><div class="glab">Seats</div><div class="gopts">' + (C.kind === 'ayo' ? [2] : [2, 3, 4]).map(function (n) { return opt('seats', n, '👤 ' + n, C.seats === n); }).join('') + '</div>' +
         '<div class="glab">Stake (each player)</div><div class="gopts wrap">' + STAKES.map(function (n) { return opt('stake', n, stakeTxt(n), C.stake === n); }).join('') + '</div>' +
         (C.kind === 'ludo' ? '<div class="glab">Leaving home</div><div class="gopts">' + opt('start6', 1, '🎲 Need a 6', C.start6, 'Roll a six to bring a piece out') + opt('start6', 0, '🏁 Start out', !C.start6, 'All pieces start on the board') + '</div><div class="glab">Capturing</div><div class="gopts">' + opt('safe', 1, '⭐ Safe stars', C.safe, 'Stars and start squares are safe') + opt('safe', 0, '⚔️ No safe squares', !C.safe, 'Any piece can be captured') + '</div>' : '') +
-        (C.kind === 'ludo' ? '' : '<div class="glab">When the market runs out</div><div class="gopts">' + opt('market', 'reshuffle', '🔁 Reshuffle', C.market === 'reshuffle', 'Played cards go back in') + opt('market', 'count', '🛒 Count', C.market === 'count', 'Fewest cards wins') + '</div>' +
+        (C.kind === 'ayo' ? '<div class="glab">What you can capture</div><div class="gopts">' + opt('cap', 3, '🎯 2 or 3', C.cap !== 4, 'Take pits that end on 2 or 3') + opt('cap', 4, '🎯 2, 3 or 4', C.cap === 4, 'Pits on 4 are taken too') + '</div>' : '') +
+        (C.kind !== 'whot' ? '' : '<div class="glab">When the market runs out</div><div class="gopts">' + opt('market', 'reshuffle', '🔁 Reshuffle', C.market === 'reshuffle', 'Played cards go back in') + opt('market', 'count', '🛒 Count', C.market === 'count', 'Fewest cards wins') + '</div>' +
         '<div class="glab">Pick two and pick three</div><div class="gopts">' + opt('stack', 1, '🔥 Stacking', C.stack, 'Defend with the same number') + opt('stack', 0, '✋ No stacking', !C.stack, 'Next player picks at once') + '</div>' +
         '<div class="glab">Your own rules</div><div class="gopts">' + opt('pick3', C.pick3 ? 0 : 1, C.pick3 ? 'Pick three: on' : 'No pick three', !C.pick3, 'A 5 is a plain card') + opt('whot', C.whot ? 0 : 1, C.whot ? 'Whot cards: on' : 'No Whot cards', !C.whot, 'Take the 20s out') + '</div>' ) +
         '<div class="glab">Who can sit</div><div class="gopts">' + opt('vis', 'open', '🌍 Anyone', C.vis === 'open', 'Listed in the Game Room') + opt('vis', 'friends', '🔒 My friends', C.vis === 'friends', 'Only people you invite') + '</div>';
@@ -7205,7 +7329,7 @@ window.G3 = (function () {
     const open = Games.lobby.filter(function (g) { return g.status === 'waiting' && !ids[g.id] && !gIn(g) && g.players.length < g.seats; }), live = Games.lobby.filter(function (g) { return g.status === 'active' && !gIn(g); });
     h += '<div class="glab big">Open tables <button class="gref" data-act="grefresh" type="button" aria-label="Refresh">↻</button></div>' + (open.length ? open.map(function (g) { return tableCard(g); }).join('') : '<p class="muted">No open tables right now. Start one and wait for players.</p>');
     if (live.length) h += '<div class="glab big">Watch a game</div>' + live.slice(0, 6).map(function (g) { return tableCard(g); }).join('');
-    h += C.kind === 'ludo' ? '<div class="card" style="margin-top:12px"><h3>How Ludo works</h3><p class="muted" style="margin:0">Roll the dice and move one piece. A <b>6</b> brings a piece out and gives you another roll (three sixes in a row loses the turn). Land on another colour to send that piece back home, unless it sits on a star or start square. Capturing or getting a piece home also gives another roll. Reach the middle with the exact number. First to bring all four pieces home wins. You have 45 seconds a turn.</p></div>' : '<div class="card" style="margin-top:12px"><h3>How Whot works</h3><p class="muted" style="margin:0">Match the shape or the number. <b>1</b> hold on (play again), <b>2</b> pick two, <b>5</b> pick three, <b>8</b> suspension (next player misses a turn), <b>14</b> general market (everyone else picks one), <b>20</b> Whot (call any shape). Empty your hand to win. You have 45 seconds a turn.</p></div>';
+    h += C.kind === 'ayo' ? '<div class="card" style="margin-top:12px"><h3>How Ayo works</h3><p class="muted" style="margin:0">Each pit starts with 4 seeds. Pick one of your pits (the row at the bottom), lift all its seeds and drop them one by one in the pits after it, going round to the left. If your last seed lands in your opponent\'s row and makes a pit 2 or 3 (or 4 if the table allows it), you take it, and the pits before it that also hold 2 or 3 (or 4). You may not take every seed they have, and if they have none you must give them some. First to 25 seeds wins. You have 45 seconds a turn.</p></div>' : C.kind === 'ludo' ? '<div class="card" style="margin-top:12px"><h3>How Ludo works</h3><p class="muted" style="margin:0">Roll the dice and move one piece. A <b>6</b> brings a piece out and gives you another roll (three sixes in a row loses the turn). Land on another colour to send that piece back home, unless it sits on a star or start square. Capturing or getting a piece home also gives another roll. Reach the middle with the exact number. First to bring all four pieces home wins. You have 45 seconds a turn.</p></div>' : '<div class="card" style="margin-top:12px"><h3>How Whot works</h3><p class="muted" style="margin:0">Match the shape or the number. <b>1</b> hold on (play again), <b>2</b> pick two, <b>5</b> pick three, <b>8</b> suspension (next player misses a turn), <b>14</b> general market (everyone else picks one), <b>20</b> Whot (call any shape). Empty your hand to win. You have 45 seconds a turn.</p></div>';
     return h;
   }
   setInterval(function () {
