@@ -501,6 +501,11 @@ button.wc.no { opacity: .45; }
 .gopps { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; } .gopp { display: grid; justify-items: center; gap: 1px; padding: 8px 10px; min-width: 84px; border-radius: 14px; background: var(--surface); border: 2px solid var(--line); } .gopp.on { border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 25%, transparent); } .gopp.out { opacity: .45; }
 .gopp b { font-size: 12px; max-width: 90px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } .gopp small { font-size: 11px; font-weight: 700; color: var(--muted, #6b7a72); }
 .gmini { display: flex; height: 14px; margin-top: 2px; } .gmini i { width: 9px; height: 14px; border-radius: 2px; background: #b3261e; border: 1px solid #fff; margin-left: -4px; } .gmini i:first-child { margin-left: 0; }
+.gtile.sel { box-shadow: 0 0 0 3px var(--ink), 0 6px 14px rgba(0,0,0,.3); }
+.lwrap { padding: 4px 0; } .lboard { display: block; width: 100%; max-width: 380px; margin: 0 auto; border-radius: 14px; box-shadow: 0 4px 14px rgba(0,0,0,.25); background: #fffdf6; touch-action: manipulation; }
+.ldock { display: flex; align-items: center; justify-content: center; gap: 14px; min-height: 64px; } .ldock .btn { padding: 12px 20px; } .ldie { width: 52px; height: 52px; flex: none; } .ldie.dim { opacity: .55; } .ldie.pop { animation: ldpop .35s ease-out; }
+@keyframes ldpop { 0% { transform: rotate(-200deg) scale(.4); } 70% { transform: rotate(12deg) scale(1.15); } 100% { transform: none; } }
+.lring { animation: lpulse .9s ease-in-out infinite; transform-box: fill-box; transform-origin: center; } @keyframes lpulse { 50% { transform: scale(1.18); opacity: .5; } }
 .gpot { text-align: center; font-weight: 800; font-size: 13px; color: #8a6a0a; }
 
 .chat-bar input:focus-visible { outline: none; border-color: var(--accent); }
@@ -6163,7 +6168,7 @@ window.G3 = (function () {
   /* ---------- phone: jobs, japa, life, log ---------- */
   /* ---------- online leaderboard (Supabase over plain REST: no library, only the public anon key) ---------- */
   const BOARD = { url: 'https://tvbnoqwyekbqrlxxnztq.supabase.co', key: 'sb_publishable_db5quqce8u5iWU7qENLltg_U4OWrfYG' };   /* public client key: safe to ship */
-  const APP_VERSION = 'v1.29 · 2 Nov 2026';
+  const APP_VERSION = 'v1.30 · 2 Nov 2026';
   const ERRS = [];
   window.addEventListener('error', function (e) { ERRS.push(String((e && e.message) || 'error').slice(0, 140) + ' @' + ((e && e.lineno) || 0)); if (ERRS.length > 5) ERRS.shift(); });
   window.addEventListener('unhandledrejection', function (e) { ERRS.push('promise: ' + String((e && e.reason && e.reason.message) || (e && e.reason) || '').slice(0, 140)); if (ERRS.length > 5) ERRS.shift(); });
@@ -6792,8 +6797,73 @@ window.G3 = (function () {
   })();
   window.__whot = Whot;
 
+  /* ---------- Ludo: four pieces each, round the board and home ---------- */
+  const Ludo = (function () {
+    const FIN = 56, DEFR = { start6: true, safe: true };
+    const rl = function (st) { return st.rules || DEFR; };
+    function deal(pl, rules) {
+      rules = Object.assign({}, DEFR, rules || {});
+      const c = pl.length === 2 ? [0, 2] : [0, 1, 2, 3].slice(0, pl.length);
+      return { pl: pl.slice(), c: c, t: pl.map(function () { return rules.start6 === false ? [0, 0, 0, 0] : [-1, -1, -1, -1]; }), turn: pl[0], dice: 0, sixes: 0, out: [], miss: {}, rules: rules, n: 0, last: null, over: false, winner: null, draw: false };
+    }
+    const clone = function (st) { return JSON.parse(JSON.stringify(st)); };
+    const alive = function (st) { return st.pl.filter(function (u) { return st.out.indexOf(u) < 0; }); };
+    function nextOf(st, u) { const n = st.pl.length; let i = st.pl.indexOf(u); for (let k = 0; k < n; k++) { i = (i + 1) % n; if (st.out.indexOf(st.pl[i]) < 0 && st.pl[i] !== u) return st.pl[i]; } return u; }
+    const absOf = function (col, rel) { return (13 * col + rel) % 52; };
+    const isSafe = function (st, a) { return rl(st).safe !== false && (a % 13 === 0 || a % 13 === 8); };
+    function legal(st, u, d) {
+      const i = st.pl.indexOf(u); if (i < 0) return [];
+      const out = []; st.t[i].forEach(function (p, k) { if (p === FIN) return; if (p < 0) { if (d === 6) out.push(k); } else if (p + d <= FIN) out.push(k); });
+      return out;
+    }
+    function roll(st, u, force) {
+      if (st.over || st.turn !== u || st.out.indexOf(u) >= 0 || st.dice > 0) return null;
+      const s = clone(st), d = force >= 1 && force <= 6 ? force : 1 + Math.floor(Math.random() * 6);
+      s.n++; s.sixes = d === 6 ? st.sixes + 1 : 0;
+      if (s.sixes >= 3) { s.last = { u: u, roll: d, three: true }; s.sixes = 0; s.turn = nextOf(s, u); return s; }
+      if (!legal(s, u, d).length) { s.last = { u: u, roll: d, pass: true }; s.sixes = 0; s.turn = nextOf(s, u); return s; }
+      s.dice = d; s.last = { u: u, roll: d }; return s;
+    }
+    function move(st, u, k) {
+      if (st.over || st.turn !== u || st.out.indexOf(u) >= 0 || !(st.dice > 0)) return null;
+      if (legal(st, u, st.dice).indexOf(k) < 0) return null;
+      const s = clone(st), i = s.pl.indexOf(u), col = s.c[i], d = s.dice, from = s.t[i][k];
+      const np = from < 0 ? 0 : from + d; s.t[i][k] = np; s.n++;
+      const hit = [];
+      if (np <= 50) {
+        const a = absOf(col, np);
+        if (!isSafe(s, a)) s.pl.forEach(function (o, j) { if (o === u || s.out.indexOf(o) >= 0) return; s.t[j].forEach(function (p, q) { if (p >= 0 && p <= 50 && absOf(s.c[j], p) === a) { s.t[j][q] = -1; hit.push(o); } }); });
+      }
+      const home = np === FIN;
+      s.last = { u: u, roll: d, mv: k, from: from, to: np, hit: hit, home: home }; s.dice = 0;
+      if (s.t[i].every(function (p) { return p === FIN; })) { s.over = true; s.winner = u; s.turn = u; return s; }
+      if (d === 6 || hit.length || home) s.turn = u; else { s.turn = nextOf(s, u); s.sixes = 0; }
+      return s;
+    }
+    function leave(st, u, why) {
+      if (st.over || st.out.indexOf(u) >= 0 || st.pl.indexOf(u) < 0) return null;
+      const s = clone(st), wasTurn = s.turn === u, nx = nextOf(s, u);
+      s.out.push(u); s.n++; s.last = { u: u, out: why || 'left' };
+      const al = alive(s);
+      if (al.length <= 1) { s.over = true; s.winner = al[0] || null; return s; }
+      if (wasTurn) { s.turn = nx; s.dice = 0; s.sixes = 0; }
+      return s;
+    }
+    function timeout(st, u) {
+      if (st.over || st.turn !== u) return null;
+      const m = (st.miss[u] || 0) + 1;
+      if (m >= 2) { const s = leave(st, u, 'idle'); if (s) s.miss[u] = m; return s; }
+      const s = clone(st); s.miss[u] = m; s.dice = 0; s.sixes = 0; s.n++; s.last = { u: u, idle: true }; s.turn = nextOf(s, u); return s;
+    }
+    return { deal: deal, roll: roll, move: move, leave: leave, timeout: timeout, legal: legal, alive: alive, nextOf: nextOf, absOf: absOf, isSafe: isSafe, FIN: FIN, DEF: DEFR };
+  })();
+  window.__ludo = Ludo;
+
   const Games = { rows: [], lobby: [], at: 0, loading: false, err: '', cur: null, busy: false, seen: {}, ready: false, sig: '', shapePick: false, pending: null, toast: '', skipRev: -1, watch: false,
-    cfg: { seats: 4, stake: 5000, stack: true, pick3: true, whot: true, market: 'reshuffle', vis: 'open', invited: [], sheet: false } };
+    cfg: { kind: 'whot', start6: true, safe: true, seats: 4, stake: 5000, stack: true, pick3: true, whot: true, market: 'reshuffle', vis: 'open', invited: [], sheet: false } };
+  const GKIND = { whot: ['Whot', '🃏'], ludo: ['Ludo', '🎲'] };
+  const gk = function (g) { return (GKIND[g && g.kind] || GKIND.whot)[0]; };
+  const gEng = function (g) { return g && g.kind === 'ludo' ? Ludo : Whot; };
   const STAKES = [0, 1000, 5000, 20000, 50000, 100000, 500000, 1000000, 5000000, 10000000];
   const stakeTxt = function (n) { return n ? (n >= 1000000 ? '₦' + (n / 1000000) + 'm' : n >= 1000 ? '₦' + (n / 1000) + 'k' : '₦' + n) : 'Friendly'; };
   const WSHAPE = { C: ['●', '#d9302a', 'Circle'], T: ['▲', '#2a6fb0', 'Triangle'], X: ['✚', '#2f8a4a', 'Cross'], Q: ['■', '#d9a21b', 'Square'], S: ['★', '#7a3fa0', 'Star'] };
@@ -6816,16 +6886,16 @@ window.G3 = (function () {
     const w = gStk(); if (!(g.id in w.stk) || (g.status !== 'finished' && g.status !== 'cancelled')) return;
     const mine = w.stk[g.id]; delete w.stk[g.id]; if (w.paid.indexOf(g.id) < 0) w.paid.push(g.id); if (w.paid.length > 40) w.paid.shift();
     const me = gMe();
-    if (g.status === 'cancelled') { if (mine) { S.cash += mine; log(S, 'A Whot table closed. Your stake of ' + fmt(mine) + ' came back.'); } }
-    else if (!g.winner) { if (mine) { S.cash += mine; log(S, 'The Whot game was a draw. Your stake of ' + fmt(mine) + ' came back.'); } }
-    else if (g.winner === me) { const win = Math.round((g.pot || mine * g.players.length) * 0.95); S.cash += win; S.stats.earned += Math.max(0, win - mine); w.w++; apply(S, { mood: 4, fun: 6 }); log(S, 'You won at Whot and took ' + fmt(win) + '.'); showToast('🏆 You won ' + fmt(win) + ' at Whot!'); }
-    else { w.l++; apply(S, { mood: -1, fun: 3 }); log(S, 'You lost ' + fmt(mine) + ' at Whot.'); }
+    if (g.status === 'cancelled') { if (mine) { S.cash += mine; log(S, 'A ' + gk(g) + ' table closed. Your stake of ' + fmt(mine) + ' came back.'); } }
+    else if (!g.winner) { if (mine) { S.cash += mine; log(S, 'The ' + gk(g) + ' game was a draw. Your stake of ' + fmt(mine) + ' came back.'); } }
+    else if (g.winner === me) { const win = Math.round((g.pot || mine * g.players.length) * 0.95); S.cash += win; S.stats.earned += Math.max(0, win - mine); w.w++; apply(S, { mood: 4, fun: 6 }); log(S, 'You won at ' + gk(g) + ' and took ' + fmt(win) + '.'); showToast('🏆 You won ' + fmt(win) + ' at ' + gk(g) + '!'); }
+    else { w.l++; apply(S, { mood: -1, fun: 3 }); log(S, 'You lost ' + fmt(mine) + ' at ' + gk(g) + '.'); }
     save();
   }
   function gSettleFree(g) {   // friendly games: only the record and the mood
     const w = gStk(); if (g.stake > 0 || g.status !== 'finished' || !g.winner || w.paid.indexOf(g.id) >= 0 || !gIn(g)) return;
     w.paid.push(g.id); if (w.paid.length > 40) w.paid.shift();
-    if (g.winner === gMe()) { w.w++; apply(S, { mood: 4, fun: 6 }); log(S, 'You won a friendly game of Whot.'); } else { w.l++; apply(S, { mood: -1, fun: 3 }); }
+    if (g.winner === gMe()) { w.w++; apply(S, { mood: 4, fun: 6 }); log(S, 'You won a friendly game of ' + gk(g) + '.'); } else { w.l++; apply(S, { mood: -1, fun: 3 }); }
     save();
   }
   function gamesLoad(force) {
@@ -6870,7 +6940,7 @@ window.G3 = (function () {
     const g = Games.cur; if (!g || g.status !== 'active' || !g.state || !gIn(g) || Games.busy || g.turn === gMe() || g.state.over) return;
     if (Games.skipRev === g.rev) return;
     if (Date.now() - gSyncWhen(g) < 50000) return;
-    const n = Whot.timeout(g.state, g.turn); if (!n) return; Games.skipRev = g.rev; gSubmit(n, true);
+    const n = gEng(g).timeout(g.state, g.turn); if (!n) return; Games.skipRev = g.rev; gSubmit(n, true);
   }
   function wcard(c, cls, attrs, tag) {
     tag = tag || 'div'; cls = cls || ''; attrs = attrs || '';
@@ -6879,7 +6949,94 @@ window.G3 = (function () {
     const sh = WSHAPE[c[0]], n = parseInt(c.slice(1), 10), sp = WSPECIAL[n];
     return '<' + tag + ' class="wc ' + cls + '" style="--wc:' + sh[1] + '" ' + attrs + ' aria-label="' + n + ' ' + sh[2] + '"><i>' + n + '</i><b>' + sh[0] + '</b><i class="r">' + n + '</i>' + (sp ? '<em>' + sp + '</em>' : '') + '</' + tag + '>';
   }
-  function rulesPills(r) {
+  /* the Ludo board, drawn as one SVG (15 x 15 squares) */
+  const LCOL = ['#dc2626', '#16a34a', '#eab308', '#2563eb'], LTINT = ['#fecaca', '#bbf7d0', '#fef08a', '#bfdbfe'], LNAME = ['Red', 'Green', 'Yellow', 'Blue'];
+  const LT = (function () {
+    const t = [], add = function (c, r) { t.push([c, r]); }; let i;
+    for (i = 1; i <= 5; i++) add(i, 6); for (i = 5; i >= 0; i--) add(6, i); add(7, 0); add(8, 0); for (i = 1; i <= 5; i++) add(8, i);
+    for (i = 9; i <= 14; i++) add(i, 6); add(14, 7); add(14, 8); for (i = 13; i >= 9; i--) add(i, 8); for (i = 9; i <= 14; i++) add(8, i);
+    add(7, 14); add(6, 14); for (i = 13; i >= 9; i--) add(6, i); for (i = 5; i >= 0; i--) add(i, 8); add(0, 7); add(0, 6); return t;
+  })();
+  const lrot = function (p, k) { let x = p[0], y = p[1]; for (let i = 0; i < k; i++) { const nx = 15 - y, ny = x; x = nx; y = ny; } return [x, y]; };
+  const LYARD = [[1.9, 1.9], [4.1, 1.9], [1.9, 4.1], [4.1, 4.1]], LFIN = [[6.55, 7.5], [7.5, 6.55], [8.45, 7.5], [7.5, 8.45]];
+  function lxy(col, rel, k) {
+    if (rel < 0) return lrot(LYARD[k], col);
+    if (rel <= 50) { const c = LT[(13 * col + rel) % 52]; return [c[0] + 0.5, c[1] + 0.5]; }
+    if (rel < 56) return lrot([rel - 51 + 1.5, 7.5], col);
+    return LFIN[col];
+  }
+  function ludoSvg(st, me, canMove, legalSet) {
+    let s = '<svg class="lboard" viewBox="0 0 15 15" role="img" aria-label="Ludo board">';
+    s += '<rect x="0" y="0" width="15" height="15" rx="0.6" fill="#fffdf6"/>';
+    for (let k = 0; k < 4; k++) {
+      const q = lrot([0.5, 0.5], k), x = k === 0 ? 0 : k === 1 ? 9 : k === 2 ? 9 : 0, y = k === 0 ? 0 : k === 1 ? 0 : k === 2 ? 9 : 9;
+      s += '<rect x="' + x + '" y="' + y + '" width="6" height="6" fill="' + LCOL[k] + '"/><rect x="' + (x + 1) + '" y="' + (y + 1) + '" width="4" height="4" rx="0.5" fill="#fffdf6"/>';
+      LYARD.forEach(function (p) { const c = lrot(p, k); s += '<circle cx="' + c[0] + '" cy="' + c[1] + '" r="0.55" fill="' + LTINT[k] + '" stroke="' + LCOL[k] + '" stroke-width="0.06"/>'; });
+    }
+    LT.forEach(function (c, i) {
+      const start = i % 13 === 0, star = i % 13 === 8, col = start ? i / 13 : -1;
+      s += '<rect x="' + c[0] + '" y="' + c[1] + '" width="1" height="1" fill="' + (start ? LCOL[col] : '#fff') + '" stroke="#b9b29a" stroke-width="0.05"/>';
+      if (star && st.rules.safe !== false) s += '<text x="' + (c[0] + 0.5) + '" y="' + (c[1] + 0.74) + '" text-anchor="middle" font-size="0.8" fill="#b9902a">★</text>';
+      if (start && st.rules.safe !== false) s += '<text x="' + (c[0] + 0.5) + '" y="' + (c[1] + 0.72) + '" text-anchor="middle" font-size="0.6" fill="#fff">★</text>';
+    });
+    for (let k = 0; k < 4; k++) for (let j = 1; j <= 5; j++) { const c = lrot([j, 7], k); s += '<rect x="' + c[0] + '" y="' + c[1] + '" width="1" height="1" fill="' + LCOL[k] + '" opacity="0.85" stroke="#fff" stroke-width="0.05"/>'; }
+    s += '<polygon points="6,6 6,9 7.5,7.5" fill="' + LCOL[0] + '"/><polygon points="6,6 9,6 7.5,7.5" fill="' + LCOL[1] + '"/><polygon points="9,6 9,9 7.5,7.5" fill="' + LCOL[2] + '"/><polygon points="6,9 9,9 7.5,7.5" fill="' + LCOL[3] + '"/>';
+    const toks = [];
+    st.pl.forEach(function (u, i) { if (st.out.indexOf(u) >= 0) return; st.t[i].forEach(function (p, k) { const xy = lxy(st.c[i], p, k); toks.push({ u: u, i: i, k: k, x: xy[0], y: xy[1], col: st.c[i], p: p }); }); });
+    const grp = {}; toks.forEach(function (t) { const key = t.x.toFixed(2) + ',' + t.y.toFixed(2); (grp[key] = grp[key] || []).push(t); });
+    Object.keys(grp).forEach(function (key) { const g = grp[key]; if (g.length > 1 && g[0].p >= 0) g.forEach(function (t, n) { const a = n / g.length * 6.283; t.x += Math.cos(a) * 0.22; t.y += Math.sin(a) * 0.22; t.sm = true; }); });
+    toks.sort(function (a, b) { return a.y - b.y; }).forEach(function (t) {
+      const mv = canMove && t.u === me && legalSet.indexOf(t.k) >= 0, r = t.sm ? 0.36 : 0.44;
+      s += '<g' + (mv ? ' class="lmv" data-act="glmove" data-id="' + t.k + '" style="cursor:pointer"' : '') + '>' + (mv ? '<circle cx="' + t.x + '" cy="' + t.y + '" r="0.78" fill="transparent"/><circle class="lring" cx="' + t.x + '" cy="' + t.y + '" r="0.62" fill="none" stroke="#111" stroke-width="0.1"/>' : '') +
+        '<circle cx="' + t.x + '" cy="' + (t.y + 0.05) + '" r="' + r + '" fill="rgba(0,0,0,.25)"/><circle cx="' + t.x + '" cy="' + t.y + '" r="' + r + '" fill="' + LCOL[t.col] + '" stroke="#fff" stroke-width="0.1"/><circle cx="' + (t.x - r * 0.28) + '" cy="' + (t.y - r * 0.3) + '" r="' + (r * 0.28) + '" fill="rgba(255,255,255,.55)"/></g>';
+    });
+    return s + '</svg>';
+  }
+  const LDOTS = { 1: [[2, 2]], 2: [[1, 1], [3, 3]], 3: [[1, 1], [2, 2], [3, 3]], 4: [[1, 1], [3, 1], [1, 3], [3, 3]], 5: [[1, 1], [3, 1], [2, 2], [1, 3], [3, 3]], 6: [[1, 1], [3, 1], [1, 2], [3, 2], [1, 3], [3, 3]] };
+  function ldie(n, cls) { return '<svg class="ldie ' + (cls || '') + '" viewBox="0 0 4 4" aria-label="Dice ' + n + '"><rect x="0.1" y="0.1" width="3.8" height="3.8" rx="0.7" fill="#fff" stroke="#333" stroke-width="0.12"/>' + (LDOTS[n] || []).map(function (d) { return '<circle cx="' + d[0] + '" cy="' + d[1] + '" r="0.3" fill="#222"/>'; }).join('') + '</svg>'; }
+  function ludoPlay(g, st) {
+    const me = gMe(), inn = gIn(g), pot = g.stake * Math.max(g.players.length, 1), meOut = st.out.indexOf(me) >= 0;
+    const myTurn = g.status === 'active' && st.turn === me && !st.over && inn && !meOut;
+    let h = '';
+    const nm = function (u) { return u === me ? 'You' : '@' + esc(gName(u)); };
+    if (g.status === 'finished') {
+      const won = g.winner === me, tip = g.stake ? (won ? ' You take ' + fmt(Math.round(pot * 0.95)) + '.' : inn ? ' You lost ' + fmt(g.stake) + '.' : '') : '';
+      h += '<div class="wh-over"><h3>' + (won ? '🎉 You won!' : '@' + esc(gName(g.winner)) + ' won') + '</h3><p class="muted" style="margin:0 0 10px">' + (st.t[st.pl.indexOf(g.winner)] && st.t[st.pl.indexOf(g.winner)].every(function (p) { return p === Ludo.FIN; }) ? (won ? 'All four of your pieces are home.' : 'All four of their pieces are home.') : 'Everyone else left.') + tip + '</p><div class="wh-row"><button class="btn" data-act="gagain" type="button">New table</button><button class="btn ghost" data-act="gclose" type="button">Back</button></div></div>';
+    } else {
+      const left = Math.max(0, 45 - Math.floor((Date.now() - gSyncWhen(g)) / 1000));
+      const lg = myTurn && st.dice > 0 ? Ludo.legal(st, me, st.dice) : [];
+      const st1 = !inn ? '👀 Watching: @' + esc(gName(st.turn)) + ' to play' : meOut ? 'You are out of this game' : myTurn ? (st.dice > 0 ? 'You rolled ' + st.dice + ' · tap a piece' : st.sixes ? 'Six! Roll again' : 'Your turn · roll the dice') : '@' + esc(gName(st.turn)) + (st.dice > 0 ? ' rolled ' + st.dice : ' is rolling…');
+      let sub = '';
+      const l = st.last;
+      if (l) {
+        if (l.out) sub = nm(l.u) + (l.out === 'idle' ? ' timed out and is out' : ' left the game');
+        else if (l.idle) sub = nm(l.u) + ' missed a turn';
+        else if (l.three) sub = nm(l.u) + ' rolled three sixes. Turn lost';
+        else if (l.pass) sub = nm(l.u) + ' rolled ' + l.roll + ' and could not move';
+        else if (l.mv !== undefined) sub = nm(l.u) + ' rolled ' + l.roll + (l.hit && l.hit.length ? ' and sent @' + esc(gName(l.hit[0])) + ' home' : l.home ? ' and got a piece home' : ' and moved');
+      }
+      h += '<div class="wh-st' + (myTurn ? ' me' : '') + '">' + st1 + (sub ? '<small>' + sub + '</small>' : '') + '<small><span id="wh-t">⏱ ' + left + 's</span>' + (st.miss[st.turn] ? ' · one missed turn already' : '') + '</small></div>';
+    }
+    h += '<div class="gopps">' + st.pl.map(function (u, i) {
+      const home = st.t[i].filter(function (p) { return p === Ludo.FIN; }).length, out = st.out.indexOf(u) >= 0, on = st.turn === u && !st.over && !out;
+      return '<div class="gopp' + (on ? ' on' : '') + (out ? ' out' : '') + '" style="border-bottom:4px solid ' + LCOL[st.c[i]] + '">' + gAvatar(u) + '<b>' + (u === me ? 'You' : '@' + esc(gName(u))) + '</b><small>' + (out ? 'Out' : LNAME[st.c[i]] + ' · ' + home + '/4 home') + '</small></div>';
+    }).join('') + '</div>';
+    const lg2 = myTurn && st.dice > 0 ? Ludo.legal(st, me, st.dice) : [];
+    h += '<div class="lwrap">' + ludoSvg(st, me, myTurn && st.dice > 0 && !Games.busy, lg2) + '</div>';
+    if (g.status === 'active') {
+      h += '<div class="ldock">' + (st.dice > 0 ? ldie(st.dice, 'pop') : st.last && st.last.roll ? ldie(st.last.roll, 'dim') : '');
+      if (myTurn && !(st.dice > 0)) h += '<button class="btn" data-act="glroll" type="button"' + (Games.busy ? ' disabled' : '') + '>🎲 Roll the dice</button>';
+      else if (myTurn) h += '<span class="muted">Tap a glowing piece to move it</span>';
+      h += '</div>';
+    }
+    if (g.stake && g.status === 'active') h += '<div class="gpot">Pot ' + fmt(g.pot || pot) + ' · winner takes ' + fmt(Math.round((g.pot || pot) * 0.95)) + '</div>';
+    if (g.status === 'active' && inn && !meOut) h += '<div class="wh-row"><button class="btn ghost" data-act="gforfeit" type="button">Leave game' + (g.stake ? ' (stake is lost)' : '') + '</button></div>';
+    if (g.status === 'active' && !inn) h += '<p class="muted" style="text-align:center">You are watching.</p>';
+    if (Games.err && Games.err !== 'setup') h += '<p class="auth-err" role="alert">' + esc(Games.err) + '</p>';
+    return h;
+  }
+  function rulesPills(r, kind) {
+    if (kind === 'ludo') { r = Object.assign({}, Ludo.DEF, r || {}); return [r.start6 ? '🎲 Need a 6' : '🏁 Start out', r.safe ? '⭐ Safe stars' : '⚔️ No safe squares'].map(function (t) { return '<span class="gr-pill">' + t + '</span>'; }).join(''); }
     r = Object.assign({}, Whot.DEF, r || {});
     return [r.stack ? '🔥 Stacking' : '✋ No stacking', r.market === 'count' ? '🛒 Count' : '🔁 Reshuffle'].concat(r.pick3 ? [] : ['No pick 3']).concat(r.whot ? [] : ['No Whot'])
       .map(function (t) { return '<span class="gr-pill">' + t + '</span>'; }).join('');
@@ -6894,7 +7051,7 @@ window.G3 = (function () {
     const inn = gIn(g), pot = g.stake * Math.max(g.players.length, 1);
     if (g.status === 'cancelled') return '<div class="card"><h3>This table was closed</h3><p class="muted">' + (g.stake ? 'Your stake comes back to your wallet.' : 'Nobody lost anything.') + '</p><button class="btn" data-act="gclose" type="button">Back to Game Room</button></div>';
     if (g.status === 'waiting') {
-      let h = '<div class="gw-head"><div class="gw-title">Whot table</div><div class="gw-sub">' + seatPips(g) + ' ' + g.players.length + ' of ' + g.seats + ' seats · ' + (g.stake ? 'Stake ' + stakeTxt(g.stake) + ' each · pot ' + fmt(pot) : 'Friendly game') + '</div><div class="gr-pills">' + rulesPills(g.rules) + (g.vis === 'friends' ? '<span class="gr-pill">🔒 Friends only</span>' : '') + '</div></div><div class="gseats">';
+      let h = '<div class="gw-head"><div class="gw-title">' + gk(g) + ' table</div><div class="gw-sub">' + seatPips(g) + ' ' + g.players.length + ' of ' + g.seats + ' seats · ' + (g.stake ? 'Stake ' + stakeTxt(g.stake) + ' each · pot ' + fmt(pot) : 'Friendly game') + '</div><div class="gr-pills">' + rulesPills(g.rules, g.kind) + (g.vis === 'friends' ? '<span class="gr-pill">🔒 Friends only</span>' : '') + '</div></div><div class="gseats">';
       for (let i = 0; i < g.seats; i++) { const p = g.players[i]; h += p ? '<div class="gseat on">' + gAvatar(p) + '<b>@' + esc(gName(p)) + '</b><small>' + (p === g.host ? 'Host' : 'Seated') + (p === me ? ' · you' : '') + '</small></div>' : '<div class="gseat"><span class="gav empty">+</span><b>Open seat</b><small>Waiting…</small></div>'; }
       h += '</div>';
       if (g.stake) h += '<p class="muted" style="text-align:center;margin:0">The winner takes the pot less 5% (' + fmt(Math.round(pot * 0.95)) + ' with ' + g.players.length + ').</p>';
@@ -6908,6 +7065,7 @@ window.G3 = (function () {
       return h;
     }
     const st = g.state; if (!st) return '<p class="muted" style="text-align:center">Loading the game…</p>';
+    if (g.kind === 'ludo') return ludoPlay(g, st);
     const myTurn = g.status === 'active' && st.turn === me && !st.over && inn && st.out.indexOf(me) < 0, t = Whot.top(st), mine = Whot.hand(st, me), meOut = st.out.indexOf(me) >= 0;
     let h = '';
     if (g.status === 'finished') {
@@ -6941,11 +7099,12 @@ window.G3 = (function () {
     if (Games.err && Games.err !== 'setup') h += '<p class="auth-err" role="alert">' + esc(Games.err) + '</p>';
     return h;
   }
+  function gTitle(g) { return (GKIND[g && g.kind] || GKIND.whot)[1] + ' ' + gk(g) + (g && g.stake ? ' · ' + stakeTxt(g.stake) : ''); }
   function renderWhotView() {
     const g = Games.cur;
-    return '<div class="chatv whotv" role="dialog" aria-modal="true" aria-label="Whot table"><div class="chat-head"><button class="chat-back" data-act="gclose" type="button" aria-label="Back">‹</button><h2>🃏 Whot' + (g && g.stake ? ' · ' + stakeTxt(g.stake) : '') + '</h2></div><div class="whot-body" id="whot-body">' + whotBody() + '</div></div>';
+    return '<div class="chatv whotv" role="dialog" aria-modal="true" aria-label="' + gk(g) + ' table"><div class="chat-head"><button class="chat-back" data-act="gclose" type="button" aria-label="Back">‹</button><h2>' + gTitle(g) + '</h2></div><div class="whot-body" id="whot-body">' + whotBody() + '</div></div>';
   }
-  function paintWhot() { const el = document.getElementById('whot-body'); if (!el || !UI.game) return; el.innerHTML = whotBody(); }
+  function paintWhot() { const el = document.getElementById('whot-body'); if (!el || !UI.game) return; el.innerHTML = whotBody(); const hh = document.querySelector('.whotv .chat-head h2'); if (hh && Games.cur) hh.textContent = gTitle(Games.cur); const vw = document.querySelector('.whotv'); if (vw && Games.cur) vw.setAttribute('aria-label', gk(Games.cur) + ' table'); }
   function gRpc(name, body) { return chatApi('/rest/v1/rpc/' + name, { method: 'POST', body: body }); }
   function gOpen(id) { UI.game = { id: id }; Games.cur = null; Games.err = ''; Games.shapePick = false; Games.skipRev = -1; render(false); gameLoad(id); }
   function gSubmit(next, byIdle) {
@@ -6957,11 +7116,11 @@ window.G3 = (function () {
     }, function (e) { Games.busy = false; Games.cur = old; Games.err = byIdle ? '' : e.message; paintWhot(); gameLoad(g.id); });
   }
   function gDealAndStart(g) {
-    return gRpc('game_start', { p_id: g.id, p_state: Whot.deal(g.players, g.rules) }).then(function (row) { if (row && UI.game && UI.game.id === g.id) { Games.cur = row; } paintWhot(); }, function (e) { Games.err = e.message; paintWhot(); gameLoad(g.id); });
+    return gRpc('game_start', { p_id: g.id, p_state: gEng(g).deal(g.players, g.rules) }).then(function (row) { if (row && UI.game && UI.game.id === g.id) { Games.cur = row; } paintWhot(); }, function (e) { Games.err = e.message; paintWhot(); gameLoad(g.id); });
   }
   function gCreate(cfg, invited) {
     if (cfg.stake > S.cash) { showToast('You need ' + fmt(cfg.stake) + ' to open this table.'); render(false); return; }
-    gRpc('game_create', { p_seats: cfg.seats, p_stake: cfg.stake, p_rules: { stack: cfg.stack, pick3: cfg.pick3, whot: cfg.whot, market: cfg.market }, p_vis: cfg.vis, p_invited: invited || [] }).then(function (row) {
+    gRpc('game_create', { p_kind: cfg.kind || 'whot', p_seats: cfg.seats, p_stake: cfg.stake, p_rules: cfg.kind === 'ludo' ? { start6: cfg.start6 !== false, safe: cfg.safe !== false } : { stack: cfg.stack, pick3: cfg.pick3, whot: cfg.whot, market: cfg.market }, p_vis: cfg.vis, p_invited: invited || [] }).then(function (row) {
       if (row && row.id) { gTake(row); Games.cfg.sheet = false; Games.seen[row.id] = 1; UI.chat = null; UI.phone = 'games'; UI.tab = 'phone'; gOpen(row.id); gamesLoad(true); }
     }, function (e) { const m = gErr(e); showToast(m === 'setup' ? 'Games are not switched on yet.' : e.message); render(false); });
   }
@@ -6969,11 +7128,11 @@ window.G3 = (function () {
     const g = Games.cur, C = Games.cfg;
     if (act === 'gclose') { UI.game = null; Games.cur = null; render(); gamesLoad(true); return true; }
     if (act === 'gopen' || act === 'gwatch') { gOpen(id); return true; }
-    if (act === 'gnew') { C.sheet = !C.sheet; render(false); return true; }
+    if (act === 'gnew') { if (id && id !== C.kind) { C.kind = id; C.sheet = true; } else C.sheet = !C.sheet; render(false); return true; }
     if (act === 'gcfg') { const k = el.dataset.k, v = el.dataset.v; if (k === 'seats' || k === 'stake') C[k] = parseInt(v, 10); else if (k === 'market' || k === 'vis') C[k] = v; else C[k] = v === '1'; if (C.vis === 'friends' && !C.invited.length) { const cs = chatConvs(); if (cs[0]) C.invited = [cs[0].id]; } render(false); return true; }
     if (act === 'ginv') { const i = C.invited.indexOf(id); if (i >= 0) C.invited.splice(i, 1); else if (C.invited.length < 3) C.invited.push(id); render(false); return true; }
     if (act === 'gcreate') { gCreate(C, C.vis === 'friends' ? C.invited : []); return true; }
-    if (act === 'gchallenge') { gCreate({ seats: 2, stake: 0, stack: true, pick3: true, whot: true, market: 'reshuffle', vis: 'friends' }, [id]); return true; }
+    if (act === 'gchallenge') { gCreate({ kind: 'whot', seats: 2, stake: 0, stack: true, pick3: true, whot: true, market: 'reshuffle', vis: 'friends' }, [id]); return true; }
     if (act === 'gjoin') {
       const t = g && g.id === id ? g : Games.lobby.concat(Games.rows).find(function (x) { return x.id === id; }) || g; if (!t) return true;
       if (t.stake > S.cash) { showToast('You need ' + fmt(t.stake) + ' to sit here.'); render(false); return true; }
@@ -6989,7 +7148,9 @@ window.G3 = (function () {
       return true;
     }
     if (act === 'grefresh') { gamesLoad(true); return true; }
-    if (act === 'gforfeit') { if (g && g.state && !Games.busy) { const n = Whot.leave(g.state, gMe(), 'left'); if (n) gSubmit(n); } return true; }
+    if (act === 'gforfeit') { if (g && g.state && !Games.busy) { const n = gEng(g).leave(g.state, gMe(), 'left'); if (n) gSubmit(n); } return true; }
+    if (act === 'glroll') { if (g && g.state && g.kind === 'ludo' && !Games.busy) { const n = Ludo.roll(g.state, gMe()); if (n) gSubmit(n); } return true; }
+    if (act === 'glmove') { if (g && g.state && g.kind === 'ludo' && !Games.busy) { const n = Ludo.move(g.state, gMe(), parseInt(id, 10)); if (n) gSubmit(n); } return true; }
     if (act === 'gdraw') { if (g && g.state) { const n = Whot.draw(g.state, gMe()); if (n) gSubmit(n); } return true; }
     if (act === 'gplay') {
       if (!g || !g.state) return true;
@@ -7001,18 +7162,18 @@ window.G3 = (function () {
     if (act === 'gsoon') { showToast('🚧 ' + (el.dataset.n || 'This game') + ' is coming soon.'); return true; }
     return false;
   }
-  const GAME_TILES = [['whot', 'Whot!', '🃏', 'linear-gradient(150deg,#e11d48,#7c1d3a)', true], ['ayo', 'Ayo', '🟤', 'linear-gradient(150deg,#b45309,#78350f)', false], ['ludo', 'Ludo', '🎲', 'linear-gradient(150deg,#2563eb,#1e3a8a)', false], ['pool', '8-ball pool', '🎱', 'linear-gradient(150deg,#15803d,#14532d)', false], ['chess', 'Chess', '♟️', 'linear-gradient(150deg,#475569,#1e293b)', false]];
+  const GAME_TILES = [['whot', 'Whot!', '🃏', 'linear-gradient(150deg,#e11d48,#7c1d3a)', true], ['ayo', 'Ayo', '🟤', 'linear-gradient(150deg,#b45309,#78350f)', false], ['ludo', 'Ludo', '🎲', 'linear-gradient(150deg,#2563eb,#1e3a8a)', true], ['pool', '8-ball pool', '🎱', 'linear-gradient(150deg,#15803d,#14532d)', false], ['chess', 'Chess', '♟️', 'linear-gradient(150deg,#475569,#1e293b)', false]];
   function tableCard(g, mode) {
     const host = gName(g.host), open = g.seats - g.players.length, inn = gIn(g), inv = g.invited.indexOf(gMe()) >= 0;
     let btn;
     if (inn) btn = '<button class="btn gbtn" data-act="gopen" data-id="' + esc(g.id) + '" type="button">' + (g.status === 'active' ? (g.turn === gMe() ? 'Your turn' : 'Resume') : 'Open') + '</button>';
     else if (g.status === 'active') btn = '<button class="btn ghost gbtn" data-act="gwatch" data-id="' + esc(g.id) + '" type="button">Watch</button>';
     else btn = '<button class="btn gbtn" data-act="gjoin" data-id="' + esc(g.id) + '" type="button"' + (g.stake > S.cash ? ' disabled' : '') + '>Sit · ' + stakeTxt(g.stake) + '</button>';
-    return '<div class="gtable' + (inv && !inn ? ' inv' : '') + '">' + gAvatar(g.host) + '<div class="gt-main"><div class="gt-top"><b>@' + esc(host) + '</b>' + (g.vis === 'friends' ? ' <span class="gr-pill">🔒</span>' : '') + '</div><div class="gt-sub">' + seatPips(g) + ' ' + g.players.length + '/' + g.seats + ' · ' + (g.stake ? stakeTxt(g.stake) + ' each · wins ' + stakeTxt(Math.round(g.stake * g.seats * 0.95)) : 'Friendly') + '</div><div class="gr-pills">' + rulesPills(g.rules) + '</div></div>' + btn + '</div>';
+    return '<div class="gtable' + (inv && !inn ? ' inv' : '') + '">' + gAvatar(g.host) + '<div class="gt-main"><div class="gt-top"><b>@' + esc(host) + '</b> <span class="gr-pill">' + (GKIND[g.kind] || GKIND.whot)[1] + ' ' + gk(g) + '</span>' + (g.vis === 'friends' ? ' <span class="gr-pill">🔒</span>' : '') + '</div><div class="gt-sub">' + seatPips(g) + ' ' + g.players.length + '/' + g.seats + ' · ' + (g.stake ? stakeTxt(g.stake) + ' each · wins ' + stakeTxt(Math.round(g.stake * g.seats * 0.95)) : 'Friendly') + '</div><div class="gr-pills">' + rulesPills(g.rules, g.kind) + '</div></div>' + btn + '</div>';
   }
   function renderGamesApp() {
     let h = '<h2>Game Room</h2>';
-    if (!Auth.session) return h + '<div class="card"><p class="muted">Play Whot with other players online. You need an account so they can find you.</p><button class="btn" data-act="aopen" type="button">Create account or log in</button></div>';
+    if (!Auth.session) return h + '<div class="card"><p class="muted">Play Whot and Ludo with other players online. You need an account so they can find you.</p><button class="btn" data-act="aopen" type="button">Create account or log in</button></div>';
     chatSync();
     if (!Chat.meLoaded) { if (!Chat.loadingMe) setTimeout(loadMe, 0); return h + '<p class="muted">Loading…</p>'; }
     if (!Chat.me) return h + '<div class="card"><p class="muted">Pick a username in Chat first, so other players can see who they are playing.</p><button class="btn" data-act="phone" data-id="chat" type="button">Open Chat</button></div>';
@@ -7020,14 +7181,15 @@ window.G3 = (function () {
     if (Games.err === 'setup') return h + '<div class="card"><h3>Games are not switched on yet</h3><p class="muted">The maker still has to run the games script in Supabase. Try again later.</p></div>';
     const me = Chat.uid, C = Games.cfg, w = gStk();
     h += '<div class="groom"><div class="gwallet"><span>Wallet</span><b>' + fmt(S.cash) + '</b></div><div class="grec">' + w.w + ' won · ' + w.l + ' lost</div></div>';
-    h += '<div class="gtiles">' + GAME_TILES.map(function (t) { return '<button class="gtile' + (t[4] ? ' live' : '') + '" style="background:' + t[3] + '" data-act="' + (t[4] ? 'gnew' : 'gsoon') + '" data-n="' + t[1] + '" type="button"><span class="gt-ic">' + t[2] + '</span><b>' + t[1] + '</b><small>' + (t[4] ? '2–4 players' : 'Soon') + '</small></button>'; }).join('') + '</div>';
+    h += '<div class="gtiles">' + GAME_TILES.map(function (t) { return '<button class="gtile' + (t[4] ? ' live' : '') + (t[4] && t[0] === C.kind && C.sheet ? ' sel' : '') + '" style="background:' + t[3] + '" data-act="' + (t[4] ? 'gnew' : 'gsoon') + '" data-id="' + t[0] + '" data-n="' + t[1] + '" type="button"><span class="gt-ic">' + t[2] + '</span><b>' + t[1] + '</b><small>' + (t[4] ? '2–4 players' : 'Soon') + '</small></button>'; }).join('') + '</div>';
     if (C.sheet) {
       const opt = function (k, v, label, on, desc) { return '<button type="button" class="gopt' + (on ? ' on' : '') + '" data-act="gcfg" data-k="' + k + '" data-v="' + v + '">' + label + (desc ? '<small>' + desc + '</small>' : '') + '</button>'; };
-      h += '<div class="gsheet"><h3>Start a Whot table</h3><div class="glab">Seats</div><div class="gopts">' + [2, 3, 4].map(function (n) { return opt('seats', n, '👤 ' + n, C.seats === n); }).join('') + '</div>' +
+      h += '<div class="gsheet"><h3>Start a ' + (GKIND[C.kind] || GKIND.whot)[0] + ' table</h3><div class="glab">Seats</div><div class="gopts">' + [2, 3, 4].map(function (n) { return opt('seats', n, '👤 ' + n, C.seats === n); }).join('') + '</div>' +
         '<div class="glab">Stake (each player)</div><div class="gopts wrap">' + STAKES.map(function (n) { return opt('stake', n, stakeTxt(n), C.stake === n); }).join('') + '</div>' +
-        '<div class="glab">When the market runs out</div><div class="gopts">' + opt('market', 'reshuffle', '🔁 Reshuffle', C.market === 'reshuffle', 'Played cards go back in') + opt('market', 'count', '🛒 Count', C.market === 'count', 'Fewest cards wins') + '</div>' +
+        (C.kind === 'ludo' ? '<div class="glab">Leaving home</div><div class="gopts">' + opt('start6', 1, '🎲 Need a 6', C.start6, 'Roll a six to bring a piece out') + opt('start6', 0, '🏁 Start out', !C.start6, 'All pieces start on the board') + '</div><div class="glab">Capturing</div><div class="gopts">' + opt('safe', 1, '⭐ Safe stars', C.safe, 'Stars and start squares are safe') + opt('safe', 0, '⚔️ No safe squares', !C.safe, 'Any piece can be captured') + '</div>' : '') +
+        (C.kind === 'ludo' ? '' : '<div class="glab">When the market runs out</div><div class="gopts">' + opt('market', 'reshuffle', '🔁 Reshuffle', C.market === 'reshuffle', 'Played cards go back in') + opt('market', 'count', '🛒 Count', C.market === 'count', 'Fewest cards wins') + '</div>' +
         '<div class="glab">Pick two and pick three</div><div class="gopts">' + opt('stack', 1, '🔥 Stacking', C.stack, 'Defend with the same number') + opt('stack', 0, '✋ No stacking', !C.stack, 'Next player picks at once') + '</div>' +
-        '<div class="glab">Your own rules</div><div class="gopts">' + opt('pick3', C.pick3 ? 0 : 1, C.pick3 ? 'Pick three: on' : 'No pick three', !C.pick3, 'A 5 is a plain card') + opt('whot', C.whot ? 0 : 1, C.whot ? 'Whot cards: on' : 'No Whot cards', !C.whot, 'Take the 20s out') + '</div>' +
+        '<div class="glab">Your own rules</div><div class="gopts">' + opt('pick3', C.pick3 ? 0 : 1, C.pick3 ? 'Pick three: on' : 'No pick three', !C.pick3, 'A 5 is a plain card') + opt('whot', C.whot ? 0 : 1, C.whot ? 'Whot cards: on' : 'No Whot cards', !C.whot, 'Take the 20s out') + '</div>' ) +
         '<div class="glab">Who can sit</div><div class="gopts">' + opt('vis', 'open', '🌍 Anyone', C.vis === 'open', 'Listed in the Game Room') + opt('vis', 'friends', '🔒 My friends', C.vis === 'friends', 'Only people you invite') + '</div>';
       if (C.vis === 'friends') {
         const cs = chatConvs().slice(0, 8);
@@ -7043,7 +7205,7 @@ window.G3 = (function () {
     const open = Games.lobby.filter(function (g) { return g.status === 'waiting' && !ids[g.id] && !gIn(g) && g.players.length < g.seats; }), live = Games.lobby.filter(function (g) { return g.status === 'active' && !gIn(g); });
     h += '<div class="glab big">Open tables <button class="gref" data-act="grefresh" type="button" aria-label="Refresh">↻</button></div>' + (open.length ? open.map(function (g) { return tableCard(g); }).join('') : '<p class="muted">No open tables right now. Start one and wait for players.</p>');
     if (live.length) h += '<div class="glab big">Watch a game</div>' + live.slice(0, 6).map(function (g) { return tableCard(g); }).join('');
-    h += '<div class="card" style="margin-top:12px"><h3>How Whot works</h3><p class="muted" style="margin:0">Match the shape or the number. <b>1</b> hold on (play again), <b>2</b> pick two, <b>5</b> pick three, <b>8</b> suspension (next player misses a turn), <b>14</b> general market (everyone else picks one), <b>20</b> Whot (call any shape). Empty your hand to win. You have 45 seconds a turn.</p></div>';
+    h += C.kind === 'ludo' ? '<div class="card" style="margin-top:12px"><h3>How Ludo works</h3><p class="muted" style="margin:0">Roll the dice and move one piece. A <b>6</b> brings a piece out and gives you another roll (three sixes in a row loses the turn). Land on another colour to send that piece back home, unless it sits on a star or start square. Capturing or getting a piece home also gives another roll. Reach the middle with the exact number. First to bring all four pieces home wins. You have 45 seconds a turn.</p></div>' : '<div class="card" style="margin-top:12px"><h3>How Whot works</h3><p class="muted" style="margin:0">Match the shape or the number. <b>1</b> hold on (play again), <b>2</b> pick two, <b>5</b> pick three, <b>8</b> suspension (next player misses a turn), <b>14</b> general market (everyone else picks one), <b>20</b> Whot (call any shape). Empty your hand to win. You have 45 seconds a turn.</p></div>';
     return h;
   }
   setInterval(function () {
