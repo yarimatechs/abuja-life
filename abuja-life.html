@@ -477,6 +477,32 @@ button.wc.no { opacity: .45; }
 .wh-over { text-align: center; padding: 14px; border-radius: 16px; background: var(--surface); border: 2px solid var(--accent); }
 .wh-over h3 { margin: 0 0 4px; font-size: 22px; }
 .wh-row { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
+.gav { display: inline-grid; place-items: center; width: 36px; height: 36px; border-radius: 50%; color: #fff; font-weight: 900; font-size: 15px; flex: none; box-shadow: inset 0 0 0 2px rgba(255,255,255,.35); }
+.gav.empty { background: var(--line); color: var(--muted, #6b7a72); }
+.gpips { display: inline-flex; gap: 3px; vertical-align: middle; } .gpips i { width: 8px; height: 8px; border-radius: 50%; background: var(--line); } .gpips i.on { background: #16a34a; }
+.gr-pills { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; } .gr-pill { font-size: 11px; font-weight: 800; padding: 2px 8px; border-radius: 999px; background: color-mix(in srgb, var(--accent) 12%, var(--surface)); border: 1px solid var(--line); }
+.groom { flex: none; display: flex; justify-content: space-between; align-items: center; padding: 14px 16px; border-radius: 18px; color: #f8e9b0; background: radial-gradient(120% 140% at 20% 0%, #1f7a4a, #0d3b26); box-shadow: inset 0 0 0 2px rgba(248,233,176,.25); margin-bottom: 12px; }
+.gwallet span { display: block; font-size: 11px; letter-spacing: .12em; text-transform: uppercase; opacity: .8; } .gwallet b { font-size: 22px; font-variant-numeric: tabular-nums; }
+.grec { font-size: 12px; font-weight: 800; background: rgba(0,0,0,.25); padding: 5px 10px; border-radius: 999px; }
+.gtiles { flex: none; min-height: 136px; display: flex; gap: 10px; overflow-x: auto; padding: 5px 5px 10px; scroll-snap-type: x proximity; }
+.gtile { flex: none; width: 104px; height: 124px; border: 0; border-radius: 18px; color: #fff; display: grid; align-content: end; justify-items: start; padding: 10px; font: inherit; text-align: left; cursor: pointer; position: relative; opacity: .72; scroll-snap-align: start; }
+.gtile.live { opacity: 1; box-shadow: 0 0 0 3px var(--accent), 0 6px 14px rgba(0,0,0,.3); }
+.gtile .gt-ic { position: absolute; top: 8px; right: 10px; font-size: 34px; } .gtile b { font-size: 15px; } .gtile small { font-size: 11px; opacity: .85; font-weight: 700; }
+.gsheet { border: 2px solid var(--line); border-radius: 18px; background: var(--surface); padding: 14px; margin: 4px 0 14px; } .gsheet h3 { margin: 0 0 6px; }
+.glab { font-size: 12px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--muted, #6b7a72); margin: 12px 0 6px; } .glab.big { font-size: 13px; margin-top: 16px; display: flex; align-items: center; justify-content: space-between; }
+.gopts { display: flex; gap: 8px; } .gopts.wrap { flex-wrap: wrap; }
+.gopt { flex: 1 1 0; min-width: 0; border: 2px solid var(--line); background: var(--bg); color: var(--ink); border-radius: 14px; padding: 9px 10px; font: inherit; font-weight: 800; font-size: 14px; text-align: center; cursor: pointer; } .gopts.wrap .gopt { flex: 0 0 auto; }
+.gopt small { display: block; font-size: 11px; font-weight: 600; opacity: .75; margin-top: 2px; } .gopt.on { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.gtable { display: flex; align-items: center; gap: 10px; padding: 11px 12px; border-radius: 16px; background: var(--surface); border: 2px solid var(--line); margin-bottom: 8px; } .gtable.inv { border-color: var(--accent); }
+.gt-main { flex: 1; min-width: 0; } .gt-top { font-size: 15px; } .gt-sub { font-size: 12px; color: var(--muted, #6b7a72); font-weight: 700; margin-top: 2px; }
+.gbtn { flex: none; padding: 9px 14px; font-size: 14px; } .gref { border: 0; background: var(--surface); border-radius: 50%; width: 30px; height: 30px; font-size: 16px; cursor: pointer; color: var(--ink); }
+.gw-head { text-align: center; } .gw-title { font-size: 22px; font-weight: 900; } .gw-sub { font-size: 13px; font-weight: 700; color: var(--muted, #6b7a72); margin-top: 4px; } .gw-head .gr-pills { justify-content: center; }
+.gseats { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; } .gseat { display: grid; justify-items: center; gap: 2px; padding: 12px 6px; border-radius: 16px; border: 2px dashed var(--line); } .gseat.on { border-style: solid; background: var(--surface); } .gseat small { font-size: 11px; color: var(--muted, #6b7a72); font-weight: 700; } .gseat b { font-size: 14px; }
+.gopps { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; } .gopp { display: grid; justify-items: center; gap: 1px; padding: 8px 10px; min-width: 84px; border-radius: 14px; background: var(--surface); border: 2px solid var(--line); } .gopp.on { border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 25%, transparent); } .gopp.out { opacity: .45; }
+.gopp b { font-size: 12px; max-width: 90px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } .gopp small { font-size: 11px; font-weight: 700; color: var(--muted, #6b7a72); }
+.gmini { display: flex; height: 14px; margin-top: 2px; } .gmini i { width: 9px; height: 14px; border-radius: 2px; background: #b3261e; border: 1px solid #fff; margin-left: -4px; } .gmini i:first-child { margin-left: 0; }
+.gpot { text-align: center; font-weight: 800; font-size: 13px; color: #8a6a0a; }
+
 .chat-bar input:focus-visible { outline: none; border-color: var(--accent); }
 .chat-money { display: grid; gap: 10px; padding: 12px 14px; background: var(--surface); border-top: 1px solid var(--line); }
 .cm-row { display: flex; justify-content: space-between; align-items: center; }
@@ -6137,7 +6163,7 @@ window.G3 = (function () {
   /* ---------- phone: jobs, japa, life, log ---------- */
   /* ---------- online leaderboard (Supabase over plain REST: no library, only the public anon key) ---------- */
   const BOARD = { url: 'https://tvbnoqwyekbqrlxxnztq.supabase.co', key: 'sb_publishable_db5quqce8u5iWU7qENLltg_U4OWrfYG' };   /* public client key: safe to ship */
-  const APP_VERSION = 'v1.28 · 1 Nov 2026';
+  const APP_VERSION = 'v1.29 · 2 Nov 2026';
   const ERRS = [];
   window.addEventListener('error', function (e) { ERRS.push(String((e && e.message) || 'error').slice(0, 140) + ' @' + ((e && e.lineno) || 0)); if (ERRS.length > 5) ERRS.shift(); });
   window.addEventListener('unhandledrejection', function (e) { ERRS.push('promise: ' + String((e && e.reason && e.reason.message) || (e && e.reason) || '').slice(0, 140)); if (ERRS.length > 5) ERRS.shift(); });
@@ -6688,98 +6714,163 @@ window.G3 = (function () {
   }, 4000);
 
 
-  /* ---------- Whot: the Nigerian card game, played online against a friend ---------- */
+  /* ---------- Game Room: Whot tables for 2 to 4 players, with stakes, house rules, friends-only tables and watching ---------- */
   const Whot = (function () {
     const SH = ['C', 'T', 'X', 'Q', 'S'];
     const NUMS = { C: [1, 2, 3, 4, 5, 7, 8, 10, 11, 12, 13, 14], T: [1, 2, 3, 4, 5, 7, 8, 10, 11, 12, 13, 14], X: [1, 2, 3, 5, 7, 10, 11, 13, 14], Q: [1, 2, 3, 5, 7, 10, 11, 13, 14], S: [1, 2, 3, 4, 5, 7, 8] };
     const shape = function (c) { return c[0]; }, num = function (c) { return parseInt(c.slice(1), 10); };
-    function deck() { const d = []; SH.forEach(function (s) { NUMS[s].forEach(function (n) { d.push(s + n); }); }); for (let i = 0; i < 5; i++) d.push('W20'); return d; }
+    const DEF = { stack: true, pick3: true, whot: true, market: 'reshuffle' };
+    const rl = function (st) { return st.rules || DEF; };
+    function deck(rules) { const d = []; SH.forEach(function (s) { NUMS[s].forEach(function (n) { d.push(s + n); }); }); if (!rules || rules.whot !== false) for (let i = 0; i < 5; i++) d.push('W20'); return d; }
     function shuffle(a, rf) { rf = rf || Math.random; for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(rf() * (i + 1)), t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
-    function deal(a, b, rf) {
-      const d = shuffle(deck(), rf), h1 = d.splice(0, 6), h2 = d.splice(0, 6); let top = null;
+    function deal(pl, rules, rf) {
+      rules = Object.assign({}, DEF, rules || {});
+      const d = shuffle(deck(rules), rf), h = pl.map(function () { return d.splice(0, 6); }); let top = null;
       for (let i = 0; i < d.length; i++) { if ([1, 2, 5, 8, 14, 20].indexOf(num(d[i])) < 0) { top = d.splice(i, 1)[0]; break; } }
-      return { a: a, b: b, d: d, p: [top], h1: h1, h2: h2, need: '', pend: 0, pk: 0, turn: a, n: 0, last: null, over: false, winner: null };
+      return { pl: pl.slice(), h: h, d: d, p: [top], need: '', pend: 0, pk: 0, turn: pl[0], out: [], miss: {}, rules: rules, n: 0, last: null, over: false, winner: null, draw: false, dry: false };
     }
     const clone = function (st) { return JSON.parse(JSON.stringify(st)); };
-    const opp = function (st, u) { return u === st.a ? st.b : st.a; };
-    const hand = function (st, u) { return u === st.a ? st.h1 : st.h2; };
+    const hand = function (st, u) { const i = st.pl.indexOf(u); return i < 0 ? [] : st.h[i]; };
     const top = function (st) { return st.p[st.p.length - 1]; };
-    function refill(st) { if (st.d.length || st.p.length < 2) return; const t = st.p.pop(); st.d = shuffle(st.p.splice(0)); st.p = [t]; }
-    function drawN(st, u, n) { let got = 0; for (let i = 0; i < n; i++) { refill(st); if (!st.d.length) break; hand(st, u).push(st.d.pop()); got++; } return got; }
+    const alive = function (st) { return st.pl.filter(function (u) { return st.out.indexOf(u) < 0; }); };
+    function nextOf(st, u) { const n = st.pl.length; let i = st.pl.indexOf(u); for (let k = 0; k < n; k++) { i = (i + 1) % n; if (st.out.indexOf(st.pl[i]) < 0 && st.pl[i] !== u) return st.pl[i]; } return u; }
+    function refill(st) { if (st.d.length || st.p.length < 2 || rl(st).market === 'count') return; const t = st.p.pop(); st.d = shuffle(st.p.splice(0)); st.p = [t]; }
+    function drawN(st, u, n) { let got = 0; for (let i = 0; i < n; i++) { refill(st); if (!st.d.length) { st.dry = true; break; } hand(st, u).push(st.d.pop()); got++; } return got; }
+    function finishCount(st) {
+      let best = 99, who = [];
+      alive(st).forEach(function (u) { const c = hand(st, u).length; if (c < best) { best = c; who = [u]; } else if (c === best) who.push(u); });
+      st.over = true; st.dry = false; if (who.length === 1) st.winner = who[0]; else { st.winner = null; st.draw = true; }
+    }
     function playable(st, c) {
-      if (st.pend > 0) return num(c) === st.pk;
+      if (st.pend > 0) return rl(st).stack !== false && num(c) === st.pk;
       if (c === 'W20') return true;
       if (st.need) return shape(c) === st.need;
       const t = top(st); return shape(c) === shape(t) || num(c) === num(t);
     }
     function play(st, u, c, want) {
-      if (st.over || st.turn !== u) return null;
+      if (st.over || st.turn !== u || st.out.indexOf(u) >= 0) return null;
       if (hand(st, u).indexOf(c) < 0 || !playable(st, c)) return null;
       if (c === 'W20' && SH.indexOf(want) < 0) return null;
-      const s = clone(st), h = hand(s, u), o = opp(s, u), n = num(c);
+      const s = clone(st), h = hand(s, u), n = num(c), R = rl(s), nx = nextOf(s, u);
       h.splice(h.indexOf(c), 1); s.p.push(c); s.n++; s.need = c === 'W20' ? want : '';
       s.last = { u: u, c: c, sh: s.need };
       if (!h.length) { s.over = true; s.winner = u; return s; }
-      if (n === 1 || n === 8) s.turn = u;
-      else if (n === 14) { drawN(s, o, 1); s.turn = u; }
-      else if (n === 2) { s.pend += 2; s.pk = 2; s.turn = o; }
-      else if (n === 5) { s.pend += 3; s.pk = 5; s.turn = o; }
-      else s.turn = o;
+      if (n === 1) s.turn = u;
+      else if (n === 8) s.turn = nextOf(s, nx);
+      else if (n === 14) { alive(s).forEach(function (o) { if (o !== u) drawN(s, o, 1); }); s.turn = u; }
+      else if (n === 2 || (n === 5 && R.pick3 !== false)) {
+        const k = n === 2 ? 2 : 3;
+        if (R.stack !== false) { s.pend += k; s.pk = n; s.turn = nx; }
+        else { drawN(s, nx, k); s.last.hit = nx; s.turn = nextOf(s, nx); }
+      } else s.turn = nx;
+      if (s.dry) finishCount(s);
       return s;
     }
     function draw(st, u) {
-      if (st.over || st.turn !== u) return null;
+      if (st.over || st.turn !== u || st.out.indexOf(u) >= 0) return null;
       const s = clone(st), n = s.pend > 0 ? s.pend : 1, got = drawN(s, u, n);
-      s.pend = 0; s.pk = 0; s.turn = opp(s, u); s.n++; s.last = { u: u, d: got };
+      s.pend = 0; s.pk = 0; s.turn = nextOf(s, u); s.n++; s.last = { u: u, d: got };
+      if (s.dry) finishCount(s);
       return s;
     }
-    return { deck: deck, shuffle: shuffle, deal: deal, play: play, draw: draw, playable: playable, hand: hand, opp: opp, top: top, num: num, shape: shape };
+    function leave(st, u, why) {
+      if (st.over || st.out.indexOf(u) >= 0 || st.pl.indexOf(u) < 0) return null;
+      const s = clone(st), h = hand(s, u), wasTurn = s.turn === u, nx = nextOf(s, u);
+      s.d = h.splice(0).concat(s.d); s.out.push(u); s.n++; s.last = { u: u, out: why || 'left' };
+      const al = alive(s);
+      if (al.length <= 1) { s.over = true; s.winner = al[0] || null; return s; }
+      if (wasTurn) { s.turn = nx; s.pend = 0; s.pk = 0; }
+      return s;
+    }
+    function timeout(st, u) {
+      if (st.over || st.turn !== u) return null;
+      const m = (st.miss[u] || 0) + 1;
+      if (m >= 2) { const s = leave(st, u, 'idle'); if (s) s.miss[u] = m; return s; }
+      const s = draw(st, u); if (s) { s.miss[u] = m; s.last = { u: u, d: s.last.d, idle: true }; } return s;
+    }
+    return { deck: deck, shuffle: shuffle, deal: deal, play: play, draw: draw, leave: leave, timeout: timeout, playable: playable, hand: hand, top: top, num: num, shape: shape, nextOf: nextOf, alive: alive, DEF: DEF };
   })();
   window.__whot = Whot;
 
-  const Games = { list: [], at: 0, loading: false, err: '', cur: null, busy: false, seen: {}, ready: false, sig: '', curAt: 0, shapePick: false, pending: null };
+  const Games = { rows: [], lobby: [], at: 0, loading: false, err: '', cur: null, busy: false, seen: {}, ready: false, sig: '', shapePick: false, pending: null, toast: '', skipRev: -1, watch: false,
+    cfg: { seats: 4, stake: 5000, stack: true, pick3: true, whot: true, market: 'reshuffle', vis: 'open', invited: [], sheet: false } };
+  const STAKES = [0, 1000, 5000, 20000, 50000, 100000, 500000, 1000000, 5000000, 10000000];
+  const stakeTxt = function (n) { return n ? (n >= 1000000 ? '₦' + (n / 1000000) + 'm' : n >= 1000 ? '₦' + (n / 1000) + 'k' : '₦' + n) : 'Friendly'; };
   const WSHAPE = { C: ['●', '#d9302a', 'Circle'], T: ['▲', '#2a6fb0', 'Triangle'], X: ['✚', '#2f8a4a', 'Cross'], Q: ['■', '#d9a21b', 'Square'], S: ['★', '#7a3fa0', 'Star'] };
-  const WSPECIAL = { 1: 'Hold on', 2: 'Pick two', 5: 'Pick three', 8: 'Suspension', 14: 'Market' };
+  const WSPECIAL = { 1: 'Hold on', 2: 'Pick two', 5: 'Pick three', 8: 'Suspend', 14: 'Market' };
   const gMe = function () { return Auth.session ? Auth.session.user.id : ''; };
-  const gOther = function (g) { return g.p1 === gMe() ? g.p2 : g.p1; };
   const gName = function (id) { return Chat.names[id] || 'player'; };
+  const gIn = function (g) { return g.players.indexOf(gMe()) >= 0; };
+  const gSyncWhen = function (g) { return g.updated_at ? Date.parse(g.updated_at) : Date.now(); };
   function gNames(ids) {
-    const need = ids.filter(function (x) { return x && !Chat.names[x]; }); if (!need.length) return Promise.resolve();
+    const need = ids.filter(function (x, i) { return x && !Chat.names[x] && ids.indexOf(x) === i; }); if (!need.length) return Promise.resolve();
     return chatApi('/rest/v1/profiles?select=user_id,username&user_id=in.(' + need.map(enc).join(',') + ')').then(function (pr) { (pr || []).forEach(function (x) { Chat.names[x.user_id] = x.username; }); }, function () {});
   }
-  function gErr(e) { return e && (e.status === 404 || /games/i.test(e.message || '') && /find|exist|relation/i.test(e.message || '')) ? 'setup' : (e && e.message || 'Something went wrong.'); }
-  function gamesTurnCount() { return Games.list.filter(function (g) { return (g.status === 'invited' && g.p2 === gMe()) || (g.status === 'active' && g.turn === gMe()); }).length; }
+  function gErr(e) { return e && (e.status === 404 || (/games/i.test(e.message || '') && /find|exist|relation/i.test(e.message || ''))) ? 'setup' : (e && e.message || 'Something went wrong.'); }
+  function gTurnCount() { return Games.rows.filter(function (g) { return g.status === 'active' && g.turn === gMe(); }).length + Games.rows.filter(function (g) { return g.status === 'waiting' && g.invited.indexOf(gMe()) >= 0 && g.players.indexOf(gMe()) < 0; }).length; }
+  const GCOLS = 'id,kind,host,players,seats,stake,rules,vis,invited,status,turn,winner,rev,pot,updated_at,created_at';
+  /* money: your stake leaves your pocket when you sit, and the pot comes back to the winner */
+  function gStk() { if (!S.whot || typeof S.whot !== 'object') S.whot = { w: 0, l: 0, paid: [] }; if (!S.whot.stk) S.whot.stk = {}; if (!Array.isArray(S.whot.paid)) S.whot.paid = []; return S.whot; }
+  function gTake(g) { const w = gStk(); if (g.stake > 0 && !(g.id in w.stk)) { S.cash -= g.stake; w.stk[g.id] = g.stake; save(); } }
+  function gSettle(g) {
+    const w = gStk(); if (!(g.id in w.stk) || (g.status !== 'finished' && g.status !== 'cancelled')) return;
+    const mine = w.stk[g.id]; delete w.stk[g.id]; if (w.paid.indexOf(g.id) < 0) w.paid.push(g.id); if (w.paid.length > 40) w.paid.shift();
+    const me = gMe();
+    if (g.status === 'cancelled') { if (mine) { S.cash += mine; log(S, 'A Whot table closed. Your stake of ' + fmt(mine) + ' came back.'); } }
+    else if (!g.winner) { if (mine) { S.cash += mine; log(S, 'The Whot game was a draw. Your stake of ' + fmt(mine) + ' came back.'); } }
+    else if (g.winner === me) { const win = Math.round((g.pot || mine * g.players.length) * 0.95); S.cash += win; S.stats.earned += Math.max(0, win - mine); w.w++; apply(S, { mood: 4, fun: 6 }); log(S, 'You won at Whot and took ' + fmt(win) + '.'); showToast('🏆 You won ' + fmt(win) + ' at Whot!'); }
+    else { w.l++; apply(S, { mood: -1, fun: 3 }); log(S, 'You lost ' + fmt(mine) + ' at Whot.'); }
+    save();
+  }
+  function gSettleFree(g) {   // friendly games: only the record and the mood
+    const w = gStk(); if (g.stake > 0 || g.status !== 'finished' || !g.winner || w.paid.indexOf(g.id) >= 0 || !gIn(g)) return;
+    w.paid.push(g.id); if (w.paid.length > 40) w.paid.shift();
+    if (g.winner === gMe()) { w.w++; apply(S, { mood: 4, fun: 6 }); log(S, 'You won a friendly game of Whot.'); } else { w.l++; apply(S, { mood: -1, fun: 3 }); }
+    save();
+  }
   function gamesLoad(force) {
     if (!chatOn() || !Chat.me || Games.loading) return;
     if (!force && Date.now() - Games.at < 4000) return;
-    Games.loading = true; Games.at = Date.now();
-    chatApi('/rest/v1/games?select=id,kind,p1,p2,status,turn,winner,rev,updated_at&or=(p1.eq.' + enc(Chat.uid) + ',p2.eq.' + enc(Chat.uid) + ')&status=in.(invited,active)&order=updated_at.desc&limit=20').then(function (rows) {
-      rows = Array.isArray(rows) ? rows : [];
-      return gNames(rows.map(gOther)).then(function () {
+    Games.loading = true; Games.at = Date.now(); const u = enc(Chat.uid);
+    Promise.all([
+      chatApi('/rest/v1/games?select=' + GCOLS + '&or=(players.cs.%7B' + u + '%7D,invited.cs.%7B' + u + '%7D)&order=updated_at.desc&limit=30'),
+      chatApi('/rest/v1/games?select=' + GCOLS + '&vis=eq.open&status=in.(waiting,active)&order=created_at.desc&limit=40')
+    ]).then(function (res) {
+      const mine = Array.isArray(res[0]) ? res[0] : [], lob = Array.isArray(res[1]) ? res[1] : [];
+      const ids = []; mine.concat(lob).forEach(function (g) { ids.push(g.host); g.players.forEach(function (p) { ids.push(p); }); });
+      return gNames(ids).then(function () {
         const first = !Games.ready; Games.ready = true; Games.err = '';
-        rows.forEach(function (g) { if (g.status === 'invited' && g.p2 === Chat.uid && !Games.seen[g.id]) { Games.seen[g.id] = 1; if (!first) showToast('🃏 @' + gName(g.p1) + ' challenged you to Whot. Open Games on your phone.'); } });
-        Games.list = rows;
-        const sg = rows.map(function (g) { return g.id + g.status + g.rev + g.turn; }).join('|');
+        mine.forEach(function (g) {
+          if (g.status === 'waiting' && g.invited.indexOf(Chat.uid) >= 0 && g.players.indexOf(Chat.uid) < 0 && !Games.seen[g.id]) { Games.seen[g.id] = 1; if (!first) showToast('🃏 @' + gName(g.host) + ' invited you to a Whot table. Open Games.'); }
+          if (g.status === 'finished' || g.status === 'cancelled') { if (g.stake > 0) gSettle(g); else gSettleFree(g); }
+        });
+        Games.rows = mine.filter(function (g) { return g.status === 'waiting' || g.status === 'active'; });
+        Games.lobby = lob;
+        const sg = Games.rows.concat(lob).map(function (g) { return g.id + g.status + g.rev + g.players.length; }).join('|');
         if (sg !== Games.sig) { Games.sig = sg; if (!UI.game && UI.tab === 'phone' && (UI.phone === 'games' || UI.phone === 'home')) render(false); }
       });
-    }, function (e) { Games.err = gErr(e); Games.ready = true; }).then(function () { Games.loading = false; });
+    }, function (e) { Games.err = gErr(e); Games.ready = true; if (!UI.game && UI.tab === 'phone' && UI.phone === 'games') render(false); }).then(function () { Games.loading = false; });
   }
   function gameLoad(id) {
     if (!chatOn() || Games.busy) return Promise.resolve();
     return chatApi('/rest/v1/games?select=*&id=eq.' + enc(id)).then(function (rows) {
       const g = rows && rows[0];
       if (!UI.game || UI.game.id !== id) return;
-      if (!g) { UI.game = null; Games.cur = null; showToast('That game is gone.'); render(); return; }
-      return gNames([g.p1, g.p2]).then(function () { if (Games.busy) return; const c = Games.cur; if (!c || g.rev > c.rev || g.status !== c.status) { Games.cur = g; Games.shapePick = false; paintWhot(); } });
+      if (!g) { UI.game = null; Games.cur = null; showToast('That table is gone.'); render(); return; }
+      return gNames(g.players.concat([g.host])).then(function () {
+        if (Games.busy) return; const c = Games.cur;
+        if (!c || g.rev > c.rev || g.status !== c.status || g.players.length !== c.players.length) { Games.cur = g; Games.shapePick = false; paintWhot(); }
+        if (g.status === 'finished' || g.status === 'cancelled') { if (g.stake > 0) gSettle(g); else gSettleFree(g); }
+        gIdleCheck();
+      });
     }, function (e) { Games.err = gErr(e); paintWhot(); });
   }
-  function whotPaid(g) {
-    if (!S || g.status !== 'finished' || !g.winner) return;
-    if (!S.whot || !Array.isArray(S.whot.paid)) S.whot = { w: 0, l: 0, paid: [] };
-    const w = S.whot; if (w.paid.indexOf(g.id) >= 0) return;
-    w.paid.push(g.id); if (w.paid.length > 30) w.paid.shift();
-    if (g.winner === gMe()) { w.w++; apply(S, { mood: 4, fun: 6 }); log(S, 'You beat @' + gName(gOther(g)) + ' at Whot.'); } else { w.l++; apply(S, { mood: -1, fun: 3 }); log(S, 'You lost a game of Whot to @' + gName(gOther(g)) + '.'); }
-    save();
+  /* a player who goes quiet for 45 seconds loses the turn (they pick a card); a second miss puts them out */
+  function gIdleCheck() {
+    const g = Games.cur; if (!g || g.status !== 'active' || !g.state || !gIn(g) || Games.busy || g.turn === gMe() || g.state.over) return;
+    if (Games.skipRev === g.rev) return;
+    if (Date.now() - gSyncWhen(g) < 50000) return;
+    const n = Whot.timeout(g.state, g.turn); if (!n) return; Games.skipRev = g.rev; gSubmit(n, true);
   }
   function wcard(c, cls, attrs, tag) {
     tag = tag || 'div'; cls = cls || ''; attrs = attrs || '';
@@ -6788,82 +6879,117 @@ window.G3 = (function () {
     const sh = WSHAPE[c[0]], n = parseInt(c.slice(1), 10), sp = WSPECIAL[n];
     return '<' + tag + ' class="wc ' + cls + '" style="--wc:' + sh[1] + '" ' + attrs + ' aria-label="' + n + ' ' + sh[2] + '"><i>' + n + '</i><b>' + sh[0] + '</b><i class="r">' + n + '</i>' + (sp ? '<em>' + sp + '</em>' : '') + '</' + tag + '>';
   }
+  function rulesPills(r) {
+    r = Object.assign({}, Whot.DEF, r || {});
+    return [r.stack ? '🔥 Stacking' : '✋ No stacking', r.market === 'count' ? '🛒 Count' : '🔁 Reshuffle'].concat(r.pick3 ? [] : ['No pick 3']).concat(r.whot ? [] : ['No Whot'])
+      .map(function (t) { return '<span class="gr-pill">' + t + '</span>'; }).join('');
+  }
+  const AVC = ['#d9302a', '#2a6fb0', '#2f8a4a', '#d9a21b', '#7a3fa0', '#0e8a8a', '#c2410c'];
+  function gAvatar(id, cls) { let n = 0; for (let i = 0; i < id.length; i++) n = (n * 31 + id.charCodeAt(i)) >>> 0; const nm = gName(id); return '<span class="gav ' + (cls || '') + '" style="background:' + AVC[n % AVC.length] + '">' + esc((nm[0] || '?').toUpperCase()) + '</span>'; }
+  function seatPips(g) { let h = ''; for (let i = 0; i < g.seats; i++) h += '<i class="' + (i < g.players.length ? 'on' : '') + '"></i>'; return '<span class="gpips">' + h + '</span>'; }
   function whotBody() {
     const g = Games.cur, me = gMe();
     if (Games.err === 'setup') return '<div class="card"><h3>Games are not switched on yet</h3><p class="muted">The maker still has to run the games script in Supabase. Try again later.</p></div>';
-    if (!g) return '<p class="muted" style="text-align:center">Loading the game…</p>' + (Games.err ? '<p class="auth-err">' + esc(Games.err) + '</p>' : '');
-    const oname = gName(gOther(g));
-    if (g.status === 'invited') {
-      return g.p2 === me
-        ? '<div class="card"><h3>@' + esc(oname) + ' challenged you to Whot</h3><p class="muted">Two players, six cards each. First to empty their hand wins.</p><div class="wh-row"><button class="btn" data-act="gaccept" data-id="' + esc(g.id) + '" type="button">Accept and play</button><button class="btn ghost" data-act="gdecline" data-id="' + esc(g.id) + '" type="button">No thanks</button></div></div>'
-        : '<div class="card"><h3>Waiting for @' + esc(oname) + '</h3><p class="muted">They will see your challenge next time they open the game. This page updates by itself.</p><button class="btn ghost" data-act="gdecline" data-id="' + esc(g.id) + '" type="button">Cancel challenge</button></div>';
+    if (!g) return '<p class="muted" style="text-align:center">Loading the table…</p>' + (Games.err ? '<p class="auth-err">' + esc(Games.err) + '</p>' : '');
+    const inn = gIn(g), pot = g.stake * Math.max(g.players.length, 1);
+    if (g.status === 'cancelled') return '<div class="card"><h3>This table was closed</h3><p class="muted">' + (g.stake ? 'Your stake comes back to your wallet.' : 'Nobody lost anything.') + '</p><button class="btn" data-act="gclose" type="button">Back to Game Room</button></div>';
+    if (g.status === 'waiting') {
+      let h = '<div class="gw-head"><div class="gw-title">Whot table</div><div class="gw-sub">' + seatPips(g) + ' ' + g.players.length + ' of ' + g.seats + ' seats · ' + (g.stake ? 'Stake ' + stakeTxt(g.stake) + ' each · pot ' + fmt(pot) : 'Friendly game') + '</div><div class="gr-pills">' + rulesPills(g.rules) + (g.vis === 'friends' ? '<span class="gr-pill">🔒 Friends only</span>' : '') + '</div></div><div class="gseats">';
+      for (let i = 0; i < g.seats; i++) { const p = g.players[i]; h += p ? '<div class="gseat on">' + gAvatar(p) + '<b>@' + esc(gName(p)) + '</b><small>' + (p === g.host ? 'Host' : 'Seated') + (p === me ? ' · you' : '') + '</small></div>' : '<div class="gseat"><span class="gav empty">+</span><b>Open seat</b><small>Waiting…</small></div>'; }
+      h += '</div>';
+      if (g.stake) h += '<p class="muted" style="text-align:center;margin:0">The winner takes the pot less 5% (' + fmt(Math.round(pot * 0.95)) + ' with ' + g.players.length + ').</p>';
+      if (!inn) h += '<button class="btn" data-act="gjoin" data-id="' + esc(g.id) + '" type="button">Sit · ' + stakeTxt(g.stake) + '</button>';
+      else {
+        if (g.host === me) h += '<button class="btn" data-act="gstart" type="button"' + (g.players.length < 2 ? ' disabled' : '') + '>' + (g.players.length < 2 ? 'Waiting for a second player…' : 'Start with ' + g.players.length + ' players') + '</button>';
+        else h += '<p class="muted" style="text-align:center">The game starts when the table is full, or when the host starts it.</p>';
+        h += '<button class="btn ghost" data-act="gleave" type="button">' + (g.host === me ? 'Close this table' : 'Leave table') + '</button>';
+      }
+      if (Games.err) h += '<p class="auth-err" role="alert">' + esc(Games.err) + '</p>';
+      return h;
     }
-    if (g.status === 'declined') return '<div class="card"><h3>This game was cancelled</h3><button class="btn" data-act="gclose" type="button">Back</button></div>';
     const st = g.state; if (!st) return '<p class="muted" style="text-align:center">Loading the game…</p>';
-    const mine = Whot.hand(st, me), theirs = Whot.hand(st, Whot.opp(st, me)), myTurn = g.status === 'active' && st.turn === me && !st.over, t = Whot.top(st);
+    const myTurn = g.status === 'active' && st.turn === me && !st.over && inn && st.out.indexOf(me) < 0, t = Whot.top(st), mine = Whot.hand(st, me), meOut = st.out.indexOf(me) >= 0;
     let h = '';
     if (g.status === 'finished') {
-      const won = g.winner === me;
-      h += '<div class="wh-over"><h3>' + (won ? '🎉 You won!' : '@' + esc(oname) + ' won') + '</h3><p class="muted" style="margin:0 0 10px">' + (st.over ? (won ? 'You played your last card.' : 'They played their last card.') : (won ? '@' + esc(oname) + ' gave up.' : 'You gave up.')) + '</p><div class="wh-row"><button class="btn" data-act="gagain" data-id="' + esc(gOther(g)) + '" type="button">Play again</button><button class="btn ghost" data-act="gclose" type="button">Back</button></div></div>';
+      const won = g.winner === me, draw = !g.winner;
+      const tip = g.stake ? (draw ? ' Your stake comes back.' : won ? ' You take ' + fmt(Math.round(pot * 0.95)) + '.' : ' You lost ' + fmt(g.stake) + '.') : '';
+      h += '<div class="wh-over"><h3>' + (draw ? '🤝 A draw' : won ? '🎉 You won!' : '@' + esc(gName(g.winner)) + ' won') + '</h3><p class="muted" style="margin:0 0 10px">' + (st.over ? (st.winner ? (won ? 'You played your last card.' : 'Their last card is down.') : 'The market ran out and the counts tied.') : 'Everyone else left.') + tip + '</p><div class="wh-row"><button class="btn" data-act="gagain" type="button">New table</button><button class="btn ghost" data-act="gclose" type="button">Back</button></div></div>';
     } else {
-      const lc = theirs.length === 1 ? ' · 🔔 Last card!' : '';
-      let st1 = myTurn ? (st.pend > 0 ? 'Your turn: play a ' + st.pk + ' or pick ' + st.pend : 'Your turn') : '@' + esc(oname) + ' is playing…';
+      const left = Math.max(0, 45 - Math.floor((Date.now() - gSyncWhen(g)) / 1000));
+      let st1 = !inn ? '👀 Watching: @' + esc(gName(st.turn)) + ' to play' : meOut ? 'You are out of this game' : myTurn ? (st.pend > 0 ? 'Your turn: play a ' + st.pk + ' or pick ' + st.pend : 'Your turn') : '@' + esc(gName(st.turn)) + ' is playing…';
       let sub = '';
-      if (st.last) { const lu = st.last.u === me ? 'You' : '@' + esc(oname); sub = st.last.c ? lu + ' played ' + (st.last.c === 'W20' ? 'Whot' : st.last.c.slice(1) + ' of ' + WSHAPE[st.last.c[0]][2].toLowerCase() + 's') : lu + ' picked ' + st.last.d + ' card' + (st.last.d === 1 ? '' : 's'); }
-      h += '<div class="wh-st' + (myTurn ? ' me' : '') + '">' + st1 + lc + (sub ? '<small>' + sub + '</small>' : '') + '</div>';
+      if (st.last) {
+        const lu = st.last.u === me ? 'You' : '@' + esc(gName(st.last.u));
+        sub = st.last.out ? lu + (st.last.out === 'idle' ? ' timed out and is out' : ' left the game') : st.last.c ? lu + ' played ' + (st.last.c === 'W20' ? 'Whot' : st.last.c.slice(1) + ' of ' + WSHAPE[st.last.c[0]][2].toLowerCase() + 's') : lu + (st.last.idle ? ' missed a turn and' : '') + ' picked ' + st.last.d + ' card' + (st.last.d === 1 ? '' : 's');
+      }
+      const lastCard = st.pl.filter(function (u) { return u !== me && st.out.indexOf(u) < 0 && Whot.hand(st, u).length === 1; });
+      h += '<div class="wh-st' + (myTurn ? ' me' : '') + '">' + st1 + (lastCard.length ? ' · 🔔 Last card!' : '') + (sub ? '<small>' + sub + '</small>' : '') + '<small><span id="wh-t">⏱ ' + left + 's</span>' + (st.miss[st.turn] ? ' · one missed turn already' : '') + '</small></div>';
     }
-    h += '<div class="wh-opp"><div class="wh-opp-n">@' + esc(oname) + ' · ' + theirs.length + ' card' + (theirs.length === 1 ? '' : 's') + '</div>' + theirs.slice(0, 12).map(function () { return wcard('back'); }).join('') + '</div>';
-    h += '<div class="wh-table"><div class="wh-market">' + (g.status === 'active' ? '<button class="wc back" data-act="gdraw" type="button" ' + (myTurn ? '' : 'disabled style="opacity:.5"') + ' aria-label="Pick from the market"><b>MARKET</b></button><small>' + (st.pend > 0 && myTurn ? 'Pick ' + st.pend : 'Market · ' + st.d.length) + '</small>' : wcard('back')) + '</div><div class="wh-market">' + wcard(t, 'big') + (st.need ? '<span class="wh-need" style="color:' + WSHAPE[st.need][1] + '">' + WSHAPE[st.need][0] + ' ' + WSHAPE[st.need][2] + ' wanted</span>' : '<small>&nbsp;</small>') + '</div></div>';
-    if (Games.shapePick && myTurn) h += '<div class="wh-st me">Which shape do you want?</div><div class="wh-shapes">' + Object.keys(WSHAPE).map(function (k) { return '<button type="button" data-act="gshape" data-id="' + k + '" style="color:' + WSHAPE[k][1] + '" aria-label="' + WSHAPE[k][2] + '">' + WSHAPE[k][0] + '</button>'; }).join('') + '</div>';
-    h += '<div class="wh-hand">' + mine.map(function (c, i) {
-      const ok = myTurn && Whot.playable(st, c) && !Games.busy;
-      return wcard(c, ok ? 'ok' : (myTurn ? 'no' : ''), ok ? 'data-act="gplay" data-id="' + c + '"' : (g.status === 'active' ? 'disabled' : 'disabled'), 'button');
+    h += '<div class="gopps">' + st.pl.filter(function (u) { return u !== me || !inn; }).map(function (u) {
+      const c = Whot.hand(st, u).length, out = st.out.indexOf(u) >= 0, on = st.turn === u && !st.over && !out;
+      return '<div class="gopp' + (on ? ' on' : '') + (out ? ' out' : '') + '">' + gAvatar(u) + '<b>@' + esc(gName(u)) + '</b><small>' + (out ? 'Out' : c + ' card' + (c === 1 ? '' : 's')) + '</small><span class="gmini">' + (out ? '' : Array(Math.min(c, 8) + 1).join('<i></i>')) + '</span></div>';
     }).join('') + '</div>';
-    if (g.status === 'active') h += '<div class="wh-row"><button class="btn ghost" data-act="gresign" data-id="' + esc(g.id) + '" type="button">Give up</button></div>';
+    h += '<div class="wh-table"><div class="wh-market">' + (g.status === 'active' && inn ? '<button class="wc back" data-act="gdraw" type="button" ' + (myTurn ? '' : 'disabled style="opacity:.5"') + ' aria-label="Pick from the market"><b>MARKET</b></button><small>' + (st.pend > 0 && myTurn ? 'Pick ' + st.pend : 'Market · ' + st.d.length) + '</small>' : wcard('back') + '<small>Market · ' + st.d.length + '</small>') + '</div><div class="wh-market">' + wcard(t, 'big') + (st.need ? '<span class="wh-need" style="color:' + WSHAPE[st.need][1] + '">' + WSHAPE[st.need][0] + ' ' + WSHAPE[st.need][2] + ' wanted</span>' : '<small>&nbsp;</small>') + '</div></div>';
+    if (g.stake && g.status === 'active') h += '<div class="gpot">Pot ' + fmt(g.pot || pot) + ' · winner takes ' + fmt(Math.round((g.pot || pot) * 0.95)) + '</div>';
+    if (Games.shapePick && myTurn) h += '<div class="wh-st me">Which shape do you want?</div><div class="wh-shapes">' + Object.keys(WSHAPE).map(function (k) { return '<button type="button" data-act="gshape" data-id="' + k + '" style="color:' + WSHAPE[k][1] + '" aria-label="' + WSHAPE[k][2] + '">' + WSHAPE[k][0] + '</button>'; }).join('') + '</div>';
+    if (inn) h += '<div class="wh-hand">' + mine.map(function (c) {
+      const ok = myTurn && Whot.playable(st, c) && !Games.busy;
+      return wcard(c, ok ? 'ok' : (myTurn ? 'no' : ''), ok ? 'data-act="gplay" data-id="' + c + '"' : 'disabled', 'button');
+    }).join('') + '</div>';
+    if (g.status === 'active' && inn && !meOut) h += '<div class="wh-row"><button class="btn ghost" data-act="gforfeit" type="button">Leave game' + (g.stake ? ' (stake is lost)' : '') + '</button></div>';
+    if (g.status === 'active' && !inn) h += '<p class="muted" style="text-align:center">You are watching. Hands are hidden.</p>';
     if (Games.err && Games.err !== 'setup') h += '<p class="auth-err" role="alert">' + esc(Games.err) + '</p>';
     return h;
   }
   function renderWhotView() {
-    const g = Games.cur, nm = g ? gName(gOther(g)) : (UI.game && UI.game.name || 'friend');
-    return '<div class="chatv whotv" role="dialog" aria-modal="true" aria-label="Whot"><div class="chat-head"><button class="chat-back" data-act="gclose" type="button" aria-label="Back">‹</button><h2>🃏 Whot · @' + esc(nm) + '</h2></div><div class="whot-body" id="whot-body">' + whotBody() + '</div></div>';
-  }
-  function paintWhot() {
-    const el = document.getElementById('whot-body'); if (!el || !UI.game) return;
-    const g = Games.cur; if (g && g.status === 'finished') whotPaid(g);
-    el.innerHTML = whotBody();
-    const hd = document.querySelector('.whotv .chat-head h2'); if (hd && g) hd.textContent = '🃏 Whot · @' + gName(gOther(g));
-  }
-  function gRpc(name, body) { return chatApi('/rest/v1/rpc/' + name, { method: 'POST', body: body }); }
-  function gOpen(id, name) { UI.game = { id: id, name: name || '' }; Games.cur = null; Games.err = ''; Games.shapePick = false; render(false); gameLoad(id); }
-  function gSubmit(next) {
-    const g = Games.cur; if (!g || Games.busy) return;
-    Games.busy = true; Games.err = '';
-    const old = Games.cur;
-    Games.cur = Object.assign({}, g, { state: next, turn: next.turn, rev: g.rev + 1 }); Games.shapePick = false; paintWhot();
-    gRpc('game_move', { p_id: g.id, p_rev: g.rev, p_state: next, p_turn: next.over ? next.winner : next.turn, p_status: next.over ? 'finished' : 'active', p_winner: next.over ? next.winner : null }).then(function (row) {
-      Games.busy = false; if (row && row.id === g.id && UI.game && UI.game.id === g.id) { Games.cur = row; } paintWhot();
-    }, function (e) {
-      Games.busy = false; Games.cur = old; Games.err = e.message; paintWhot(); gameLoad(g.id);
-    });
-  }
-  function gAct(act, id) {
     const g = Games.cur;
+    return '<div class="chatv whotv" role="dialog" aria-modal="true" aria-label="Whot table"><div class="chat-head"><button class="chat-back" data-act="gclose" type="button" aria-label="Back">‹</button><h2>🃏 Whot' + (g && g.stake ? ' · ' + stakeTxt(g.stake) : '') + '</h2></div><div class="whot-body" id="whot-body">' + whotBody() + '</div></div>';
+  }
+  function paintWhot() { const el = document.getElementById('whot-body'); if (!el || !UI.game) return; el.innerHTML = whotBody(); }
+  function gRpc(name, body) { return chatApi('/rest/v1/rpc/' + name, { method: 'POST', body: body }); }
+  function gOpen(id) { UI.game = { id: id }; Games.cur = null; Games.err = ''; Games.shapePick = false; Games.skipRev = -1; render(false); gameLoad(id); }
+  function gSubmit(next, byIdle) {
+    const g = Games.cur; if (!g || Games.busy) return;
+    Games.busy = true; Games.err = ''; const old = Games.cur;
+    Games.cur = Object.assign({}, g, { state: next, turn: next.over ? null : next.turn, rev: g.rev + 1, status: next.over ? 'finished' : 'active', winner: next.over ? next.winner : null, updated_at: new Date().toISOString() }); Games.shapePick = false; paintWhot();
+    gRpc('game_move', { p_id: g.id, p_rev: g.rev, p_state: next, p_turn: next.over ? null : next.turn, p_status: next.over ? 'finished' : 'active', p_winner: next.over ? next.winner : null }).then(function (row) {
+      Games.busy = false; if (row && row.id === g.id && UI.game && UI.game.id === g.id) { Games.cur = row; if (row.status === 'finished') { if (row.stake > 0) gSettle(row); else gSettleFree(row); } } paintWhot();
+    }, function (e) { Games.busy = false; Games.cur = old; Games.err = byIdle ? '' : e.message; paintWhot(); gameLoad(g.id); });
+  }
+  function gDealAndStart(g) {
+    return gRpc('game_start', { p_id: g.id, p_state: Whot.deal(g.players, g.rules) }).then(function (row) { if (row && UI.game && UI.game.id === g.id) { Games.cur = row; } paintWhot(); }, function (e) { Games.err = e.message; paintWhot(); gameLoad(g.id); });
+  }
+  function gCreate(cfg, invited) {
+    if (cfg.stake > S.cash) { showToast('You need ' + fmt(cfg.stake) + ' to open this table.'); render(false); return; }
+    gRpc('game_create', { p_seats: cfg.seats, p_stake: cfg.stake, p_rules: { stack: cfg.stack, pick3: cfg.pick3, whot: cfg.whot, market: cfg.market }, p_vis: cfg.vis, p_invited: invited || [] }).then(function (row) {
+      if (row && row.id) { gTake(row); Games.cfg.sheet = false; Games.seen[row.id] = 1; UI.chat = null; UI.phone = 'games'; UI.tab = 'phone'; gOpen(row.id); gamesLoad(true); }
+    }, function (e) { const m = gErr(e); showToast(m === 'setup' ? 'Games are not switched on yet.' : e.message); render(false); });
+  }
+  function gAct(act, id, el) {
+    const g = Games.cur, C = Games.cfg;
     if (act === 'gclose') { UI.game = null; Games.cur = null; render(); gamesLoad(true); return true; }
-    if (act === 'gopen') { const x = Games.list.find(function (q) { return q.id === id; }); gOpen(id, x ? gName(gOther(x)) : ''); return true; }
-    if (act === 'gaccept') {
-      if (!g || Games.busy) return true; Games.busy = true;
-      gRpc('game_accept', { p_id: g.id, p_state: Whot.deal(g.p1, g.p2) }).then(function (row) { Games.busy = false; if (row && UI.game) { Games.cur = row; } paintWhot(); }, function (e) { Games.busy = false; Games.err = e.message; paintWhot(); gameLoad(g.id); });
+    if (act === 'gopen' || act === 'gwatch') { gOpen(id); return true; }
+    if (act === 'gnew') { C.sheet = !C.sheet; render(false); return true; }
+    if (act === 'gcfg') { const k = el.dataset.k, v = el.dataset.v; if (k === 'seats' || k === 'stake') C[k] = parseInt(v, 10); else if (k === 'market' || k === 'vis') C[k] = v; else C[k] = v === '1'; if (C.vis === 'friends' && !C.invited.length) { const cs = chatConvs(); if (cs[0]) C.invited = [cs[0].id]; } render(false); return true; }
+    if (act === 'ginv') { const i = C.invited.indexOf(id); if (i >= 0) C.invited.splice(i, 1); else if (C.invited.length < 3) C.invited.push(id); render(false); return true; }
+    if (act === 'gcreate') { gCreate(C, C.vis === 'friends' ? C.invited : []); return true; }
+    if (act === 'gchallenge') { gCreate({ seats: 2, stake: 0, stack: true, pick3: true, whot: true, market: 'reshuffle', vis: 'friends' }, [id]); return true; }
+    if (act === 'gjoin') {
+      const t = g && g.id === id ? g : Games.lobby.concat(Games.rows).find(function (x) { return x.id === id; }) || g; if (!t) return true;
+      if (t.stake > S.cash) { showToast('You need ' + fmt(t.stake) + ' to sit here.'); render(false); return true; }
+      gRpc('game_join', { p_id: t.id }).then(function (row) {
+        if (!row) return; gTake(row); Games.seen[row.id] = 1; if (!UI.game || UI.game.id !== row.id) gOpen(row.id); else { Games.cur = row; paintWhot(); }
+        if (row.players.length >= row.seats && row.status === 'waiting') gDealAndStart(row);
+      }, function (e) { showToast(e.message); gamesLoad(true); if (UI.game) gameLoad(UI.game.id); else render(false); });
       return true;
     }
-    if (act === 'gdecline') {
-      gRpc('game_decline', { p_id: id }).then(function () { UI.game = null; Games.cur = null; render(); gamesLoad(true); }, function (e) { Games.err = e.message; paintWhot(); });
+    if (act === 'gstart') { if (g && !Games.busy) gDealAndStart(g); return true; }
+    if (act === 'gleave') {
+      if (!g) return true; gRpc('game_leave', { p_id: g.id }).then(function () { const w = gStk(); if (g.id in w.stk) { const m = w.stk[g.id]; delete w.stk[g.id]; S.cash += m; save(); showToast('Your stake of ' + fmt(m) + ' came back.'); } UI.game = null; Games.cur = null; render(); gamesLoad(true); }, function (e) { Games.err = e.message; paintWhot(); });
       return true;
     }
-    if (act === 'gresign') {
-      if (!g) return true; Games.busy = true;
-      gRpc('game_resign', { p_id: g.id }).then(function (row) { Games.busy = false; if (row && UI.game) { Games.cur = row; } paintWhot(); }, function (e) { Games.busy = false; Games.err = e.message; paintWhot(); });
-      return true;
-    }
+    if (act === 'grefresh') { gamesLoad(true); return true; }
+    if (act === 'gforfeit') { if (g && g.state && !Games.busy) { const n = Whot.leave(g.state, gMe(), 'left'); if (n) gSubmit(n); } return true; }
     if (act === 'gdraw') { if (g && g.state) { const n = Whot.draw(g.state, gMe()); if (n) gSubmit(n); } return true; }
     if (act === 'gplay') {
       if (!g || !g.state) return true;
@@ -6871,35 +6997,58 @@ window.G3 = (function () {
       const n = Whot.play(g.state, gMe(), id); if (n) gSubmit(n); return true;
     }
     if (act === 'gshape') { if (g && g.state && Games.pending) { const n = Whot.play(g.state, gMe(), Games.pending, id); Games.pending = null; if (n) gSubmit(n); } return true; }
-    if (act === 'gchallenge' || act === 'gagain') {
-      const to = id, nm = gName(to);
-      gRpc('game_invite', { p_to: to }).then(function (row) { if (row && row.id) { UI.chat = null; Games.seen[row.id] = 1; gOpen(row.id, nm); } }, function (e) { const m = gErr(e); showToast(m === 'setup' ? 'Games are not switched on yet.' : e.message); render(false); });
-      return true;
-    }
+    if (act === 'gagain') { UI.game = null; Games.cur = null; Games.cfg.sheet = true; UI.tab = 'phone'; UI.phone = 'games'; render(); return true; }
+    if (act === 'gsoon') { showToast('🚧 ' + (el.dataset.n || 'This game') + ' is coming soon.'); return true; }
     return false;
   }
+  const GAME_TILES = [['whot', 'Whot!', '🃏', 'linear-gradient(150deg,#e11d48,#7c1d3a)', true], ['ayo', 'Ayo', '🟤', 'linear-gradient(150deg,#b45309,#78350f)', false], ['ludo', 'Ludo', '🎲', 'linear-gradient(150deg,#2563eb,#1e3a8a)', false], ['pool', '8-ball pool', '🎱', 'linear-gradient(150deg,#15803d,#14532d)', false], ['chess', 'Chess', '♟️', 'linear-gradient(150deg,#475569,#1e293b)', false]];
+  function tableCard(g, mode) {
+    const host = gName(g.host), open = g.seats - g.players.length, inn = gIn(g), inv = g.invited.indexOf(gMe()) >= 0;
+    let btn;
+    if (inn) btn = '<button class="btn gbtn" data-act="gopen" data-id="' + esc(g.id) + '" type="button">' + (g.status === 'active' ? (g.turn === gMe() ? 'Your turn' : 'Resume') : 'Open') + '</button>';
+    else if (g.status === 'active') btn = '<button class="btn ghost gbtn" data-act="gwatch" data-id="' + esc(g.id) + '" type="button">Watch</button>';
+    else btn = '<button class="btn gbtn" data-act="gjoin" data-id="' + esc(g.id) + '" type="button"' + (g.stake > S.cash ? ' disabled' : '') + '>Sit · ' + stakeTxt(g.stake) + '</button>';
+    return '<div class="gtable' + (inv && !inn ? ' inv' : '') + '">' + gAvatar(g.host) + '<div class="gt-main"><div class="gt-top"><b>@' + esc(host) + '</b>' + (g.vis === 'friends' ? ' <span class="gr-pill">🔒</span>' : '') + '</div><div class="gt-sub">' + seatPips(g) + ' ' + g.players.length + '/' + g.seats + ' · ' + (g.stake ? stakeTxt(g.stake) + ' each · wins ' + stakeTxt(Math.round(g.stake * g.seats * 0.95)) : 'Friendly') + '</div><div class="gr-pills">' + rulesPills(g.rules) + '</div></div>' + btn + '</div>';
+  }
   function renderGamesApp() {
-    let h = '<h2>Games</h2>';
-    if (!Auth.session) return h + '<div class="card"><p class="muted">Play Whot against your friends online. You need an account so they can find you.</p><button class="btn" data-act="aopen" type="button">Create account or log in</button></div>';
+    let h = '<h2>Game Room</h2>';
+    if (!Auth.session) return h + '<div class="card"><p class="muted">Play Whot with other players online. You need an account so they can find you.</p><button class="btn" data-act="aopen" type="button">Create account or log in</button></div>';
     chatSync();
     if (!Chat.meLoaded) { if (!Chat.loadingMe) setTimeout(loadMe, 0); return h + '<p class="muted">Loading…</p>'; }
-    if (!Chat.me) return h + '<div class="card"><p class="muted">Pick a username in Chat first, so friends can challenge you.</p><button class="btn" data-act="phone" data-id="chat" type="button">Open Chat</button></div>';
+    if (!Chat.me) return h + '<div class="card"><p class="muted">Pick a username in Chat first, so other players can see who they are playing.</p><button class="btn" data-act="phone" data-id="chat" type="button">Open Chat</button></div>';
     gamesLoad(true);
     if (Games.err === 'setup') return h + '<div class="card"><h3>Games are not switched on yet</h3><p class="muted">The maker still has to run the games script in Supabase. Try again later.</p></div>';
-    const me = Chat.uid, inv = Games.list.filter(function (g) { return g.status === 'invited' && g.p2 === me; }), act = Games.list.filter(function (g) { return g.status === 'active'; }), out = Games.list.filter(function (g) { return g.status === 'invited' && g.p1 === me; });
-    const w = S.whot || { w: 0, l: 0 };
-    h += '<div class="card"><h3>🃏 Whot</h3><p class="muted">Two players, six cards each. Match the shape or the number. <b>1</b> hold on, <b>2</b> pick two, <b>5</b> pick three, <b>8</b> suspension, <b>14</b> general market, <b>20</b> Whot (pick any shape). First to empty their hand wins.</p><p class="muted" style="margin:0">Record: ' + w.w + ' won, ' + w.l + ' lost.</p></div>';
-    const rowG = function (g, label, tone) { return row('data-act="gopen" data-id="' + esc(g.id) + '"', '@' + esc(gName(gOther(g))), label, '<span class="chip' + (tone ? ' ' + tone : '') + '">Open</span>', false, ''); };
-    if (inv.length) h += '<h3>Challenges for you</h3><div class="list">' + inv.map(function (g) { return rowG(g, 'wants to play Whot', 'good'); }).join('') + '</div>';
-    if (act.length) h += '<h3>Your games</h3><div class="list">' + act.map(function (g) { return rowG(g, g.turn === me ? 'Your turn' : 'Waiting for them', g.turn === me ? 'good' : ''); }).join('') + '</div>';
-    if (out.length) h += '<h3>Waiting for a reply</h3><div class="list">' + out.map(function (g) { return rowG(g, 'Challenge sent', ''); }).join('') + '</div>';
-    if (!inv.length && !act.length && !out.length) h += '<p class="muted">No games yet. Open a chat with a friend and tap <b>🃏 Play Whot</b>.</p>';
-    return h + '<button class="btn ghost" data-act="phone" data-id="chat" type="button" style="margin-top:10px">Find a friend in Chat</button>';
+    const me = Chat.uid, C = Games.cfg, w = gStk();
+    h += '<div class="groom"><div class="gwallet"><span>Wallet</span><b>' + fmt(S.cash) + '</b></div><div class="grec">' + w.w + ' won · ' + w.l + ' lost</div></div>';
+    h += '<div class="gtiles">' + GAME_TILES.map(function (t) { return '<button class="gtile' + (t[4] ? ' live' : '') + '" style="background:' + t[3] + '" data-act="' + (t[4] ? 'gnew' : 'gsoon') + '" data-n="' + t[1] + '" type="button"><span class="gt-ic">' + t[2] + '</span><b>' + t[1] + '</b><small>' + (t[4] ? '2–4 players' : 'Soon') + '</small></button>'; }).join('') + '</div>';
+    if (C.sheet) {
+      const opt = function (k, v, label, on, desc) { return '<button type="button" class="gopt' + (on ? ' on' : '') + '" data-act="gcfg" data-k="' + k + '" data-v="' + v + '">' + label + (desc ? '<small>' + desc + '</small>' : '') + '</button>'; };
+      h += '<div class="gsheet"><h3>Start a Whot table</h3><div class="glab">Seats</div><div class="gopts">' + [2, 3, 4].map(function (n) { return opt('seats', n, '👤 ' + n, C.seats === n); }).join('') + '</div>' +
+        '<div class="glab">Stake (each player)</div><div class="gopts wrap">' + STAKES.map(function (n) { return opt('stake', n, stakeTxt(n), C.stake === n); }).join('') + '</div>' +
+        '<div class="glab">When the market runs out</div><div class="gopts">' + opt('market', 'reshuffle', '🔁 Reshuffle', C.market === 'reshuffle', 'Played cards go back in') + opt('market', 'count', '🛒 Count', C.market === 'count', 'Fewest cards wins') + '</div>' +
+        '<div class="glab">Pick two and pick three</div><div class="gopts">' + opt('stack', 1, '🔥 Stacking', C.stack, 'Defend with the same number') + opt('stack', 0, '✋ No stacking', !C.stack, 'Next player picks at once') + '</div>' +
+        '<div class="glab">Your own rules</div><div class="gopts">' + opt('pick3', C.pick3 ? 0 : 1, C.pick3 ? 'Pick three: on' : 'No pick three', !C.pick3, 'A 5 is a plain card') + opt('whot', C.whot ? 0 : 1, C.whot ? 'Whot cards: on' : 'No Whot cards', !C.whot, 'Take the 20s out') + '</div>' +
+        '<div class="glab">Who can sit</div><div class="gopts">' + opt('vis', 'open', '🌍 Anyone', C.vis === 'open', 'Listed in the Game Room') + opt('vis', 'friends', '🔒 My friends', C.vis === 'friends', 'Only people you invite') + '</div>';
+      if (C.vis === 'friends') {
+        const cs = chatConvs().slice(0, 8);
+        h += cs.length ? '<div class="glab">Invite up to 3 friends</div><div class="gopts wrap">' + cs.map(function (c) { return '<button type="button" class="gopt' + (C.invited.indexOf(c.id) >= 0 ? ' on' : '') + '" data-act="ginv" data-id="' + esc(c.id) + '">@' + esc(gName(c.id)) + '</button>'; }).join('') + '</div>' : '<p class="muted">Chat with a friend first, then you can invite them here.</p>';
+      }
+      h += '<p class="muted" style="margin:8px 0">' + (C.stake ? 'Each player puts in ' + fmt(C.stake) + '. The winner takes ' + fmt(Math.round(C.stake * C.seats * 0.95)) + ' with a full table (5% to the house). Leaving or two missed turns puts you out and your stake stays in the pot. Game money only.' : 'No money on this one. Just bragging rights.') + '</p>' +
+        '<button class="btn" data-act="gcreate" type="button"' + (C.stake > S.cash || (C.vis === 'friends' && !C.invited.length) ? ' disabled' : '') + '>Open table · ' + stakeTxt(C.stake) + '</button></div>';
+    }
+    const mine = Games.rows, ids = {}; mine.forEach(function (g) { ids[g.id] = 1; });
+    const invs = mine.filter(function (g) { return g.status === 'waiting' && !gIn(g) && g.invited.indexOf(me) >= 0; }), mys = mine.filter(function (g) { return gIn(g); });
+    if (invs.length) h += '<div class="glab big">Invitations</div>' + invs.map(function (g) { return tableCard(g); }).join('');
+    if (mys.length) h += '<div class="glab big">Your tables</div>' + mys.map(function (g) { return tableCard(g); }).join('');
+    const open = Games.lobby.filter(function (g) { return g.status === 'waiting' && !ids[g.id] && !gIn(g) && g.players.length < g.seats; }), live = Games.lobby.filter(function (g) { return g.status === 'active' && !gIn(g); });
+    h += '<div class="glab big">Open tables <button class="gref" data-act="grefresh" type="button" aria-label="Refresh">↻</button></div>' + (open.length ? open.map(function (g) { return tableCard(g); }).join('') : '<p class="muted">No open tables right now. Start one and wait for players.</p>');
+    if (live.length) h += '<div class="glab big">Watch a game</div>' + live.slice(0, 6).map(function (g) { return tableCard(g); }).join('');
+    h += '<div class="card" style="margin-top:12px"><h3>How Whot works</h3><p class="muted" style="margin:0">Match the shape or the number. <b>1</b> hold on (play again), <b>2</b> pick two, <b>5</b> pick three, <b>8</b> suspension (next player misses a turn), <b>14</b> general market (everyone else picks one), <b>20</b> Whot (call any shape). Empty your hand to win. You have 45 seconds a turn.</p></div>';
+    return h;
   }
   setInterval(function () {
     if (document.hidden || !chatOn() || !Chat.me) return;
-    if (UI.game && Games.cur && Games.cur.status !== 'finished' && Games.cur.status !== 'declined') { if (!Games.busy) gameLoad(UI.game.id); return; }
-    if (UI.game) return;
+    if (UI.game) { if (!Games.busy && (!Games.cur || (Games.cur.status !== 'finished' && Games.cur.status !== 'cancelled'))) gameLoad(UI.game.id); const te = document.getElementById('wh-t'); if (te && Games.cur && Games.cur.status === 'active') te.textContent = '⏱ ' + Math.max(0, 45 - Math.floor((Date.now() - gSyncWhen(Games.cur)) / 1000)) + 's'; return; }
     if (Date.now() - Games.at >= ((UI.tab === 'phone' && UI.phone === 'games') ? 5000 : 20000)) gamesLoad();
   }, 2400);
 
@@ -7194,7 +7343,7 @@ window.G3 = (function () {
   function appBadge(id) {
     if (id === 'log') return Math.min(9, unreadCount(S));
     if (id === 'chat') return Math.min(9, chatUnread());
-    if (id === 'games') return Math.min(9, gamesTurnCount());
+    if (id === 'games') return Math.min(9, gTurnCount());
     if (id === 'gigs') return S.mis && S.mis.active ? 1 : 0;
     if (id === 'japa' && (S.japa.status === 'approved' || S.japa.status === 'denied')) return 1;
     if (id === 'health' && S.sick) return 1;
@@ -8136,7 +8285,7 @@ window.G3 = (function () {
       return;
     }
     if (act === 'chatopen') { UI.chat = { id: id, name: el.dataset.n || (Chat.names[id] || 'player') }; Chat.names[id] = UI.chat.name; UI.chatMoney = false; UI.chatSafe = null; Chat.draft = ''; render(false); paintChat(true); const ci = document.getElementById('chat-input'); if (ci) ci.focus(); return; }
-    if (gAct(act, id)) return;
+    if (gAct(act, id, el)) return;
     if (act === 'chatclose') { UI.chat = null; UI.chatMoney = false; UI.chatSafe = null; render(); return; }
     if (act === 'chatsend') { UI.chatMoney = !UI.chatMoney; render(false); paintChat(true); const ca = document.getElementById('c-amt'); if (ca) ca.focus(); return; }
     if (act === 'camt') { const ca = document.getElementById('c-amt'); if (ca) { ca.value = parseInt(id, 10).toLocaleString('en-US'); Chat.amt = ca.value; } return; }
