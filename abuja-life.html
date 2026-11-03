@@ -1,14 +1,14 @@
 <!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
 <meta charset="utf-8">
-<title>Abuja Life</title>
-<meta name="description" content="Abuja Life: hustle, survive and try to japa. A Nigerian life sim set in Abuja.">
-<meta property="og:title" content="Abuja Life">
+<title>Naija Verse</title>
+<meta name="description" content="Naija Verse: hustle, survive and try to japa. A Nigerian life sim set in Abuja.">
+<meta property="og:title" content="Naija Verse">
 <meta property="og:description" content="Hustle in Abuja, dodge scams, and try to japa. Can you make it out?">
 <meta property="og:type" content="website">
 <meta name="theme-color" content="#0b7a43">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Abuja Life">
+<meta name="apple-mobile-web-app-title" content="Naija Verse">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
@@ -791,10 +791,10 @@ const CITY = {
     guzape: { name: 'Villa on Guzape Hills', place: 'guzape', rent: 700000, rest: 82, mood: 4 }
   },
   backgrounds: [
-    { id: 'graduate', name: 'Fresh graduate', line: 'BSc in hand, NYSC not yet done. Everyone at home keeps asking what is next.', cash: 1000000, edu: 2, nysc: false, conn: 0, xp: {} },
-    { id: 'ssce', home: 'shared', name: 'SSCE leaver', line: 'No certificate beyond secondary school. Plenty of strength, little money.', cash: 1000000, edu: 0, nysc: false, conn: 0, xp: { hustle: 3 } },
-    { id: 'hustler', name: 'Born hustler', line: 'OND certificate, sharp eyes and a quick mouth. You already know how to make a naira move.', cash: 1000000, edu: 1, nysc: false, conn: 1, xp: { hustle: 12 } },
-    { id: 'uncle', name: 'Somebody’s nephew', line: 'Your uncle’s friend is a permanent secretary. Degree done, NYSC done, doors that open.', cash: 1000000, edu: 2, nysc: true, conn: 3, xp: { social: 6 } }
+    { id: 'graduate', name: 'Fresh graduate', line: 'BSc in hand, NYSC not yet done. Everyone at home keeps asking what is next.', cash: 500000, edu: 2, nysc: false, conn: 0, xp: {} },
+    { id: 'ssce', home: 'shared', name: 'SSCE leaver', line: 'No certificate beyond secondary school. Plenty of strength, little money.', cash: 500000, edu: 0, nysc: false, conn: 0, xp: { hustle: 3 } },
+    { id: 'hustler', name: 'Born hustler', line: 'OND certificate, sharp eyes and a quick mouth. You already know how to make a naira move.', cash: 500000, edu: 1, nysc: false, conn: 1, xp: { hustle: 12 } },
+    { id: 'uncle', name: 'Somebody’s nephew', line: 'Your uncle’s friend is a permanent secretary. Degree done, NYSC done, doors that open.', cash: 500000, edu: 2, nysc: true, conn: 3, xp: { social: 6 } }
   ],
   places: {
     abujacars: {
@@ -2158,7 +2158,7 @@ function reportLines(s) {
 }
 function reportText(s) {
   const rp = reportLines(s);
-  return 'ABUJA LIFE\n' + (s.name ? s.name + ': ' : '') + rp.title + '\n\n' + rp.rows.map(r => r[0] + ': ' + r[1]).join('\n') + '\n\nCan you japa? #BeingANigerian';
+  return 'NAIJA VERSE\n' + (s.name ? s.name + ': ' : '') + rp.title + '\n\n' + rp.rows.map(r => r[0] + ': ' + r[1]).join('\n') + '\n\nCan you japa? #NaijaVerse';
 }
 
 function pickEvent(s) {
@@ -5199,7 +5199,7 @@ window.G3 = (function () {
       palm(root, x, z, 0.8 + rnd() * 0.5);
     }
     billboard(root, 8, 6, 0, ['JAPA? CHECK IELTS', 'Garki prep classes'], '#0b7a43', '#ffffff');
-    billboard(root, -12, -8.6, P / 2, ['ABUJA LIFE', 'Can you japa?'], '#14201a', '#3fbf7f');
+    billboard(root, -12, -8.6, P / 2, ['NAIJA VERSE', 'Can you japa?'], '#14201a', '#3fbf7f');
     billboard(root, 28, -2.5, 0, ['NEPA TAKE LIGHT?', 'Buy an inverter'], '#d9a21b', '#14201a');
     billboard(root, -40, 6, 0, ['HUSTLE DAILY', 'Suya spot, Utako'], '#c23a2a', '#ffffff');
     billboard(root, 26, 14, 0, ['GOOD LIFE ESTATES', 'Own a home in Maitama'], '#2a8fd9', '#ffffff');
@@ -6188,7 +6188,7 @@ window.G3 = (function () {
   /* ---------- phone: jobs, japa, life, log ---------- */
   /* ---------- online leaderboard (Supabase over plain REST: no library, only the public anon key) ---------- */
   const BOARD = { url: 'https://tvbnoqwyekbqrlxxnztq.supabase.co', key: 'sb_publishable_db5quqce8u5iWU7qENLltg_U4OWrfYG' };   /* public client key: safe to ship */
-  const APP_VERSION = 'v1.33 · 3 Nov 2026';
+  const APP_VERSION = 'v1.35 · 3 Nov 2026';
   const ERRS = [];
   window.addEventListener('error', function (e) { ERRS.push(String((e && e.message) || 'error').slice(0, 140) + ' @' + ((e && e.lineno) || 0)); if (ERRS.length > 5) ERRS.shift(); });
   window.addEventListener('unhandledrejection', function (e) { ERRS.push('promise: ' + String((e && e.reason && e.reason.message) || (e && e.reason) || '').slice(0, 140)); if (ERRS.length > 5) ERRS.shift(); });
@@ -6452,7 +6452,7 @@ window.G3 = (function () {
   window.addEventListener('online', function () { if (Auth.session && S && dirty()) cloudPush(false); });
 
   function renderAuth() {
-    const eyebrow = '<div class="eyebrow">Abuja Life</div>';
+    const eyebrow = '<div class="eyebrow">Naija Verse</div>';
     if (Auth.conflict) {
       const row = Auth.conflict.row, cs = row.data || {}, sum = function (o) { let nw = 0; try { nw = netWorth(o); } catch (e) {} return 'Day ' + (o.day || 1) + ' · ' + (o.name ? esc(o.name) + ' · ' : '') + fmt(nw) + ' net worth'; };
       return '<div class="veil"><div class="sheet auth" role="dialog" aria-modal="true">' + eyebrow + '<h2>Which game do you want to keep?</h2><p class="muted">You have a saved game on your account and a different one on this phone. Pick one. The other one is replaced.</p><div class="list">' +
@@ -6488,7 +6488,7 @@ window.G3 = (function () {
   /* ---------- chat: find players by username, message them, send them money ---------- */
   const Chat = { uid: '', me: null, meLoaded: false, loadingMe: false, msgs: [], maxId: 0, names: {}, polling: false, last: 0, err: '', q: '', res: null, searching: false, stm: 0, nameErr: '', draft: '', amt: '', blocked: {}, blocksOk: false, rnote: '' };
   const enc = encodeURIComponent;
-  const RESERVED = ['admin', 'support', 'moderator', 'system', 'abujalife', 'abuja_life', 'staff', 'official'];
+  const RESERVED = ['admin', 'support', 'moderator', 'system', 'abujalife', 'abuja_life', 'naijaverse', 'naija_verse', 'staff', 'official'];
   function chatReset() { Chat.uid = ''; Chat.me = null; Chat.meLoaded = false; Chat.loadingMe = false; Chat.msgs = []; Chat.maxId = 0; Chat.names = {}; Chat.res = null; Chat.q = ''; Chat.err = ''; Chat.polling = false; Chat.draft = ''; Chat.amt = ''; Chat.nameErr = ''; Chat.blocked = {}; Chat.blocksOk = false; Chat.rnote = ''; }
   function chatOn() { return !!(Auth.session && S && !Auth.pulling && !Auth.conflict && !Auth.recovery); }
   function chatApi(path, o) { return freshToken().then(function (tok) { return authFetch(path, Object.assign({}, o || {}, { token: tok })); }); }
@@ -6663,7 +6663,7 @@ window.G3 = (function () {
     chatPoll();
     return h + '<p class="muted">You are <b>@' + esc(Chat.me.username) + '</b>. Tell your friends to search for you.</p>' +
       '<label class="namef"><span class="lab">Find a player</span><input type="search" id="c-search" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="Search by username" value="' + esc(Chat.q) + '"></label><div id="c-results">' + searchHtml() + '</div>' +
-      '<button class="btn ghost" data-act="share" type="button" style="margin-top:10px">📲 Invite a friend to Abuja Life</button>' +
+      '<button class="btn ghost" data-act="share" type="button" style="margin-top:10px">📲 Invite a friend to Naija Verse</button>' +
       '<h3>Chats</h3><div class="list" id="c-list">' + chatListHtml() + '</div>' + blockedHtml();
   }
   const REASONS = [['abuse', 'Rude or abusive'], ['spam', 'Spam or scam'], ['username', 'Bad username'], ['other', 'Something else']];
@@ -7940,7 +7940,7 @@ window.G3 = (function () {
     return { v: APP_VERSION, day: S && S.day, cash: S && Math.round(S.cash), nw: S && Math.round(netWorth(S)), job: S && S.job, japa: S && S.japa && S.japa.status, tab: UI.tab, app: UI.phone,
       ua: String(navigator.userAgent || '').slice(0, 160), w: window.innerWidth, h: window.innerHeight, gl: !!threeOk, errs: ERRS.slice() };
   }
-  function fbText() { return 'Abuja Life feedback (' + FB.kind + ', ' + APP_VERSION + (S ? ', day ' + S.day : '') + '):\n' + FB.text.trim(); }
+  function fbText() { return 'Naija Verse feedback (' + FB.kind + ', ' + APP_VERSION + (S ? ', day ' + S.day : '') + '):\n' + FB.text.trim(); }
   function renderFeedback() {
     let h = '<h2>Feedback</h2><p class="muted">Found a bug? Something too hard, too easy or boring? Tell the maker here. Be as plain as you like.</p>';
     if (FB.sent) h += '<div class="card"><h3>Thank you 🙏🏾</h3><p class="muted">Got it. You can send another any time.</p><button class="btn" data-act="fbagain" type="button">Send another</button></div>';
@@ -7964,14 +7964,14 @@ window.G3 = (function () {
   }
   function shareGame() {
     const url = location.href.split('#')[0].split('?')[0], nm = Chat.me ? ' Find me in Chat: @' + Chat.me.username + '.' : '';
-    const text = 'I am playing Abuja Life, a game about hustling in Abuja and trying to japa. Can you make it out?' + nm;
-    if (navigator.share) { navigator.share({ title: 'Abuja Life', text: text, url: url }).catch(function () {}); return; }
+    const text = 'I am playing Naija Verse, a game about hustling in Nigeria and trying to japa. Can you make it out?' + nm;
+    if (navigator.share) { navigator.share({ title: 'Naija Verse', text: text, url: url }).catch(function () {}); return; }
     const full = text + ' ' + url;
     try { navigator.clipboard.writeText(full).then(function () { showToast('Invite copied. Paste it in WhatsApp.'); render(false); }, function () { showToast(esc(full)); render(false); }); } catch (err) { showToast(esc(full)); render(false); }
   }
   function renderWelcome() {
     const li = function (i, t) { return '<div class="wl"><span class="wl-i">' + i + '</span><span>' + t + '</span></div>'; };
-    return '<div class="veil"><div class="sheet" role="dialog" aria-modal="true" aria-label="Welcome"><div class="eyebrow">Welcome to Abuja Life</div><h2>Can you make it out?</h2>' +
+    return '<div class="veil"><div class="sheet" role="dialog" aria-modal="true" aria-label="Welcome"><div class="eyebrow">Welcome to Naija Verse</div><h2>Can you make it out?</h2>' +
       li('🎯', '<b>The goal:</b> save money, pass IELTS, get a visa and japa. Or stay and build a life here. Both are real endings.') +
       li('⚡', '<b>Everything you do uses energy.</b> Work uses the most. When it runs low, sleep in your bed to recover and start a new day.') +
       li('📱', '<b>Your phone runs your life:</b> Jobs, Bank, Chowdeck, Ride, Houses, Cars and more. Watch the food, fun and clean bars.') +
@@ -8545,7 +8545,7 @@ window.G3 = (function () {
   }
 
   function renderStart() {
-    return '<div class="veil"><div class="sheet"><div class="eyebrow">Abuja Life</div><h2>Where do you start in life?</h2>' +
+    return '<div class="veil"><div class="sheet"><div class="eyebrow">Naija Verse</div><h2>Where do you start in life?</h2>' +
       '<p class="muted">Nobody picks their starting point. You do here. After that, every choice is yours.</p>' +
       '<div class="card"><h3>Who are you?</h3>' + nameField(UI.name) + lookEditor(UI.look, 'start') + '</div><div class="eyebrow">Pick your starting point</div><div class="bgs">' +
       CITY.backgrounds.map(b => row('data-act="start" data-id="' + b.id + '"', b.name, b.line, '<span class="chip money">' + fmt(b.cash) + '</span>', false)).join('') + '</div></div></div>';
