@@ -514,6 +514,18 @@ button.wc.no { opacity: .45; }
 @keyframes aypulse { 50% { box-shadow: inset 0 3px 7px rgba(0,0,0,.65), 0 0 0 5px rgba(246,196,83,.45); } }
 .aydots { display: flex; flex-wrap: wrap; gap: 2px; justify-content: center; align-content: center; width: 80%; } .aydots i { width: 7px; height: 7px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #fff3d6, #d9b273 60%, #a8742f); }
 .aytag { display: flex; align-items: center; gap: 8px; padding: 6px 10px; border-radius: 14px; border: 2px solid transparent; } .aytag.on { border-color: var(--accent); background: var(--surface); } .aytag b { flex: 1; } .ayscore { font-weight: 900; font-size: 20px; font-variant-numeric: tabular-nums; } .ayscore small { font-size: 12px; opacity: .6; }
+.cboard { display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); width: 100%; max-width: 400px; margin: 6px auto; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 14px rgba(0,0,0,.28); touch-action: manipulation; user-select: none; }
+.csq { position: relative; aspect-ratio: 1; min-width: 0; overflow: hidden; display: grid; place-items: center; } .csq.lt { background: #eee4cc; } .csq.dk { background: #6b8f71; } .cboard.mine .csq { cursor: pointer; }
+.csq.lst::before { content: ''; position: absolute; inset: 0; background: rgba(246, 205, 60, .45); } .csq.sel::before { content: ''; position: absolute; inset: 0; background: rgba(80, 160, 255, .5); } .csq.chk::before { content: ''; position: absolute; inset: 0; background: radial-gradient(circle, rgba(220,38,38,.9), rgba(220,38,38,0) 72%); }
+.csq.tmv::after { content: ''; position: absolute; width: 28%; height: 28%; border-radius: 50%; background: rgba(20, 60, 30, .45); } .csq.tcap::after { content: ''; position: absolute; inset: 4%; border-radius: 50%; border: 4px solid rgba(20, 60, 30, .5); }
+.cpc { position: relative; z-index: 1; line-height: 1; font-size: calc(min(100vw - 28px, 400px) / 8 * .8); font-family: 'Segoe UI Symbol', 'Noto Sans Symbols 2', 'Apple Symbols', serif; } .cpc.cw { color: #fff; text-shadow: 0 0 2px #000, 0 0 2px #000, 0 1px 3px rgba(0,0,0,.6); } .cpc.cb { color: #1c1c1c; text-shadow: 0 0 1px rgba(255,255,255,.7); }
+.cpop { animation: cspop .28s ease-out; } @keyframes cspop { 0% { transform: scale(1.35); } 100% { transform: none; } }
+.crk, .cfl { position: absolute; z-index: 2; font-size: 9px; font-style: normal; font-weight: 800; opacity: .65; pointer-events: none; } .crk { top: 1px; left: 2px; } .cfl { bottom: 0; right: 2px; }
+.cpro { display: flex; gap: 10px; justify-content: center; margin: 6px 0; } .cpro button { width: 60px; height: 60px; border-radius: 14px; border: 2px solid var(--line); background: #6b8f71; font-size: 38px; line-height: 1; cursor: pointer; font-family: 'Segoe UI Symbol', 'Noto Sans Symbols 2', 'Apple Symbols', serif; } .cpro button.cw { color: #fff; text-shadow: 0 0 2px #000, 0 0 2px #000; } .cpro button.cb { color: #1c1c1c; }
+.ctaken { font-size: 15px; letter-spacing: -2px; max-width: 46%; overflow: hidden; white-space: nowrap; font-family: 'Segoe UI Symbol', 'Noto Sans Symbols 2', serif; } .ctaken.ofb { color: #1c1c1c; } .ctaken.ofw { color: #8a8a8a; } .cside { font-size: 11px; }
+.pcv { display: block; width: min(100%, 300px); margin: 6px auto; border-radius: 12px; touch-action: none; box-shadow: 0 4px 14px rgba(0,0,0,.3); background: #5a3416; }
+.pctl { max-width: 300px; margin: 4px auto; } .pctl label { display: flex; justify-content: space-between; font-weight: 800; font-size: 13px; } .pctl input[type=range] { width: 100%; margin: 4px 0 8px; } .prow { display: flex; gap: 8px; justify-content: center; } .prow .btn { flex: 1; } .prow .btn.ghost { flex: 0 0 52px; padding: 10px 0; }
+.ptray { display: inline-flex; align-items: center; gap: 2px; flex-wrap: wrap; justify-content: flex-end; max-width: 55%; font-size: 11px; font-weight: 800; } .ptray i { width: 12px; height: 12px; border-radius: 50%; display: inline-block; border: 1px solid rgba(0,0,0,.35); } .ptray small { margin-right: 3px; opacity: .7; } .ptray em { font-style: normal; background: #111; color: #fff; border-radius: 8px; padding: 0 5px; margin-left: 3px; }
 .gpot { text-align: center; font-weight: 800; font-size: 13px; color: #8a6a0a; }
 
 .chat-bar input:focus-visible { outline: none; border-color: var(--accent); }
@@ -6176,7 +6188,7 @@ window.G3 = (function () {
   /* ---------- phone: jobs, japa, life, log ---------- */
   /* ---------- online leaderboard (Supabase over plain REST: no library, only the public anon key) ---------- */
   const BOARD = { url: 'https://tvbnoqwyekbqrlxxnztq.supabase.co', key: 'sb_publishable_db5quqce8u5iWU7qENLltg_U4OWrfYG' };   /* public client key: safe to ship */
-  const APP_VERSION = 'v1.31 · 2 Nov 2026';
+  const APP_VERSION = 'v1.33 · 3 Nov 2026';
   const ERRS = [];
   window.addEventListener('error', function (e) { ERRS.push(String((e && e.message) || 'error').slice(0, 140) + ' @' + ((e && e.lineno) || 0)); if (ERRS.length > 5) ERRS.shift(); });
   window.addEventListener('unhandledrejection', function (e) { ERRS.push('promise: ' + String((e && e.reason && e.reason.message) || (e && e.reason) || '').slice(0, 140)); if (ERRS.length > 5) ERRS.shift(); });
@@ -6921,11 +6933,271 @@ window.G3 = (function () {
   })();
   window.__ayo = Ayo;
 
+  /* ---------- Chess: two players, the full rules ---------- */
+  const Chess = (function () {
+    const START = 'rnbqkbnrpppppppp................................PPPPPPPPRNBQKBNR', DEFC = { tm: 180 };
+    const colOf = function (ch) { return ch === '.' ? 0 : (ch >= 'A' && ch <= 'Z' ? 1 : -1); };
+    const KN = [[-2, -1], [-2, 1], [-1, -2], [-1, 2], [1, -2], [1, 2], [2, -1], [2, 1]], KG = [[-1, -1], [-1, 0], [-1, 1], [0, -1], [0, 1], [1, -1], [1, 0], [1, 1]];
+    const RD = [[-1, 0], [1, 0], [0, -1], [0, 1]], BD = [[-1, -1], [-1, 1], [1, -1], [1, 1]];
+    function attacked(b, sq, by) {
+      const r = sq >> 3, c = sq & 7; let i, d, rr, cc, ch;
+      const pr = by === 1 ? r + 1 : r - 1, pc = by === 1 ? 'P' : 'p';
+      if (pr >= 0 && pr < 8) { if (c > 0 && b[pr * 8 + c - 1] === pc) return true; if (c < 7 && b[pr * 8 + c + 1] === pc) return true; }
+      const kn = by === 1 ? 'N' : 'n', kg = by === 1 ? 'K' : 'k', ro = by === 1 ? 'R' : 'r', bi = by === 1 ? 'B' : 'b', qu = by === 1 ? 'Q' : 'q';
+      for (i = 0; i < 8; i++) { rr = r + KN[i][0]; cc = c + KN[i][1]; if (rr >= 0 && rr < 8 && cc >= 0 && cc < 8 && b[rr * 8 + cc] === kn) return true; }
+      for (i = 0; i < 8; i++) { rr = r + KG[i][0]; cc = c + KG[i][1]; if (rr >= 0 && rr < 8 && cc >= 0 && cc < 8 && b[rr * 8 + cc] === kg) return true; }
+      for (d = 0; d < 4; d++) { rr = r + RD[d][0]; cc = c + RD[d][1]; while (rr >= 0 && rr < 8 && cc >= 0 && cc < 8) { ch = b[rr * 8 + cc]; if (ch !== '.') { if (ch === ro || ch === qu) return true; break; } rr += RD[d][0]; cc += RD[d][1]; } }
+      for (d = 0; d < 4; d++) { rr = r + BD[d][0]; cc = c + BD[d][1]; while (rr >= 0 && rr < 8 && cc >= 0 && cc < 8) { ch = b[rr * 8 + cc]; if (ch !== '.') { if (ch === bi || ch === qu) return true; break; } rr += BD[d][0]; cc += BD[d][1]; } }
+      return false;
+    }
+    const kingSq = function (b, side) { const k = side === 1 ? 'K' : 'k'; for (let i = 0; i < 64; i++) if (b[i] === k) return i; return -1; };
+    function pseudo(P) {
+      const b = P.b, side = P.side, out = []; let sq, i, d, rr, cc, t, ch;
+      for (sq = 0; sq < 64; sq++) {
+        const pc = b[sq]; if (pc === '.' || colOf(pc) !== side) continue;
+        const r = sq >> 3, c = sq & 7, u = pc.toUpperCase();
+        if (u === 'P') {
+          const dir = side === 1 ? -1 : 1, sr = side === 1 ? 6 : 1, lr = side === 1 ? 0 : 7, r1 = r + dir;
+          const add = function (to, cap) { if ((to >> 3) === lr) { 'qrbn'.split('').forEach(function (p) { out.push({ f: sq, t: to, pr: p }); }); } else out.push({ f: sq, t: to, ep: cap === 'ep' }); };
+          if (r1 >= 0 && r1 < 8 && b[r1 * 8 + c] === '.') { add(r1 * 8 + c); if (r === sr && b[(r + 2 * dir) * 8 + c] === '.') out.push({ f: sq, t: (r + 2 * dir) * 8 + c, dbl: true }); }
+          for (let dc = -1; dc <= 1; dc += 2) { cc = c + dc; if (cc < 0 || cc > 7 || r1 < 0 || r1 > 7) continue; t = r1 * 8 + cc; if (b[t] !== '.' && colOf(b[t]) === -side) add(t); else if (t === P.ep) add(t, 'ep'); }
+        } else if (u === 'N' || u === 'K') {
+          const L = u === 'N' ? KN : KG;
+          for (i = 0; i < 8; i++) { rr = r + L[i][0]; cc = c + L[i][1]; if (rr < 0 || rr > 7 || cc < 0 || cc > 7) continue; t = rr * 8 + cc; if (colOf(b[t]) !== side) out.push({ f: sq, t: t }); }
+          if (u === 'K') {
+            const home = side === 1 ? 60 : 4, en = -side;
+            if (sq === home && !attacked(b, sq, en)) {
+              const ks = side === 1 ? 'K' : 'k', qs = side === 1 ? 'Q' : 'q', rk = side === 1 ? 'R' : 'r';
+              if (P.cs.indexOf(ks) >= 0 && b[home + 1] === '.' && b[home + 2] === '.' && b[home + 3] === rk && !attacked(b, home + 1, en) && !attacked(b, home + 2, en)) out.push({ f: sq, t: home + 2, cas: 'k' });
+              if (P.cs.indexOf(qs) >= 0 && b[home - 1] === '.' && b[home - 2] === '.' && b[home - 3] === '.' && b[home - 4] === rk && !attacked(b, home - 1, en) && !attacked(b, home - 2, en)) out.push({ f: sq, t: home - 2, cas: 'q' });
+            }
+          }
+        } else {
+          const dirs = u === 'R' ? RD : u === 'B' ? BD : RD.concat(BD);
+          for (d = 0; d < dirs.length; d++) { rr = r + dirs[d][0]; cc = c + dirs[d][1]; while (rr >= 0 && rr < 8 && cc >= 0 && cc < 8) { t = rr * 8 + cc; ch = b[t]; if (ch === '.') out.push({ f: sq, t: t }); else { if (colOf(ch) === -side) out.push({ f: sq, t: t }); break; } rr += dirs[d][0]; cc += dirs[d][1]; } }
+        }
+      }
+      return out;
+    }
+    function applyP(P, m) {
+      const b = P.b.slice(), pc = b[m.f], side = P.side; let cap = b[m.t], cs = P.cs, ep = -1;
+      b[m.t] = m.pr ? (side === 1 ? m.pr.toUpperCase() : m.pr) : pc; b[m.f] = '.';
+      if (m.ep) { const cq = m.t + (side === 1 ? 8 : -8); cap = b[cq]; b[cq] = '.'; }
+      if (m.cas === 'k') { b[m.f + 1] = b[m.f + 3]; b[m.f + 3] = '.'; } else if (m.cas === 'q') { b[m.f - 1] = b[m.f - 4]; b[m.f - 4] = '.'; }
+      if (m.dbl) ep = (m.f + m.t) / 2;
+      if (cs) { const strip = function (x) { cs = cs.split(x).join(''); }; if (m.f === 60 || m.t === 60) { strip('K'); strip('Q'); } if (m.f === 4 || m.t === 4) { strip('k'); strip('q'); } if (m.f === 63 || m.t === 63) strip('K'); if (m.f === 56 || m.t === 56) strip('Q'); if (m.f === 7 || m.t === 7) strip('k'); if (m.f === 0 || m.t === 0) strip('q'); }
+      return { P: { b: b, side: -side, cs: cs, ep: ep }, cap: cap === '.' ? '' : cap, pawn: pc.toUpperCase() === 'P' };
+    }
+    function legalP(P) {
+      const res = [], ms = pseudo(P);
+      for (let i = 0; i < ms.length; i++) { const n = applyP(P, ms[i]).P, k = kingSq(n.b, P.side); if (k >= 0 && !attacked(n.b, k, -P.side)) res.push(ms[i]); }
+      return res;
+    }
+    const inCheckP = function (P) { const k = kingSq(P.b, P.side); return k >= 0 && attacked(P.b, k, -P.side); };
+    const toP = function (st) { return { b: st.bd.split(''), side: st.turn === st.pl[0] ? 1 : -1, cs: st.cs, ep: st.ep }; };
+    const rkey = function (st, P) { return st.bd + (P ? '' : '') + (st.turn === st.pl[0] ? 'w' : 'b') + st.cs + st.ep; };
+    function deal(pl, rules, fen) {
+      rules = Object.assign({}, DEFC, rules || {});
+      const w = pl.slice(0, 2); if (!fen && Math.random() < 0.5) w.reverse();
+      const st = { pl: w, bd: START, cs: 'KQkq', ep: -1, half: 0, full: 1, turn: w[0], out: [], miss: {}, rules: rules, n: 0, last: null, over: false, winner: null, draw: false, why: '', rep: {} };
+      st.rep[rkey(st)] = 1; return st;
+    }
+    function fromFen(fen, pl) {
+      const f = fen.split(' '), rows = f[0].split('/'); let bd = '';
+      rows.forEach(function (r) { r.split('').forEach(function (ch) { bd += /\d/.test(ch) ? Array(parseInt(ch, 10) + 1).join('.') : ch; }); });
+      const st = deal(pl || ['W', 'B'], {}, true); st.bd = bd; st.turn = f[1] === 'b' ? st.pl[1] : st.pl[0]; st.cs = f[2] === '-' ? '' : f[2];
+      st.ep = f[3] && f[3] !== '-' ? (8 - parseInt(f[3][1], 10)) * 8 + (f[3].charCodeAt(0) - 97) : -1; st.rep = {}; st.rep[rkey(st)] = 1; return st;
+    }
+    function insufficient(b) {
+      const pcs = b.filter(function (x) { return x !== '.' && x.toUpperCase() !== 'K'; });
+      if (!pcs.length) return true;
+      if (pcs.length === 1 && 'nbNB'.indexOf(pcs[0]) >= 0) return true;
+      return false;
+    }
+    const clone = function (st) { return JSON.parse(JSON.stringify(st)); };
+    function legalAll(st) { return legalP(toP(st)); }
+    function targets(st, sq) { return legalAll(st).filter(function (m) { return m.f === sq; }); }
+    function move(st, u, f, t, promo) {
+      if (st.over || st.turn !== u || st.out.indexOf(u) >= 0) return null;
+      const P = toP(st), m = legalP(P).find(function (x) { return x.f === f && x.t === t && (!x.pr || x.pr === (promo || 'q')); });
+      if (!m) return null;
+      const r = applyP(P, m), s = clone(st), side = P.side;
+      s.bd = r.P.b.join(''); s.cs = r.P.cs; s.ep = r.P.ep; s.n++; if (side === -1) s.full++;
+      s.half = (r.pawn || r.cap) ? 0 : s.half + 1; s.turn = s.pl[side === 1 ? 1 : 0];
+      const ck = inCheckP(r.P), has = legalP(r.P).length > 0;
+      s.last = { u: u, f: f, t: t, pc: P.b[f], cap: r.cap, pr: m.pr || '', cas: m.cas || '', ck: ck };
+      const key = rkey(s); if (r.pawn || r.cap) s.rep = {}; s.rep[key] = (s.rep[key] || 0) + 1;
+      if (!has) { s.over = true; if (ck) { s.winner = u; s.why = 'mate'; } else { s.draw = true; s.why = 'stalemate'; } }
+      else if (insufficient(r.P.b)) { s.over = true; s.draw = true; s.why = 'material'; }
+      else if (s.half >= 100) { s.over = true; s.draw = true; s.why = '50'; }
+      else if (s.rep[key] >= 3) { s.over = true; s.draw = true; s.why = 'rep'; }
+      return s;
+    }
+    function leave(st, u, why) {
+      if (st.over || st.out.indexOf(u) >= 0 || st.pl.indexOf(u) < 0) return null;
+      const s = clone(st); s.out.push(u); s.n++; s.last = { u: u, out: why || 'left' }; s.over = true; s.winner = s.pl[0] === u ? s.pl[1] : s.pl[0]; s.why = why === 'idle' ? 'time' : 'resign'; return s;
+    }
+    function timeout(st, u) { if (st.over || st.turn !== u) return null; const s = leave(st, u, 'idle'); if (s) s.miss[u] = 1; return s; }
+    function perft(P, d) { if (d === 0) return 1; const ms = legalP(P); if (d === 1) return ms.length; let n = 0; for (let i = 0; i < ms.length; i++) n += perft(applyP(P, ms[i]).P, d - 1); return n; }
+    return { deal: deal, fromFen: fromFen, move: move, legal: legalAll, targets: targets, leave: leave, timeout: timeout, inCheck: function (st) { return inCheckP(toP(st)); }, toP: toP, perft: perft, kingSq: kingSq, START: START, DEF: DEFC };
+  })();
+  window.__chess = Chess;
+
+  /* ---------- Pool: 8-ball, two players. The shooter's phone runs the shot; the opponent's phone replays it ---------- */
+  const Pool = (function () {
+    const W = 200, H = 400, R = 5.6, DT = 1 / 480, PK = [[0, 0], [W, 0], [0, H / 2], [W, H / 2], [0, H], [W, H]];
+    const DEFP = { tm: 90 };
+    const grpOf = function (id) { return id === 8 ? '8' : id < 8 ? 's' : 't'; };
+    const pkR = function (i) { return i === 2 || i === 3 ? 10.5 : 11.5; }, mouth = function (i) { return i === 2 || i === 3 ? 14 : 16; };
+    function rack() {
+      const bl = []; bl[0] = [W / 2, 100];
+      const dx = 2 * R + 0.06, dy = 2 * R * 0.8660254 + 0.06, pos = [];
+      for (let r = 0; r < 5; r++) for (let k = 0; k <= r; k++) pos.push([W / 2 + (k - r / 2) * dx, 290 + r * dy]);
+      const solids = [2, 3, 4, 5, 6, 7], stripes = [9, 10, 11, 12, 13, 14, 15];
+      const shuf = function (a) { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)), t = a[i]; a[i] = a[j]; a[j] = t; } return a; };
+      shuf(solids); shuf(stripes);
+      const corners = Math.random() < 0.5 ? [solids.pop(), stripes.pop()] : [stripes.pop(), solids.pop()];
+      const rest = shuf(solids.concat(stripes)), ids = [];
+      ids[0] = 1; ids[10] = corners[0]; ids[14] = corners[1]; ids[4] = 8;
+      for (let i = 0; i < 15; i++) if (ids[i] === undefined) ids[i] = rest.pop();
+      for (let i = 0; i < 15; i++) bl[ids[i]] = [pos[i][0], pos[i][1]];
+      bl.eightSpot = null; return bl;
+    }
+    function deal(pl, rules) {
+      rules = Object.assign({}, DEFP, rules || {});
+      const bl = rack(), spot = bl[8].slice(); delete bl.eightSpot;
+      return { pl: pl.slice(0, 2), bl: bl, spot: spot, g: [null, null], turn: pl[0], bih: false, brk: true, out: [], miss: {}, rules: rules, n: 0, last: null, over: false, winner: null, draw: false, why: '' };
+    }
+    const clone = function (st) { return JSON.parse(JSON.stringify(st)); };
+    function freeAt(bl, x, y, skip) {
+      if (x < R || x > W - R || y < R || y > H - R) return false;
+      for (let i = 0; i < 16; i++) { if (i === skip || !bl[i]) continue; if (Math.hypot(bl[i][0] - x, bl[i][1] - y) < 2 * R + 0.1) return false; }
+      return true;
+    }
+    /* run a shot: returns frames (60 per second) and the final positions */
+    function simulate(bl0, sh) {
+      const x = [], y = [], vx = [], vy = [], on = [];
+      for (let i = 0; i < 16; i++) { const b = bl0[i]; on[i] = !!b; x[i] = b ? b[0] : -999; y[i] = b ? b[1] : -999; vx[i] = 0; vy[i] = 0; }
+      if (sh.cx !== undefined) { x[0] = sh.cx; y[0] = sh.cy; on[0] = true; }
+      const sp = Math.max(0.05, Math.min(1, sh.p)) * 700; vx[0] = Math.cos(sh.a) * sp; vy[0] = Math.sin(sh.a) * sp;
+      const ev = { first: null, pk: [], rail: false }, frames = []; let t = 0, step = 0;
+      const snap = function () { const f = new Array(32); for (let i = 0; i < 16; i++) { f[2 * i] = on[i] ? Math.round(x[i] * 100) / 100 : -999; f[2 * i + 1] = on[i] ? Math.round(y[i] * 100) / 100 : -999; } frames.push(f); };
+      snap();
+      while (t < 16) {
+        let moving = false;
+        for (let i = 0; i < 16; i++) {
+          if (!on[i]) continue;
+          let s = Math.hypot(vx[i], vy[i]);
+          if (s > 0) { const ns = Math.max(0, s - (70 + 0.6 * s) * DT); if (ns < 3) { vx[i] = 0; vy[i] = 0; } else { const k = ns / s; vx[i] *= k; vy[i] *= k; moving = true; } }
+          x[i] += vx[i] * DT; y[i] += vy[i] * DT;
+        }
+        for (let i = 0; i < 16; i++) {
+          if (!on[i]) continue;
+          let free = true;
+          for (let p = 0; p < 6; p++) { const d = Math.hypot(x[i] - PK[p][0], y[i] - PK[p][1]); if (d < pkR(p)) { on[i] = false; vx[i] = vy[i] = 0; ev.pk.push(i); free = false; break; } if (d < mouth(p)) free = false; }
+          if (!on[i]) continue;
+          let hit = false;
+          if (x[i] < R && vx[i] < 0 && (free || x[i] < 0)) { x[i] = R; vx[i] = -vx[i] * 0.78; hit = true; }
+          else if (x[i] > W - R && vx[i] > 0 && (free || x[i] > W)) { x[i] = W - R; vx[i] = -vx[i] * 0.78; hit = true; }
+          if (y[i] < R && vy[i] < 0 && (free || y[i] < 0)) { y[i] = R; vy[i] = -vy[i] * 0.78; hit = true; }
+          else if (y[i] > H - R && vy[i] > 0 && (free || y[i] > H)) { y[i] = H - R; vy[i] = -vy[i] * 0.78; hit = true; }
+          if (hit && ev.first !== null) ev.rail = true;
+        }
+        for (let i = 0; i < 16; i++) {
+          if (!on[i]) continue;
+          for (let j = i + 1; j < 16; j++) {
+            if (!on[j]) continue;
+            const dx = x[j] - x[i], dy = y[j] - y[i], d2 = dx * dx + dy * dy;
+            if (d2 >= 4 * R * R || d2 === 0) continue;
+            const d = Math.sqrt(d2), nx = dx / d, ny = dy / d, vn = (vx[j] - vx[i]) * nx + (vy[j] - vy[i]) * ny;
+            const ov = (2 * R - d) / 2; x[i] -= nx * ov; y[i] -= ny * ov; x[j] += nx * ov; y[j] += ny * ov;
+            if (vn < 0) {
+              const jn = -(1 + 0.96) * vn / 2; vx[i] -= jn * nx; vy[i] -= jn * ny; vx[j] += jn * nx; vy[j] += jn * ny;
+              if (ev.first === null && (i === 0 || j === 0)) ev.first = i === 0 ? j : i;
+            }
+          }
+        }
+        t += DT; step++; if (step % 8 === 0) snap();
+        if (!moving) { let any = false; for (let i = 0; i < 16; i++) if (on[i] && (vx[i] || vy[i])) any = true; if (!any) break; }
+      }
+      snap();
+      const bl = []; for (let i = 0; i < 16; i++) bl[i] = on[i] ? [Math.round(x[i] * 100) / 100, Math.round(y[i] * 100) / 100] : null;
+      return { frames: frames, bl: bl, ev: ev };
+    }
+    const countOn = function (bl, g) { let n = 0; for (let i = 1; i < 16; i++) if (bl[i] && grpOf(i) === g) n++; return n; };
+    function shoot(st, u, sh) {
+      if (st.over || st.turn !== u || st.out.indexOf(u) >= 0 || !sh || !isFinite(sh.a) || !isFinite(sh.p)) return null;
+      const i = st.pl.indexOf(u), o = st.pl[1 - i], bl0 = st.bl.map(function (b) { return b ? b.slice() : null; });
+      const s0 = { a: sh.a, p: Math.max(0.05, Math.min(1, sh.p)) };
+      if (st.bih) {
+        if (!isFinite(sh.cx) || !isFinite(sh.cy)) return null;
+        bl0[0] = null; if (!freeAt(bl0, sh.cx, sh.cy, 0)) return null; s0.cx = Math.round(sh.cx * 100) / 100; s0.cy = Math.round(sh.cy * 100) / 100;
+      } else if (!bl0[0]) return null;
+      const r = simulate(bl0, s0), s = clone(st), my = st.g[i];
+      const before = my ? countOn(st.bl, my) : 99, scratch = r.ev.pk.indexOf(0) >= 0, pk = r.ev.pk.filter(function (id) { return id !== 0; });
+      s.bl = r.bl; s.n++; s.bih = false;
+      let foul = '';
+      if (scratch) foul = 'The cue ball went in';
+      else if (r.ev.first === null) foul = 'No ball was hit';
+      else {
+        const fg = grpOf(r.ev.first);
+        if (my) { if (fg !== (before > 0 ? my : '8')) foul = 'Wrong ball hit first'; } else if (fg === '8') foul = 'The 8 ball was hit first';
+      }
+      if (!foul && !pk.length && !r.ev.rail) foul = 'No ball reached a cushion';
+      let eight = pk.indexOf(8) >= 0;
+      if (eight && st.brk) {
+        eight = false; let sx = st.spot[0], sy = st.spot[1], k = 0; const tmp = s.bl.slice();
+        while (!freeAt(tmp, sx, sy, 8) && k < 60) { sy -= 2 * R + 0.2; k++; }
+        s.bl[8] = [sx, sy];
+      }
+      s.last = { u: u, sh: s0, pk: pk, foul: foul, first: r.ev.first, sc: scratch };
+      if (eight) {
+        const legal = !!my && before === 0 && !foul;
+        s.over = true; s.winner = legal ? u : o; s.why = legal ? 'eight' : foul ? 'eightfoul' : 'eightearly'; s.turn = u; return s;
+      }
+      const pk2 = pk.filter(function (id) { return id !== 8; });
+      if (!my && !foul && !st.brk && pk2.length) { const g1 = grpOf(pk2[0]); s.g[i] = g1; s.g[1 - i] = g1 === 's' ? 't' : 's'; s.last.assign = g1; }
+      s.brk = false;
+      const mine = s.g[i] ? pk2.filter(function (id) { return grpOf(id) === s.g[i]; }).length : (st.brk && pk2.length && !foul ? pk2.length : 0);
+      if (foul) { s.turn = o; s.bih = true; if (scratch) s.bl[0] = null; }
+      else s.turn = mine ? u : o;
+      return s;
+    }
+    function leave(st, u, why) {
+      if (st.over || st.out.indexOf(u) >= 0 || st.pl.indexOf(u) < 0) return null;
+      const s = clone(st); s.out.push(u); s.n++; s.last = { u: u, out: why || 'left' }; s.over = true; s.winner = s.pl[0] === u ? s.pl[1] : s.pl[0]; s.why = why === 'idle' ? 'time' : 'resign'; return s;
+    }
+    function timeout(st, u) {
+      if (st.over || st.turn !== u) return null;
+      const m = (st.miss[u] || 0) + 1;
+      if (m >= 2) { const s = leave(st, u, 'idle'); if (s) s.miss[u] = m; return s; }
+      const s = clone(st); s.miss[u] = m; s.n++; s.turn = s.pl[0] === u ? s.pl[1] : s.pl[0]; s.bih = true; s.brk = false; s.last = { u: u, idle: true }; return s;
+    }
+    /* where the aiming line first touches something (for the guide) */
+    function aimHit(bl, a) {
+      const c = bl[0]; if (!c) return null; const dx = Math.cos(a), dy = Math.sin(a); let best = 1e9, who = -1;
+      for (let i = 1; i < 16; i++) {
+        if (!bl[i]) continue; const px = bl[i][0] - c[0], py = bl[i][1] - c[1], t = px * dx + py * dy; if (t <= 0) continue;
+        const d2 = px * px + py * py - t * t; if (d2 >= 4 * R * R) continue; const th = t - Math.sqrt(4 * R * R - d2); if (th < best) { best = th; who = i; }
+      }
+      let wall = 1e9;
+      if (dx > 0) wall = Math.min(wall, (W - R - c[0]) / dx); else if (dx < 0) wall = Math.min(wall, (R - c[0]) / dx);
+      if (dy > 0) wall = Math.min(wall, (H - R - c[1]) / dy); else if (dy < 0) wall = Math.min(wall, (R - c[1]) / dy);
+      if (who >= 0 && best < wall) return { t: best, id: who, x: c[0] + dx * best, y: c[1] + dy * best };
+      return { t: wall, id: -1, x: c[0] + dx * wall, y: c[1] + dy * wall };
+    }
+    return { deal: deal, shoot: shoot, simulate: simulate, leave: leave, timeout: timeout, freeAt: freeAt, aimHit: aimHit, countOn: countOn, grpOf: grpOf, W: W, H: H, R: R, PK: PK, DEF: DEFP };
+  })();
+  window.__pool = Pool;
+
   const Games = { rows: [], lobby: [], at: 0, loading: false, err: '', cur: null, busy: false, seen: {}, ready: false, sig: '', shapePick: false, pending: null, toast: '', skipRev: -1, watch: false,
-    cfg: { kind: 'whot', cap: 3, start6: true, safe: true, seats: 4, stake: 5000, stack: true, pick3: true, whot: true, market: 'reshuffle', vis: 'open', invited: [], sheet: false } };
-  const GKIND = { whot: ['Whot', '🃏'], ludo: ['Ludo', '🎲'], ayo: ['Ayo', '🟤'] };
+    cfg: { kind: 'whot', cap: 3, tm: 180, start6: true, safe: true, seats: 4, stake: 5000, stack: true, pick3: true, whot: true, market: 'reshuffle', vis: 'open', invited: [], sheet: false } };
+  const GKIND = { whot: ['Whot', '🃏'], ludo: ['Ludo', '🎲'], ayo: ['Ayo', '🟤'], chess: ['Chess', '♟️'], pool: ['Pool', '🎱'] };
+  const gTm = function (g) { return g && g.rules && g.rules.tm ? g.rules.tm : 45; };
+  const gLeft = function (g) { return Math.max(0, gTm(g) - Math.floor((Date.now() - gSyncWhen(g)) / 1000)); };
+  const gLeftTxt = function (n) { return n >= 120 ? Math.floor(n / 60) + ':' + ('0' + (n % 60)).slice(-2) : n + 's'; };
   const gk = function (g) { return (GKIND[g && g.kind] || GKIND.whot)[0]; };
-  const gEng = function (g) { return g && g.kind === 'ludo' ? Ludo : g && g.kind === 'ayo' ? Ayo : Whot; };
+  const gEng = function (g) { return g && g.kind === 'ludo' ? Ludo : g && g.kind === 'ayo' ? Ayo : g && g.kind === 'chess' ? Chess : g && g.kind === 'pool' ? Pool : Whot; };
   const STAKES = [0, 1000, 5000, 20000, 50000, 100000, 500000, 1000000, 5000000, 10000000];
   const stakeTxt = function (n) { return n ? (n >= 1000000 ? '₦' + (n / 1000000) + 'm' : n >= 1000 ? '₦' + (n / 1000) + 'k' : '₦' + n) : 'Friendly'; };
   const WSHAPE = { C: ['●', '#d9302a', 'Circle'], T: ['▲', '#2a6fb0', 'Triangle'], X: ['✚', '#2f8a4a', 'Cross'], Q: ['■', '#d9a21b', 'Square'], S: ['★', '#7a3fa0', 'Star'] };
@@ -7001,7 +7273,7 @@ window.G3 = (function () {
   function gIdleCheck() {
     const g = Games.cur; if (!g || g.status !== 'active' || !g.state || !gIn(g) || Games.busy || g.turn === gMe() || g.state.over) return;
     if (Games.skipRev === g.rev) return;
-    if (Date.now() - gSyncWhen(g) < 50000) return;
+    if (Date.now() - gSyncWhen(g) < (gTm(g) + 5) * 1000) return;
     const n = gEng(g).timeout(g.state, g.turn); if (!n) return; Games.skipRev = g.rev; gSubmit(n, true);
   }
   function wcard(c, cls, attrs, tag) {
@@ -7065,7 +7337,7 @@ window.G3 = (function () {
       const won = g.winner === me, tip = g.stake ? (won ? ' You take ' + fmt(Math.round(pot * 0.95)) + '.' : inn ? ' You lost ' + fmt(g.stake) + '.' : '') : '';
       h += '<div class="wh-over"><h3>' + (won ? '🎉 You won!' : '@' + esc(gName(g.winner)) + ' won') + '</h3><p class="muted" style="margin:0 0 10px">' + (st.t[st.pl.indexOf(g.winner)] && st.t[st.pl.indexOf(g.winner)].every(function (p) { return p === Ludo.FIN; }) ? (won ? 'All four of your pieces are home.' : 'All four of their pieces are home.') : 'Everyone else left.') + tip + '</p><div class="wh-row"><button class="btn" data-act="gagain" type="button">New table</button><button class="btn ghost" data-act="gclose" type="button">Back</button></div></div>';
     } else {
-      const left = Math.max(0, 45 - Math.floor((Date.now() - gSyncWhen(g)) / 1000));
+      const left = gLeft(g);
       const lg = myTurn && st.dice > 0 ? Ludo.legal(st, me, st.dice) : [];
       const st1 = !inn ? '👀 Watching: @' + esc(gName(st.turn)) + ' to play' : meOut ? 'You are out of this game' : myTurn ? (st.dice > 0 ? 'You rolled ' + st.dice + ' · tap a piece' : st.sixes ? 'Six! Roll again' : 'Your turn · roll the dice') : '@' + esc(gName(st.turn)) + (st.dice > 0 ? ' rolled ' + st.dice : ' is rolling…');
       let sub = '';
@@ -7077,7 +7349,7 @@ window.G3 = (function () {
         else if (l.pass) sub = nm(l.u) + ' rolled ' + l.roll + ' and could not move';
         else if (l.mv !== undefined) sub = nm(l.u) + ' rolled ' + l.roll + (l.hit && l.hit.length ? ' and sent @' + esc(gName(l.hit[0])) + ' home' : l.home ? ' and got a piece home' : ' and moved');
       }
-      h += '<div class="wh-st' + (myTurn ? ' me' : '') + '">' + st1 + (sub ? '<small>' + sub + '</small>' : '') + '<small><span id="wh-t">⏱ ' + left + 's</span>' + (st.miss[st.turn] ? ' · one missed turn already' : '') + '</small></div>';
+      h += '<div class="wh-st' + (myTurn ? ' me' : '') + '">' + st1 + (sub ? '<small>' + sub + '</small>' : '') + '<small><span id="wh-t">⏱ ' + gLeftTxt(left) + '</span>' + (st.miss[st.turn] ? ' · one missed turn already' : '') + '</small></div>';
     }
     h += '<div class="gopps">' + st.pl.map(function (u, i) {
       const home = st.t[i].filter(function (p) { return p === Ludo.FIN; }).length, out = st.out.indexOf(u) >= 0, on = st.turn === u && !st.over && !out;
@@ -7140,11 +7412,11 @@ window.G3 = (function () {
       const mi = inn ? st.pl.indexOf(me) : 0, sc = st.s[mi] + ' – ' + st.s[1 - mi];
       h += '<div class="wh-over"><h3>' + (draw ? '🤝 A draw' : won ? '🎉 You won!' : '@' + esc(gName(g.winner)) + ' won') + '</h3><p class="muted" style="margin:0 0 10px">' + (st.out.length ? 'Your opponent left the game.' : 'Final count ' + sc + '.') + tip + '</p><div class="wh-row"><button class="btn" data-act="gagain" type="button">New table</button><button class="btn ghost" data-act="gclose" type="button">Back</button></div></div>';
     } else {
-      const left = Math.max(0, 45 - Math.floor((Date.now() - gSyncWhen(g)) / 1000));
+      const left = gLeft(g);
       const st1 = !inn ? '👀 Watching: @' + esc(gName(st.turn)) + ' to play' : meOut ? 'You are out of this game' : myTurn ? 'Your turn · pick a pit' : '@' + esc(gName(st.turn)) + ' is thinking…';
       let sub = ''; const l = st.last;
       if (l) { if (l.out) sub = nm(l.u) + (l.out === 'idle' ? ' timed out and is out' : ' left the game'); else if (l.mv !== undefined) sub = nm(l.u) + (l.idle ? ' missed a turn, a pit was played' : ' played') + (l.got ? ' and captured ' + l.got : ''); }
-      h += '<div class="wh-st' + (myTurn ? ' me' : '') + '">' + st1 + (sub ? '<small>' + sub + '</small>' : '') + '<small><span id="wh-t">⏱ ' + left + 's</span>' + (st.miss[st.turn] ? ' · one missed turn already' : '') + '</small></div>';
+      h += '<div class="wh-st' + (myTurn ? ' me' : '') + '">' + st1 + (sub ? '<small>' + sub + '</small>' : '') + '<small><span id="wh-t">⏱ ' + gLeftTxt(left) + '</span>' + (st.miss[st.turn] ? ' · one missed turn already' : '') + '</small></div>';
     }
     const vi = Math.max(0, st.pl.indexOf(me)), oi = 1 - vi;
     const tag = function (i) { const u = st.pl[i], on = st.turn === u && !st.over; return '<div class="aytag' + (on ? ' on' : '') + '">' + gAvatar(u) + '<b>' + (u === me ? 'You' : '@' + esc(gName(u))) + '</b><span class="ayscore">' + st.s[i] + '<small> / 25</small></span></div>'; };
@@ -7155,7 +7427,220 @@ window.G3 = (function () {
     if (Games.err && Games.err !== 'setup') h += '<p class="auth-err" role="alert">' + esc(Games.err) + '</p>';
     return h;
   }
+  /* the chess board: tap a piece, then tap where it goes */
+  const CPG = { K: '♚', Q: '♛', R: '♜', B: '♝', N: '♞', P: '♟︎' }, CNAME = { K: 'king', Q: 'queen', R: 'rook', B: 'bishop', N: 'knight', P: 'pawn' };
+  const sqName = function (s) { return String.fromCharCode(97 + (s & 7)) + (8 - (s >> 3)); };
+  const chCol = function (ch) { return ch === '.' ? 0 : (ch >= 'A' && ch <= 'Z' ? 1 : -1); };
+  function chessWhy(g, st, me) {
+    const won = g.winner === me, inn = gIn(g);
+    if (st.why === 'mate') return 'Checkmate.';
+    if (st.why === 'stalemate') return 'Stalemate: no legal move and no check.';
+    if (st.why === 'material') return 'Not enough pieces left to win.';
+    if (st.why === '50') return 'Fifty moves without a capture or a pawn move.';
+    if (st.why === 'rep') return 'The same position came up three times.';
+    if (st.why === 'time') return inn ? (won ? 'Your opponent ran out of time.' : 'You ran out of time.') : 'Someone ran out of time.';
+    if (st.why === 'resign') return inn ? (won ? 'Your opponent resigned.' : 'You resigned.') : 'Someone resigned.';
+    return '';
+  }
+  function chessMoveTxt(l) {
+    if (l.cas) return l.cas === 'k' ? 'O-O' : 'O-O-O';
+    const pc = (l.pc || 'P').toUpperCase();
+    return (pc === 'P' ? '' : pc) + sqName(l.f) + (l.cap ? '×' : '–') + sqName(l.t) + (l.pr ? '=' + l.pr.toUpperCase() : '') + (l.ck ? '+' : '');
+  }
+  function chessPlay(g, st) {
+    const me = gMe(), inn = gIn(g), vi = inn ? Math.max(0, st.pl.indexOf(me)) : 0, meOut = st.out.indexOf(me) >= 0, side = vi === 0 ? 1 : -1;
+    const myTurn = g.status === 'active' && st.turn === me && !st.over && inn && !meOut && !Games.busy;
+    if (!myTurn) { Games.chSel = -1; Games.chPro = null; }
+    const sel = Games.chSel >= 0 ? Games.chSel : -1, tg = myTurn && sel >= 0 ? Chess.targets(st, sel) : [], tgs = {}; tg.forEach(function (m) { tgs[m.t] = 1; });
+    const chk = !st.over && Chess.inCheck(st) ? Chess.kingSq(st.bd.split(''), st.turn === st.pl[0] ? 1 : -1) : -1;
+    const lf = st.last && st.last.f !== undefined ? st.last.f : -1, lt = st.last && st.last.t !== undefined ? st.last.t : -1;
+    const pot = g.stake * Math.max(g.players.length, 1), nm = function (u) { return u === me ? 'You' : '@' + esc(gName(u)); };
+    let h = '';
+    if (g.status === 'finished') {
+      const won = g.winner === me, draw = !g.winner, tip = g.stake ? (draw ? ' Your stake comes back.' : won ? ' You take ' + fmt(Math.round(pot * 0.95)) + '.' : inn ? ' You lost ' + fmt(g.stake) + '.' : '') : '';
+      h += '<div class="wh-over"><h3>' + (draw ? '🤝 A draw' : won ? '🎉 You won!' : '@' + esc(gName(g.winner)) + ' won') + '</h3><p class="muted" style="margin:0 0 10px">' + chessWhy(g, st, me) + tip + '</p><div class="wh-row"><button class="btn" data-act="gagain" type="button">New table</button><button class="btn ghost" data-act="gclose" type="button">Back</button></div></div>';
+    } else {
+      const left = gLeft(g);
+      const st1 = !inn ? '👀 Watching: @' + esc(gName(st.turn)) + ' to move' : meOut ? 'You are out of this game' : myTurn ? (chk >= 0 ? 'Check! Your move' : 'Your turn · you are ' + (side === 1 ? 'White' : 'Black')) : '@' + esc(gName(st.turn)) + ' is thinking…' + (chk >= 0 ? ' (in check)' : '');
+      const l = st.last; let sub = '';
+      if (l && l.out) sub = nm(l.u) + (l.out === 'idle' ? ' ran out of time' : ' resigned'); else if (l && l.f !== undefined) sub = nm(l.u) + ' played ' + chessMoveTxt(l);
+      h += '<div class="wh-st' + (myTurn ? ' me' : '') + '">' + st1 + (sub ? '<small>' + sub + '</small>' : '') + '<small><span id="wh-t">⏱ ' + gLeftTxt(left) + '</span> per move</small></div>';
+    }
+    const cnt = {}; st.bd.split('').forEach(function (ch) { if (ch !== '.') cnt[ch] = (cnt[ch] || 0) + 1; });
+    const FULL = { P: 8, N: 2, B: 2, R: 2, Q: 1 };
+    const taken = function (i) {   // pieces player i has captured (the other colour's missing pieces)
+      let s = ''; const w = i === 0 ? 'pnbrq' : 'PNBRQ';
+      'QRBNP'.split('').forEach(function (p) { const key = i === 0 ? p.toLowerCase() : p, miss = Math.max(0, FULL[p] - (cnt[key] || 0)); for (let k = 0; k < miss; k++) s += CPG[p]; });
+      return s;
+    };
+    const tag = function (i) { const u = st.pl[i], on = st.turn === u && !st.over; return '<div class="aytag' + (on ? ' on' : '') + '">' + gAvatar(u) + '<b>' + (u === me ? 'You' : '@' + esc(gName(u))) + ' <small class="cside">' + (i === 0 ? '⚪' : '⚫') + '</small></b><span class="ctaken ' + (i === 0 ? 'ofb' : 'ofw') + '">' + taken(i) + '</span></div>'; };
+    let bh = '';
+    for (let rr = 0; rr < 8; rr++) for (let cc = 0; cc < 8; cc++) {
+      const r = side === 1 ? rr : 7 - rr, c = side === 1 ? cc : 7 - cc, sq = r * 8 + c, ch = st.bd[sq], dark = (r + c) % 2 === 1, mine = chCol(ch) === side;
+      const cls = 'csq ' + (dark ? 'dk' : 'lt') + (sq === sel ? ' sel' : '') + (sq === lf || sq === lt ? ' lst' : '') + (sq === chk ? ' chk' : '') + (tgs[sq] ? (ch !== '.' || (st.ep === sq && st.bd[sel].toUpperCase() === 'P' && (sel & 7) !== (sq & 7)) ? ' tcap' : ' tmv') : '');
+      bh += '<div class="' + cls + '"' + (myTurn ? ' data-act="gcsq" data-id="' + sq + '"' : '') + '>' + (ch !== '.' ? '<span class="cpc ' + (chCol(ch) === 1 ? 'cw' : 'cb') + (sq === lt ? ' cpop' : '') + '" aria-label="' + (chCol(ch) === 1 ? 'White ' : 'Black ') + CNAME[ch.toUpperCase()] + ' on ' + sqName(sq) + '">' + CPG[ch.toUpperCase()] + '</span>' : '') + (cc === 0 ? '<i class="crk">' + (8 - r) + '</i>' : '') + (rr === 7 ? '<i class="cfl">' + String.fromCharCode(97 + c) + '</i>' : '') + '</div>';
+    }
+    h += tag(1 - vi) + '<div class="cboard' + (myTurn ? ' mine' : '') + '">' + bh + '</div>' + tag(vi);
+    if (Games.chPro && myTurn) h += '<div class="wh-st me">Promote to…</div><div class="cpro">' + ['q', 'r', 'b', 'n'].map(function (p) { return '<button type="button" class="' + (side === 1 ? 'cw' : 'cb') + '" data-act="gcpromo" data-id="' + p + '" aria-label="' + CNAME[p.toUpperCase()] + '">' + CPG[p.toUpperCase()] + '</button>'; }).join('') + '</div>';
+    if (g.stake && g.status === 'active') h += '<div class="gpot">Pot ' + fmt(g.pot || pot) + ' · winner takes ' + fmt(Math.round((g.pot || pot) * 0.95)) + '</div>';
+    if (g.status === 'active' && inn && !meOut) h += '<div class="wh-row"><button class="btn ghost" data-act="gforfeit" type="button">Resign' + (g.stake ? ' (stake is lost)' : '') + '</button></div>';
+    if (g.status === 'active' && !inn) h += '<p class="muted" style="text-align:center">You are watching.</p>';
+    if (Games.err && Games.err !== 'setup') h += '<p class="auth-err" role="alert">' + esc(Games.err) + '</p>';
+    return h;
+  }
+  /* the pool table: drag on the table to aim, set the power, shoot. The opponent's phone replays every shot. */
+  const PBC = ['#fff', '#f2c230', '#2a56b8', '#d6342a', '#6b3fa0', '#f08a24', '#1f9448', '#8a2a2a', '#111'];
+  const POOL = { gid: '', seenN: -1, prevBl: null, anim: null, aim: Math.PI / 2, power: 0.6, placed: false, cue: [100, 100], raf: 0, dirty: true, bound: null };
+  const PPAD = 14;
+  function poolTurnReset(st, me) {
+    POOL.placed = false;
+    const bl = st.bl; POOL.cue = bl[0] ? bl[0].slice() : [100, 100];
+    if (st.turn === me) {
+      const need = st.g[st.pl.indexOf(me)], pick = []; for (let i = 1; i < 16; i++) { if (!bl[i]) continue; const gr = Pool.grpOf(i); if (need ? (gr === need || (gr === '8' && !Pool.countOn(bl, need))) : gr !== '8') pick.push(i); }
+      let best = 1e9, a = POOL.aim; const c = POOL.cue;
+      pick.forEach(function (i) { const d = Math.hypot(bl[i][0] - c[0], bl[i][1] - c[1]); if (d < best) { best = d; a = Math.atan2(bl[i][1] - c[1], bl[i][0] - c[0]); } });
+      POOL.aim = a;
+    }
+    POOL.dirty = true;
+  }
+  function poolSync(g, st) {
+    const me = gMe();
+    if (POOL.gid !== g.id) { POOL.gid = g.id; POOL.seenN = st.n; POOL.prevBl = st.bl; POOL.anim = null; poolTurnReset(st, me); return; }
+    if (POOL.seenN !== st.n) {
+      const l = st.last;
+      if (l && l.sh && POOL.prevBl) {
+        const bl0 = POOL.prevBl.map(function (b) { return b ? b.slice() : null; });
+        const sim = Pool.simulate(bl0, l.sh);
+        POOL.anim = { frames: sim.frames, t0: 0, final: st.bl };
+      }
+      POOL.seenN = st.n; POOL.prevBl = st.bl; poolTurnReset(st, me);
+    }
+  }
+  function poolBall(ctx, id, x, y, r) {
+    const base = id === 0 ? '#fdfdf6' : id === 8 ? '#111' : PBC[id < 8 ? id : id - 8];
+    ctx.save(); ctx.beginPath(); ctx.arc(x, y + 0.6, r, 0, 6.2832); ctx.fillStyle = 'rgba(0,0,0,.3)'; ctx.fill();
+    ctx.beginPath(); ctx.arc(x, y, r, 0, 6.2832); ctx.clip();
+    ctx.fillStyle = id > 8 ? '#fdfdf6' : base; ctx.fillRect(x - r, y - r, 2 * r, 2 * r);
+    if (id > 8) { ctx.fillStyle = base; ctx.fillRect(x - r, y - r * 0.55, 2 * r, r * 1.1); }
+    ctx.restore();
+    if (id > 0) { ctx.beginPath(); ctx.arc(x, y, r * 0.5, 0, 6.2832); ctx.fillStyle = '#fff'; ctx.fill(); ctx.fillStyle = '#111'; ctx.font = 'bold ' + (r * 0.75) + 'px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(String(id), x, y + 0.3); }
+    const gr = ctx.createRadialGradient(x - r * 0.35, y - r * 0.4, r * 0.1, x, y, r); gr.addColorStop(0, 'rgba(255,255,255,.55)'); gr.addColorStop(0.35, 'rgba(255,255,255,0)'); gr.addColorStop(1, 'rgba(0,0,0,.25)');
+    ctx.beginPath(); ctx.arc(x, y, r, 0, 6.2832); ctx.fillStyle = gr; ctx.fill();
+  }
+  function poolDraw() {
+    const cv = document.getElementById('pool-cv'); if (!cv) return false;
+    const g = Games.cur; if (!g || !g.state || g.kind !== 'pool') return true;
+    const st = g.state, W = Pool.W, H = Pool.H, R = Pool.R, me = gMe();
+    const dpr = window.devicePixelRatio || 1, cw = cv.clientWidth || 300, tw = W + 2 * PPAD, th = H + 2 * PPAD;
+    const pw = Math.round(cw * dpr), ph = Math.round(cw * th / tw * dpr); if (cv.width !== pw || cv.height !== ph) { cv.width = pw; cv.height = ph; }
+    const ctx = cv.getContext('2d'), k = pw / tw; ctx.setTransform(k, 0, 0, k, 0, 0);
+    ctx.fillStyle = '#5a3416'; ctx.beginPath(); ctx.roundRect ? ctx.roundRect(0, 0, tw, th, 10) : ctx.rect(0, 0, tw, th); ctx.fill();
+    ctx.fillStyle = '#7a4a22'; ctx.fillRect(3, 3, tw - 6, th - 6); ctx.fillStyle = '#157a4a'; ctx.fillRect(PPAD, PPAD, W, H);
+    ctx.strokeStyle = 'rgba(255,255,255,.18)'; ctx.lineWidth = 0.6; ctx.beginPath(); ctx.moveTo(PPAD, PPAD + 100); ctx.lineTo(PPAD + W, PPAD + 100); ctx.stroke();
+    Pool.PK.forEach(function (p, i) { ctx.beginPath(); ctx.arc(PPAD + p[0] + (p[0] === 0 ? -1 : p[0] === W ? 1 : 0), PPAD + p[1] + (p[1] === 0 ? -1 : p[1] === H ? 1 : 0), i === 2 || i === 3 ? 8.5 : 9.5, 0, 6.2832); ctx.fillStyle = '#0b0b0b'; ctx.fill(); });
+    let pos = [];
+    if (POOL.anim) { const a = POOL.anim; if (!a.t0) a.t0 = performance.now(); let i = Math.floor((performance.now() - a.t0) / 16.67); if (i >= a.frames.length - 1) { i = a.frames.length - 1; POOL.anim = null; setTimeout(function () { POOL.dirty = true; paintWhot(); }, 0); } const f = a.frames[i]; for (let b = 0; b < 16; b++) pos[b] = f[2 * b] > -900 ? [f[2 * b], f[2 * b + 1]] : null; }
+    else { pos = st.bl.map(function (b) { return b ? b.slice() : null; }); }
+    const mine = g.status === 'active' && st.turn === me && !st.over && gIn(g) && !POOL.anim && st.out.indexOf(me) < 0;
+    const placing = mine && st.bih && !POOL.placed;
+    if (mine && st.bih) pos[0] = POOL.cue.slice();
+    const aiming = mine && (!st.bih || POOL.placed) && pos[0];
+    if (aiming) {
+      const tmp = pos.map(function (b) { return b ? b.slice() : null; }), h = Pool.aimHit(tmp, POOL.aim);
+      if (h) {
+        const c = pos[0]; ctx.save(); ctx.translate(PPAD, PPAD); ctx.setLineDash([2.5, 2.5]); ctx.strokeStyle = 'rgba(255,255,255,.85)'; ctx.lineWidth = 0.9; ctx.beginPath(); ctx.moveTo(c[0], c[1]); ctx.lineTo(h.x, h.y); ctx.stroke(); ctx.setLineDash([]);
+        ctx.beginPath(); ctx.arc(h.x, h.y, R, 0, 6.2832); ctx.strokeStyle = 'rgba(255,255,255,.9)'; ctx.lineWidth = 0.8; ctx.stroke();
+        if (h.id >= 0) { const b = pos[h.id], dx = b[0] - h.x, dy = b[1] - h.y, d = Math.hypot(dx, dy) || 1; ctx.strokeStyle = 'rgba(255,230,120,.95)'; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(b[0], b[1]); ctx.lineTo(b[0] + dx / d * 40, b[1] + dy / d * 40); ctx.stroke(); }
+        const bx = c[0] - Math.cos(POOL.aim) * (R + 4 + POOL.power * 40), by = c[1] - Math.sin(POOL.aim) * (R + 4 + POOL.power * 40);
+        ctx.strokeStyle = '#e8c88a'; ctx.lineWidth = 2.4; ctx.lineCap = 'round'; ctx.beginPath(); ctx.moveTo(bx, by); ctx.lineTo(bx - Math.cos(POOL.aim) * 90, by - Math.sin(POOL.aim) * 90); ctx.stroke();
+        ctx.restore();
+      }
+    }
+    ctx.save(); ctx.translate(PPAD, PPAD);
+    for (let b = 1; b < 16; b++) if (pos[b]) poolBall(ctx, b, pos[b][0], pos[b][1], R);
+    if (pos[0]) { if (placing) { ctx.beginPath(); ctx.arc(pos[0][0], pos[0][1], R + 3, 0, 6.2832); ctx.strokeStyle = '#ffe36b'; ctx.lineWidth = 1; ctx.stroke(); } poolBall(ctx, 0, pos[0][0], pos[0][1], R); }
+    ctx.restore();
+    return true;
+  }
+  function poolLoop() {
+    POOL.raf = 0;
+    const cv = document.getElementById('pool-cv'); if (!cv || !UI.game) return;
+    if (POOL.anim || POOL.dirty) { POOL.dirty = false; poolDraw(); }
+    POOL.raf = requestAnimationFrame(poolLoop);
+  }
+  function poolPoint(e, cv) { const r = cv.getBoundingClientRect(), tw = Pool.W + 2 * PPAD; return [(e.clientX - r.left) / r.width * tw - PPAD, (e.clientY - r.top) / r.height * (Pool.H + 2 * PPAD) - PPAD]; }
+  function poolMount() {
+    const cv = document.getElementById('pool-cv'); if (!cv || !Games.cur || Games.cur.kind !== 'pool') return;
+    if (POOL.bound !== cv) {
+      POOL.bound = cv;
+      const move = function (e) {
+        const g = Games.cur; if (!g || !g.state || POOL.anim) return; const st = g.state;
+        if (st.turn !== gMe() || st.over || g.status !== 'active' || !gIn(g)) return;
+        const p = poolPoint(e, cv);
+        if (st.bih && !POOL.placed) {
+          const others = st.bl.map(function (b, i) { return i === 0 ? null : b; }); let x = Math.max(Pool.R, Math.min(Pool.W - Pool.R, p[0])), y = Math.max(Pool.R, Math.min(Pool.H - Pool.R, p[1]));
+          if (Pool.freeAt(others, x, y, 0)) POOL.cue = [x, y];
+        } else { const c = POOL.cue; POOL.aim = Math.atan2(p[1] - c[1], p[0] - c[0]); }
+        POOL.dirty = true; e.preventDefault();
+      };
+      cv.addEventListener('pointerdown', function (e) { try { cv.setPointerCapture(e.pointerId); } catch (x) {} POOL.drag = true; move(e); });
+      cv.addEventListener('pointermove', function (e) { if (POOL.drag) move(e); });
+      cv.addEventListener('pointerup', function () { POOL.drag = false; });
+      cv.addEventListener('pointercancel', function () { POOL.drag = false; });
+      const pw = document.getElementById('pool-pw'); if (pw) pw.addEventListener('input', function () { POOL.power = Math.max(0.05, Math.min(1, pw.value / 100)); const lb = document.getElementById('pool-pwl'); if (lb) lb.textContent = Math.round(POOL.power * 100) + '%'; POOL.dirty = true; });
+    }
+    POOL.dirty = true; if (!POOL.raf) POOL.raf = requestAnimationFrame(poolLoop);
+  }
+  function poolWhy(g, st, me) {
+    const inn = gIn(g), won = g.winner === me;
+    if (st.why === 'eight') return won ? 'You sank the 8 ball and took the table.' : '@' + esc(gName(g.winner)) + ' sank the 8 ball.';
+    if (st.why === 'eightfoul' || st.why === 'eightearly') return inn ? (won ? 'Your opponent sank the 8 ball too early or with a foul.' : 'The 8 ball went in too early or with a foul.') : 'The 8 ball went in too early or with a foul.';
+    if (st.why === 'time') return inn ? (won ? 'Your opponent ran out of time.' : 'You ran out of time.') : 'Someone ran out of time.';
+    if (st.why === 'resign') return inn ? (won ? 'Your opponent left the game.' : 'You left the game.') : 'Someone left the game.';
+    return '';
+  }
+  function poolTray(st, i) {
+    const gr = st.g[i]; if (!gr) return '<span class="ptray muted">Open table</span>';
+    let s = ''; for (let id = 1; id < 16; id++) if (st.bl[id] && Pool.grpOf(id) === gr) s += '<i style="background:' + PBC[id < 8 ? id : id - 8] + (id > 8 ? ';box-shadow:inset 0 0 0 2px #fff' : '') + '"></i>';
+    const left = Pool.countOn(st.bl, gr); return '<span class="ptray"><small>' + (gr === 's' ? 'Solids' : 'Stripes') + '</small>' + s + (left === 0 ? '<em>8 ball</em>' : '') + '</span>';
+  }
+  function poolPlay(g, st) {
+    const me = gMe(), inn = gIn(g), pot = g.stake * Math.max(g.players.length, 1), meOut = st.out.indexOf(me) >= 0;
+    poolSync(g, st);
+    setTimeout(poolMount, 0);
+    const myTurn = g.status === 'active' && st.turn === me && !st.over && inn && !meOut && !POOL.anim && !Games.busy;
+    const nm = function (u) { return u === me ? 'You' : '@' + esc(gName(u)); };
+    let h = '';
+    if (g.status === 'finished') {
+      const won = g.winner === me, tip = g.stake ? (won ? ' You take ' + fmt(Math.round(pot * 0.95)) + '.' : inn ? ' You lost ' + fmt(g.stake) + '.' : '') : '';
+      h += '<div class="wh-over"><h3>' + (won ? '🎉 You won!' : '@' + esc(gName(g.winner)) + ' won') + '</h3><p class="muted" style="margin:0 0 10px">' + poolWhy(g, st, me) + tip + '</p><div class="wh-row"><button class="btn" data-act="gagain" type="button">New table</button><button class="btn ghost" data-act="gclose" type="button">Back</button></div></div>';
+    } else {
+      const left = gLeft(g), my = inn ? st.g[st.pl.indexOf(me)] : null;
+      const st1 = !inn ? '👀 Watching: @' + esc(gName(st.turn)) + ' to shoot' : meOut ? 'You are out of this game' : POOL.anim ? 'Balls rolling…' : myTurn ? (st.bih ? 'Ball in hand · place the cue ball' : 'Your shot' + (my ? ' · you are ' + (my === 's' ? 'solids' : 'stripes') : ' · table is open')) : '@' + esc(gName(st.turn)) + ' is lining up…';
+      const l = st.last; let sub = '';
+      if (l && l.out) sub = nm(l.u) + (l.out === 'idle' ? ' ran out of time' : ' left the game');
+      else if (l && l.idle) sub = nm(l.u) + ' missed a shot. Ball in hand';
+      else if (l && l.sh) sub = nm(l.u) + (l.pk.length ? ' sank ' + l.pk.join(', ') : ' sank nothing') + (l.assign ? ' · ' + (l.assign === 's' ? 'solids' : 'stripes') + ' taken' : '') + (l.foul ? ' · Foul: ' + l.foul : '');
+      h += '<div class="wh-st' + (myTurn ? ' me' : '') + '">' + st1 + (sub && !POOL.anim ? '<small>' + sub + '</small>' : '') + '<small><span id="wh-t">⏱ ' + gLeftTxt(left) + '</span> per shot</small></div>';
+    }
+    const vi = inn ? Math.max(0, st.pl.indexOf(me)) : 0;
+    const tag = function (i) { const u = st.pl[i], on = st.turn === u && !st.over; return '<div class="aytag' + (on ? ' on' : '') + '">' + gAvatar(u) + '<b>' + (u === me ? 'You' : '@' + esc(gName(u))) + '</b>' + poolTray(st, i) + '</div>'; };
+    h += tag(1 - vi) + '<canvas id="pool-cv" class="pcv" aria-label="Pool table"></canvas>' + tag(vi);
+    if (myTurn) {
+      h += '<div class="pctl"><label for="pool-pw">Power <b id="pool-pwl">' + Math.round(POOL.power * 100) + '%</b></label><input type="range" id="pool-pw" min="5" max="100" value="' + Math.round(POOL.power * 100) + '"><div class="prow">';
+      if (st.bih && !POOL.placed) h += '<button class="btn" data-act="gpplace" type="button">Place cue ball here</button>';
+      else h += '<button class="btn ghost" data-act="gpfine" data-id="-1" type="button" aria-label="Turn aim left">◀</button><button class="btn" data-act="gpshoot" type="button">🎱 Shoot</button><button class="btn ghost" data-act="gpfine" data-id="1" type="button" aria-label="Turn aim right">▶</button>';
+      h += '</div><p class="muted" style="margin:6px 0 0;text-align:center;font-size:12px">' + (st.bih && !POOL.placed ? 'Drag on the table to move the cue ball.' : 'Drag on the table to aim. Use ◀ ▶ to fine tune.') + '</p></div>';
+    }
+    if (g.stake && g.status === 'active') h += '<div class="gpot">Pot ' + fmt(g.pot || pot) + ' · winner takes ' + fmt(Math.round((g.pot || pot) * 0.95)) + '</div>';
+    if (g.status === 'active' && inn && !meOut) h += '<div class="wh-row"><button class="btn ghost" data-act="gforfeit" type="button">Leave game' + (g.stake ? ' (stake is lost)' : '') + '</button></div>';
+    if (g.status === 'active' && !inn) h += '<p class="muted" style="text-align:center">You are watching.</p>';
+    if (Games.err && Games.err !== 'setup') h += '<p class="auth-err" role="alert">' + esc(Games.err) + '</p>';
+    return h;
+  }
   function rulesPills(r, kind) {
+    if (kind === 'pool') { r = Object.assign({}, Pool.DEF, r || {}); return '<span class="gr-pill">🎱 8-ball</span><span class="gr-pill">⏱ ' + (r.tm === 45 ? '45s' : r.tm === 180 ? '3 min' : '90s') + ' a shot</span>'; }
+    if (kind === 'chess') { r = Object.assign({}, Chess.DEF, r || {}); return '<span class="gr-pill">⏱ ' + (r.tm === 60 ? '1 min' : r.tm === 600 ? '10 min' : '3 min') + ' a move</span>'; }
     if (kind === 'ayo') { r = Object.assign({}, Ayo.DEF, r || {}); return '<span class="gr-pill">🎯 Capture 2–' + (r.cap === 4 ? 4 : 3) + '</span>'; }
     if (kind === 'ludo') { r = Object.assign({}, Ludo.DEF, r || {}); return [r.start6 ? '🎲 Need a 6' : '🏁 Start out', r.safe ? '⭐ Safe stars' : '⚔️ No safe squares'].map(function (t) { return '<span class="gr-pill">' + t + '</span>'; }).join(''); }
     r = Object.assign({}, Whot.DEF, r || {});
@@ -7188,6 +7673,8 @@ window.G3 = (function () {
     const st = g.state; if (!st) return '<p class="muted" style="text-align:center">Loading the game…</p>';
     if (g.kind === 'ludo') return ludoPlay(g, st);
     if (g.kind === 'ayo') return ayoPlay(g, st);
+    if (g.kind === 'chess') return chessPlay(g, st);
+    if (g.kind === 'pool') return poolPlay(g, st);
     const myTurn = g.status === 'active' && st.turn === me && !st.over && inn && st.out.indexOf(me) < 0, t = Whot.top(st), mine = Whot.hand(st, me), meOut = st.out.indexOf(me) >= 0;
     let h = '';
     if (g.status === 'finished') {
@@ -7195,7 +7682,7 @@ window.G3 = (function () {
       const tip = g.stake ? (draw ? ' Your stake comes back.' : won ? ' You take ' + fmt(Math.round(pot * 0.95)) + '.' : ' You lost ' + fmt(g.stake) + '.') : '';
       h += '<div class="wh-over"><h3>' + (draw ? '🤝 A draw' : won ? '🎉 You won!' : '@' + esc(gName(g.winner)) + ' won') + '</h3><p class="muted" style="margin:0 0 10px">' + (st.over ? (st.winner ? (won ? 'You played your last card.' : 'Their last card is down.') : 'The market ran out and the counts tied.') : 'Everyone else left.') + tip + '</p><div class="wh-row"><button class="btn" data-act="gagain" type="button">New table</button><button class="btn ghost" data-act="gclose" type="button">Back</button></div></div>';
     } else {
-      const left = Math.max(0, 45 - Math.floor((Date.now() - gSyncWhen(g)) / 1000));
+      const left = gLeft(g);
       let st1 = !inn ? '👀 Watching: @' + esc(gName(st.turn)) + ' to play' : meOut ? 'You are out of this game' : myTurn ? (st.pend > 0 ? 'Your turn: play a ' + st.pk + ' or pick ' + st.pend : 'Your turn') : '@' + esc(gName(st.turn)) + ' is playing…';
       let sub = '';
       if (st.last) {
@@ -7203,7 +7690,7 @@ window.G3 = (function () {
         sub = st.last.out ? lu + (st.last.out === 'idle' ? ' timed out and is out' : ' left the game') : st.last.c ? lu + ' played ' + (st.last.c === 'W20' ? 'Whot' : st.last.c.slice(1) + ' of ' + WSHAPE[st.last.c[0]][2].toLowerCase() + 's') : lu + (st.last.idle ? ' missed a turn and' : '') + ' picked ' + st.last.d + ' card' + (st.last.d === 1 ? '' : 's');
       }
       const lastCard = st.pl.filter(function (u) { return u !== me && st.out.indexOf(u) < 0 && Whot.hand(st, u).length === 1; });
-      h += '<div class="wh-st' + (myTurn ? ' me' : '') + '">' + st1 + (lastCard.length ? ' · 🔔 Last card!' : '') + (sub ? '<small>' + sub + '</small>' : '') + '<small><span id="wh-t">⏱ ' + left + 's</span>' + (st.miss[st.turn] ? ' · one missed turn already' : '') + '</small></div>';
+      h += '<div class="wh-st' + (myTurn ? ' me' : '') + '">' + st1 + (lastCard.length ? ' · 🔔 Last card!' : '') + (sub ? '<small>' + sub + '</small>' : '') + '<small><span id="wh-t">⏱ ' + gLeftTxt(left) + '</span>' + (st.miss[st.turn] ? ' · one missed turn already' : '') + '</small></div>';
     }
     h += '<div class="gopps">' + st.pl.filter(function (u) { return u !== me || !inn; }).map(function (u) {
       const c = Whot.hand(st, u).length, out = st.out.indexOf(u) >= 0, on = st.turn === u && !st.over && !out;
@@ -7228,7 +7715,7 @@ window.G3 = (function () {
   }
   function paintWhot() { const el = document.getElementById('whot-body'); if (!el || !UI.game) return; el.innerHTML = whotBody(); const hh = document.querySelector('.whotv .chat-head h2'); if (hh && Games.cur) hh.textContent = gTitle(Games.cur); const vw = document.querySelector('.whotv'); if (vw && Games.cur) vw.setAttribute('aria-label', gk(Games.cur) + ' table'); }
   function gRpc(name, body) { return chatApi('/rest/v1/rpc/' + name, { method: 'POST', body: body }); }
-  function gOpen(id) { UI.game = { id: id }; Games.cur = null; Games.err = ''; Games.shapePick = false; Games.skipRev = -1; render(false); gameLoad(id); }
+  function gOpen(id) { Games.chSel = -1; Games.chPro = null; UI.game = { id: id }; Games.cur = null; Games.err = ''; Games.shapePick = false; Games.skipRev = -1; render(false); gameLoad(id); }
   function gSubmit(next, byIdle) {
     const g = Games.cur; if (!g || Games.busy) return;
     Games.busy = true; Games.err = ''; const old = Games.cur;
@@ -7242,7 +7729,7 @@ window.G3 = (function () {
   }
   function gCreate(cfg, invited) {
     if (cfg.stake > S.cash) { showToast('You need ' + fmt(cfg.stake) + ' to open this table.'); render(false); return; }
-    gRpc('game_create', { p_kind: cfg.kind || 'whot', p_seats: cfg.kind === 'ayo' ? 2 : cfg.seats, p_stake: cfg.stake, p_rules: cfg.kind === 'ayo' ? { cap: cfg.cap === 4 ? 4 : 3 } : cfg.kind === 'ludo' ? { start6: cfg.start6 !== false, safe: cfg.safe !== false } : { stack: cfg.stack, pick3: cfg.pick3, whot: cfg.whot, market: cfg.market }, p_vis: cfg.vis, p_invited: invited || [] }).then(function (row) {
+    gRpc('game_create', { p_kind: cfg.kind || 'whot', p_seats: cfg.kind === 'ayo' || cfg.kind === 'chess' || cfg.kind === 'pool' ? 2 : cfg.seats, p_stake: cfg.stake, p_rules: cfg.kind === 'pool' ? { tm: cfg.ptm === 45 || cfg.ptm === 180 ? cfg.ptm : 90 } : cfg.kind === 'chess' ? { tm: cfg.tm === 60 || cfg.tm === 600 ? cfg.tm : 180 } : cfg.kind === 'ayo' ? { cap: cfg.cap === 4 ? 4 : 3 } : cfg.kind === 'ludo' ? { start6: cfg.start6 !== false, safe: cfg.safe !== false } : { stack: cfg.stack, pick3: cfg.pick3, whot: cfg.whot, market: cfg.market }, p_vis: cfg.vis, p_invited: invited || [] }).then(function (row) {
       if (row && row.id) { gTake(row); Games.cfg.sheet = false; Games.seen[row.id] = 1; UI.chat = null; UI.phone = 'games'; UI.tab = 'phone'; gOpen(row.id); gamesLoad(true); }
     }, function (e) { const m = gErr(e); showToast(m === 'setup' ? 'Games are not switched on yet.' : e.message); render(false); });
   }
@@ -7250,8 +7737,8 @@ window.G3 = (function () {
     const g = Games.cur, C = Games.cfg;
     if (act === 'gclose') { UI.game = null; Games.cur = null; render(); gamesLoad(true); return true; }
     if (act === 'gopen' || act === 'gwatch') { gOpen(id); return true; }
-    if (act === 'gnew') { if (id && id !== C.kind) { C.kind = id; C.sheet = true; if (id === 'ayo') C.seats = 2; } else C.sheet = !C.sheet; render(false); return true; }
-    if (act === 'gcfg') { const k = el.dataset.k, v = el.dataset.v; if (k === 'seats' || k === 'stake' || k === 'cap') C[k] = parseInt(v, 10); else if (k === 'market' || k === 'vis') C[k] = v; else C[k] = v === '1'; if (C.vis === 'friends' && !C.invited.length) { const cs = chatConvs(); if (cs[0]) C.invited = [cs[0].id]; } render(false); return true; }
+    if (act === 'gnew') { if (id && id !== C.kind) { C.kind = id; C.sheet = true; if (id === 'ayo' || id === 'chess' || id === 'pool') C.seats = 2; Games.chSel = -1; Games.chPro = null; } else C.sheet = !C.sheet; render(false); return true; }
+    if (act === 'gcfg') { const k = el.dataset.k, v = el.dataset.v; if (k === 'seats' || k === 'stake' || k === 'cap' || k === 'tm' || k === 'ptm') C[k] = parseInt(v, 10); else if (k === 'market' || k === 'vis') C[k] = v; else C[k] = v === '1'; if (C.vis === 'friends' && !C.invited.length) { const cs = chatConvs(); if (cs[0]) C.invited = [cs[0].id]; } render(false); return true; }
     if (act === 'ginv') { const i = C.invited.indexOf(id); if (i >= 0) C.invited.splice(i, 1); else if (C.invited.length < 3) C.invited.push(id); render(false); return true; }
     if (act === 'gcreate') { gCreate(C, C.vis === 'friends' ? C.invited : []); return true; }
     if (act === 'gchallenge') { gCreate({ kind: 'whot', seats: 2, stake: 0, stack: true, pick3: true, whot: true, market: 'reshuffle', vis: 'friends' }, [id]); return true; }
@@ -7274,6 +7761,22 @@ window.G3 = (function () {
     if (act === 'glroll') { if (g && g.state && g.kind === 'ludo' && !Games.busy) { const n = Ludo.roll(g.state, gMe()); if (n) gSubmit(n); } return true; }
     if (act === 'glmove') { if (g && g.state && g.kind === 'ludo' && !Games.busy) { const n = Ludo.move(g.state, gMe(), parseInt(id, 10)); if (n) gSubmit(n); } return true; }
     if (act === 'gamove') { if (g && g.state && g.kind === 'ayo' && !Games.busy && !AY.anim) { const n = Ayo.move(g.state, gMe(), parseInt(id, 10)); if (n) gSubmit(n); } return true; }
+    if (act === 'gcsq') {
+      if (!g || !g.state || g.kind !== 'chess' || Games.busy) return true;
+      const st = g.state, me = gMe(), sq = parseInt(id, 10), side = st.pl[0] === me ? 1 : -1;
+      if (st.turn !== me || st.over) return true;
+      const sel = Games.chSel >= 0 ? Games.chSel : -1;
+      if (sel >= 0) { const mv = Chess.targets(st, sel).filter(function (m) { return m.t === sq; }); if (mv.length) { if (mv[0].pr) { Games.chPro = { f: sel, t: sq }; paintWhot(); return true; } const n = Chess.move(st, me, sel, sq); Games.chSel = -1; if (n) gSubmit(n); return true; } }
+      const ch = st.bd[sq]; if (ch !== '.' && ((ch >= 'A' && ch <= 'Z') ? 1 : -1) === side && sq !== sel && Chess.targets(st, sq).length) Games.chSel = sq; else Games.chSel = -1;
+      Games.chPro = null; paintWhot(); return true;
+    }
+    if (act === 'gpshoot') {
+      if (g && g.state && g.kind === 'pool' && !Games.busy && !POOL.anim && g.state.turn === gMe() && !g.state.over) { const sh = { a: POOL.aim, p: POOL.power }; if (g.state.bih) { if (!POOL.placed) return true; sh.cx = POOL.cue[0]; sh.cy = POOL.cue[1]; } const n = Pool.shoot(g.state, gMe(), sh); if (n) gSubmit(n); }
+      return true;
+    }
+    if (act === 'gpplace') { if (g && g.state && g.kind === 'pool' && g.state.bih && g.state.turn === gMe()) { const o = g.state.bl.map(function (b, i) { return i === 0 ? null : b; }); if (Pool.freeAt(o, POOL.cue[0], POOL.cue[1], 0)) { POOL.placed = true; POOL.dirty = true; paintWhot(); } } return true; }
+    if (act === 'gpfine') { if (g && g.kind === 'pool') { POOL.aim += parseInt(id, 10) * 0.004; POOL.dirty = true; } return true; }
+    if (act === 'gcpromo') { if (g && g.state && g.kind === 'chess' && Games.chPro && !Games.busy) { const pr = Games.chPro; Games.chPro = null; Games.chSel = -1; const n = Chess.move(g.state, gMe(), pr.f, pr.t, id); if (n) gSubmit(n); } return true; }
     if (act === 'gdraw') { if (g && g.state) { const n = Whot.draw(g.state, gMe()); if (n) gSubmit(n); } return true; }
     if (act === 'gplay') {
       if (!g || !g.state) return true;
@@ -7285,7 +7788,7 @@ window.G3 = (function () {
     if (act === 'gsoon') { showToast('🚧 ' + (el.dataset.n || 'This game') + ' is coming soon.'); return true; }
     return false;
   }
-  const GAME_TILES = [['whot', 'Whot!', '🃏', 'linear-gradient(150deg,#e11d48,#7c1d3a)', true], ['ayo', 'Ayo', '🟤', 'linear-gradient(150deg,#b45309,#78350f)', true], ['ludo', 'Ludo', '🎲', 'linear-gradient(150deg,#2563eb,#1e3a8a)', true], ['pool', '8-ball pool', '🎱', 'linear-gradient(150deg,#15803d,#14532d)', false], ['chess', 'Chess', '♟️', 'linear-gradient(150deg,#475569,#1e293b)', false]];
+  const GAME_TILES = [['whot', 'Whot!', '🃏', 'linear-gradient(150deg,#e11d48,#7c1d3a)', true], ['ayo', 'Ayo', '🟤', 'linear-gradient(150deg,#b45309,#78350f)', true], ['ludo', 'Ludo', '🎲', 'linear-gradient(150deg,#2563eb,#1e3a8a)', true], ['pool', '8-ball pool', '🎱', 'linear-gradient(150deg,#15803d,#14532d)', true], ['chess', 'Chess', '♟️', 'linear-gradient(150deg,#475569,#1e293b)', true]];
   function tableCard(g, mode) {
     const host = gName(g.host), open = g.seats - g.players.length, inn = gIn(g), inv = g.invited.indexOf(gMe()) >= 0;
     let btn;
@@ -7296,7 +7799,7 @@ window.G3 = (function () {
   }
   function renderGamesApp() {
     let h = '<h2>Game Room</h2>';
-    if (!Auth.session) return h + '<div class="card"><p class="muted">Play Whot, Ludo and Ayo with other players online. You need an account so they can find you.</p><button class="btn" data-act="aopen" type="button">Create account or log in</button></div>';
+    if (!Auth.session) return h + '<div class="card"><p class="muted">Play Whot, Ludo, Ayo, Chess and Pool with other players online. You need an account so they can find you.</p><button class="btn" data-act="aopen" type="button">Create account or log in</button></div>';
     chatSync();
     if (!Chat.meLoaded) { if (!Chat.loadingMe) setTimeout(loadMe, 0); return h + '<p class="muted">Loading…</p>'; }
     if (!Chat.me) return h + '<div class="card"><p class="muted">Pick a username in Chat first, so other players can see who they are playing.</p><button class="btn" data-act="phone" data-id="chat" type="button">Open Chat</button></div>';
@@ -7304,12 +7807,14 @@ window.G3 = (function () {
     if (Games.err === 'setup') return h + '<div class="card"><h3>Games are not switched on yet</h3><p class="muted">The maker still has to run the games script in Supabase. Try again later.</p></div>';
     const me = Chat.uid, C = Games.cfg, w = gStk();
     h += '<div class="groom"><div class="gwallet"><span>Wallet</span><b>' + fmt(S.cash) + '</b></div><div class="grec">' + w.w + ' won · ' + w.l + ' lost</div></div>';
-    h += '<div class="gtiles">' + GAME_TILES.map(function (t) { return '<button class="gtile' + (t[4] ? ' live' : '') + (t[4] && t[0] === C.kind && C.sheet ? ' sel' : '') + '" style="background:' + t[3] + '" data-act="' + (t[4] ? 'gnew' : 'gsoon') + '" data-id="' + t[0] + '" data-n="' + t[1] + '" type="button"><span class="gt-ic">' + t[2] + '</span><b>' + t[1] + '</b><small>' + (t[4] ? (t[0] === 'ayo' ? '2 players' : '2–4 players') : 'Soon') + '</small></button>'; }).join('') + '</div>';
+    h += '<div class="gtiles">' + GAME_TILES.map(function (t) { return '<button class="gtile' + (t[4] ? ' live' : '') + (t[4] && t[0] === C.kind && C.sheet ? ' sel' : '') + '" style="background:' + t[3] + '" data-act="' + (t[4] ? 'gnew' : 'gsoon') + '" data-id="' + t[0] + '" data-n="' + t[1] + '" type="button"><span class="gt-ic">' + t[2] + '</span><b>' + t[1] + '</b><small>' + (t[4] ? (t[0] === 'ayo' || t[0] === 'chess' || t[0] === 'pool' ? '2 players' : '2–4 players') : 'Soon') + '</small></button>'; }).join('') + '</div>';
     if (C.sheet) {
       const opt = function (k, v, label, on, desc) { return '<button type="button" class="gopt' + (on ? ' on' : '') + '" data-act="gcfg" data-k="' + k + '" data-v="' + v + '">' + label + (desc ? '<small>' + desc + '</small>' : '') + '</button>'; };
-      h += '<div class="gsheet"><h3>Start ' + (C.kind === 'ayo' ? 'an' : 'a') + ' ' + (GKIND[C.kind] || GKIND.whot)[0] + ' table</h3><div class="glab">Seats</div><div class="gopts">' + (C.kind === 'ayo' ? [2] : [2, 3, 4]).map(function (n) { return opt('seats', n, '👤 ' + n, C.seats === n); }).join('') + '</div>' +
+      h += '<div class="gsheet"><h3>Start ' + (C.kind === 'ayo' ? 'an' : 'a') + ' ' + (GKIND[C.kind] || GKIND.whot)[0] + ' table</h3><div class="glab">Seats</div><div class="gopts">' + (C.kind === 'ayo' || C.kind === 'chess' || C.kind === 'pool' ? [2] : [2, 3, 4]).map(function (n) { return opt('seats', n, '👤 ' + n, C.seats === n); }).join('') + '</div>' +
         '<div class="glab">Stake (each player)</div><div class="gopts wrap">' + STAKES.map(function (n) { return opt('stake', n, stakeTxt(n), C.stake === n); }).join('') + '</div>' +
         (C.kind === 'ludo' ? '<div class="glab">Leaving home</div><div class="gopts">' + opt('start6', 1, '🎲 Need a 6', C.start6, 'Roll a six to bring a piece out') + opt('start6', 0, '🏁 Start out', !C.start6, 'All pieces start on the board') + '</div><div class="glab">Capturing</div><div class="gopts">' + opt('safe', 1, '⭐ Safe stars', C.safe, 'Stars and start squares are safe') + opt('safe', 0, '⚔️ No safe squares', !C.safe, 'Any piece can be captured') + '</div>' : '') +
+        (C.kind === 'pool' ? '<div class="glab">Time for each shot</div><div class="gopts">' + opt('ptm', 45, '⚡ 45s', C.ptm === 45, 'Fast') + opt('ptm', 90, '⏱ 90s', C.ptm !== 45 && C.ptm !== 180, 'Relaxed') + opt('ptm', 180, '🐢 3 min', C.ptm === 180, 'Slow') + '</div><p class="muted" style="margin:6px 0 0">Standard 8-ball. Miss your time once and your opponent gets the cue ball in hand. Miss twice and you are out.</p>' : '') +
+        (C.kind === 'chess' ? '<div class="glab">Time for each move</div><div class="gopts">' + opt('tm', 60, '⚡ 1 min', C.tm === 60, 'Fast') + opt('tm', 180, '⏱ 3 min', C.tm !== 60 && C.tm !== 600, 'Relaxed') + opt('tm', 600, '🐢 10 min', C.tm === 600, 'Slow') + '</div><p class="muted" style="margin:6px 0 0">Run out of time on your move and you lose. Colours are picked at random.</p>' : '') +
         (C.kind === 'ayo' ? '<div class="glab">What you can capture</div><div class="gopts">' + opt('cap', 3, '🎯 2 or 3', C.cap !== 4, 'Take pits that end on 2 or 3') + opt('cap', 4, '🎯 2, 3 or 4', C.cap === 4, 'Pits on 4 are taken too') + '</div>' : '') +
         (C.kind !== 'whot' ? '' : '<div class="glab">When the market runs out</div><div class="gopts">' + opt('market', 'reshuffle', '🔁 Reshuffle', C.market === 'reshuffle', 'Played cards go back in') + opt('market', 'count', '🛒 Count', C.market === 'count', 'Fewest cards wins') + '</div>' +
         '<div class="glab">Pick two and pick three</div><div class="gopts">' + opt('stack', 1, '🔥 Stacking', C.stack, 'Defend with the same number') + opt('stack', 0, '✋ No stacking', !C.stack, 'Next player picks at once') + '</div>' +
@@ -7329,12 +7834,12 @@ window.G3 = (function () {
     const open = Games.lobby.filter(function (g) { return g.status === 'waiting' && !ids[g.id] && !gIn(g) && g.players.length < g.seats; }), live = Games.lobby.filter(function (g) { return g.status === 'active' && !gIn(g); });
     h += '<div class="glab big">Open tables <button class="gref" data-act="grefresh" type="button" aria-label="Refresh">↻</button></div>' + (open.length ? open.map(function (g) { return tableCard(g); }).join('') : '<p class="muted">No open tables right now. Start one and wait for players.</p>');
     if (live.length) h += '<div class="glab big">Watch a game</div>' + live.slice(0, 6).map(function (g) { return tableCard(g); }).join('');
-    h += C.kind === 'ayo' ? '<div class="card" style="margin-top:12px"><h3>How Ayo works</h3><p class="muted" style="margin:0">Each pit starts with 4 seeds. Pick one of your pits (the row at the bottom), lift all its seeds and drop them one by one in the pits after it, going round to the left. If your last seed lands in your opponent\'s row and makes a pit 2 or 3 (or 4 if the table allows it), you take it, and the pits before it that also hold 2 or 3 (or 4). You may not take every seed they have, and if they have none you must give them some. First to 25 seeds wins. You have 45 seconds a turn.</p></div>' : C.kind === 'ludo' ? '<div class="card" style="margin-top:12px"><h3>How Ludo works</h3><p class="muted" style="margin:0">Roll the dice and move one piece. A <b>6</b> brings a piece out and gives you another roll (three sixes in a row loses the turn). Land on another colour to send that piece back home, unless it sits on a star or start square. Capturing or getting a piece home also gives another roll. Reach the middle with the exact number. First to bring all four pieces home wins. You have 45 seconds a turn.</p></div>' : '<div class="card" style="margin-top:12px"><h3>How Whot works</h3><p class="muted" style="margin:0">Match the shape or the number. <b>1</b> hold on (play again), <b>2</b> pick two, <b>5</b> pick three, <b>8</b> suspension (next player misses a turn), <b>14</b> general market (everyone else picks one), <b>20</b> Whot (call any shape). Empty your hand to win. You have 45 seconds a turn.</p></div>';
+    h += C.kind === 'pool' ? '<div class="card" style="margin-top:12px"><h3>How Pool works</h3><p class="muted" style="margin:0">Standard 8-ball with 15 balls. The host breaks. Drag on the table to aim, set the power, then shoot. Sink a ball and the table is yours: the first ball you sink decides if you are solids (1–7) or stripes (9–15). Keep shooting while you sink your own balls. Clear them all, then sink the 8 ball to win. Fouls give your opponent the cue ball anywhere: sinking the cue ball, hitting nothing, hitting the wrong ball first, or no ball touching a cushion. Sink the 8 ball early or on a foul and you lose.</p></div>' : C.kind === 'chess' ? '<div class="card" style="margin-top:12px"><h3>How Chess works</h3><p class="muted" style="margin:0">Full chess rules: castling, en passant and promotion all work. Tap a piece, then tap a glowing square to move it. Checkmate wins. Stalemate, three repeats, fifty moves with no capture or pawn move, or too few pieces left is a draw. Run out of time on your move and you lose, and so does resigning.</p></div>' : C.kind === 'ayo' ? '<div class="card" style="margin-top:12px"><h3>How Ayo works</h3><p class="muted" style="margin:0">Each pit starts with 4 seeds. Pick one of your pits (the row at the bottom), lift all its seeds and drop them one by one in the pits after it, going round to the left. If your last seed lands in your opponent\'s row and makes a pit 2 or 3 (or 4 if the table allows it), you take it, and the pits before it that also hold 2 or 3 (or 4). You may not take every seed they have, and if they have none you must give them some. First to 25 seeds wins. You have 45 seconds a turn.</p></div>' : C.kind === 'ludo' ? '<div class="card" style="margin-top:12px"><h3>How Ludo works</h3><p class="muted" style="margin:0">Roll the dice and move one piece. A <b>6</b> brings a piece out and gives you another roll (three sixes in a row loses the turn). Land on another colour to send that piece back home, unless it sits on a star or start square. Capturing or getting a piece home also gives another roll. Reach the middle with the exact number. First to bring all four pieces home wins. You have 45 seconds a turn.</p></div>' : '<div class="card" style="margin-top:12px"><h3>How Whot works</h3><p class="muted" style="margin:0">Match the shape or the number. <b>1</b> hold on (play again), <b>2</b> pick two, <b>5</b> pick three, <b>8</b> suspension (next player misses a turn), <b>14</b> general market (everyone else picks one), <b>20</b> Whot (call any shape). Empty your hand to win. You have 45 seconds a turn.</p></div>';
     return h;
   }
   setInterval(function () {
     if (document.hidden || !chatOn() || !Chat.me) return;
-    if (UI.game) { if (!Games.busy && (!Games.cur || (Games.cur.status !== 'finished' && Games.cur.status !== 'cancelled'))) gameLoad(UI.game.id); const te = document.getElementById('wh-t'); if (te && Games.cur && Games.cur.status === 'active') te.textContent = '⏱ ' + Math.max(0, 45 - Math.floor((Date.now() - gSyncWhen(Games.cur)) / 1000)) + 's'; return; }
+    if (UI.game) { if (!Games.busy && (!Games.cur || (Games.cur.status !== 'finished' && Games.cur.status !== 'cancelled'))) gameLoad(UI.game.id); const te = document.getElementById('wh-t'); if (te && Games.cur && Games.cur.status === 'active') te.textContent = '⏱ ' + gLeftTxt(gLeft(Games.cur)); return; }
     if (Date.now() - Games.at >= ((UI.tab === 'phone' && UI.phone === 'games') ? 5000 : 20000)) gamesLoad();
   }, 2400);
 
